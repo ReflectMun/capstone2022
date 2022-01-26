@@ -8,7 +8,7 @@ app.get('/', (req, res) => {
         code: 200,
         body: 'Hello, World!'
     }
-
+    
     res.json(response)
 })
 
