@@ -45,9 +45,9 @@ login.get('/', async (req, res) => {
         response.err = '유저 테이블 조회중 에러 발생'
     }
     finally{
-        if(conn) { conn.close() }
+        if(conn) { conn.close() } // 할당된 연결이 있다면 연결을 삭제
 
-        res.json(response)
+        res.json(response) // 받아온 내용을 응답
     }
 })
 
