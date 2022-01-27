@@ -6,6 +6,7 @@ const Pool = createPool({
     host: 'maindb.cxoty2vxx2ed.us-east-1.rds.amazonaws.com',
     user: 'admin',
     password: 'MainDBvotmdnjem!!',
+    database: 'MainDB',
     port: 3306
 })
 
@@ -22,15 +23,16 @@ login.get('/', async (req, res) => {
         err: null
     }
     try{
-        const queryString = `SELECT COUNT(UID) FROM Users WHERE ID = 'ID' AND Password = 'password'`
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = 'ID' AND Password = 'password'`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         const [row, fields] = await conn.query(queryString)
         await conn.commit()
 
-        console.log(row)
-        response.body = row
+        console.log(row[0]['COUNT(UID)'])
+        response.code = 200
+        response.body = row[0]
     }
     catch(err){
         console.log(err)
