@@ -46,3 +46,6 @@ login.get('/', async (req, res) => {
 })
 
 export default login
+
+// main 브랜치에서 작성한 커밋 메시지 남기기용 코멘트
+// DB 연결 테스트
