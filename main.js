@@ -3,20 +3,34 @@ import express from 'express'
 const app = express()
 const port = 14450
 
+////////////////////////////////////////////////////////
+// 여기 이 영역은 글로 설명하기엔 힘드니 다음번에 만났을 때
+// 그림 그려가면서 설명해드리겠습니다
+
 import login from './router/login.js'
+import signin from './router/signin.js'
 
 app.use('/login', login)
+app.use('/signin', signin)
+////////////////////////////////////////////////////////
 
+// 서버가 응답을 받을 경우 처리 할 동작들을 정의하는 메서드
+// 첫번째 인자는 엔드포인트 이름 / 만 있으면 따로 엔드포인트를 지정하지 않았다는 의미
+// 두번째 인자는 해당 엔드포인트로 연결했을 때 실행될 동작들에 대한 정보가 담긴 콜백 함수
 app.get('/', (req, res) => {
+    // req는 서버에 요청을 날린 클라이언트의 정보가 담긴 객체
+    // res는 서버에 요청을 날린 클라이언트에게 응답할 객체
     const response = {
         code: 200,
         body: 'Hello, World!'
     }
     
+    // json의 형태로 응답하는 메서드
     res.json(response)
 })
 
 app.listen(port, () => {
+    // 서버를 실행시키는 코드, 여기에 정의된 동작들이 서버 실행직후 동작됨
     console.log('Server start')
 })
 
