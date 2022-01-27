@@ -36,7 +36,7 @@ login.get('/', async (req, res) => {
         response.code = 404
         response.err = '유저 테이블 조회중 에러 발생'
     }
-    finally{
+    finally{리
         if(conn) { conn.close() }
     }
 })
