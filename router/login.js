@@ -3,18 +3,17 @@ import { createPool } from 'mysql2/promise'
 
 const login = Router()
 const Pool = createPool({
-    host: 'aws',
+    host: 'maindb.cxoty2vxx2ed.us-east-1.rds.amazonaws.com',
     user: 'admin',
     password: 'MainDBvotmdnjem!!',
-    database: 'MainDB',
     port: 3306
 })
 
 login.get('/', async (req, res) => {
-    const body = JSON.parse(req.body)
+    // const body = JSON.parse(req.body)
 
-    const ID = body.ID
-    const password = body.password
+    // const ID = body.ID
+    // const password = body.password
 
     let conn = null
     const response = {
@@ -23,14 +22,15 @@ login.get('/', async (req, res) => {
         err: null
     }
     try{
-        const queryString = `SELECT COUNT(UID) FROM User WHERE ID = '${ID}' AND Password = '${password}'`
-        conn = Pool.getConnection()
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE ID = 'ID' AND Password = 'password'`
+        conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         const [row, fields] = await conn.query(queryString)
         await conn.commit()
 
         console.log(row)
+        response.body = row
     }
     catch(err){
         console.log(err)
@@ -40,6 +40,8 @@ login.get('/', async (req, res) => {
     }
     finally{
         if(conn) { conn.close() }
+
+        res.json(response)
     }
 })
 
