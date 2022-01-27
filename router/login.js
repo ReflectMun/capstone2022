@@ -29,6 +29,8 @@ login.get('/', async (req, res) => {
         await conn.beginTransaction()
         const [row, fields] = await conn.query(queryString)
         await conn.commit()
+
+        console.log(row)
     }
     catch(err){
         console.log(err)
@@ -36,7 +38,7 @@ login.get('/', async (req, res) => {
         response.code = 404
         response.err = '유저 테이블 조회중 에러 발생'
     }
-    finally{리
+    finally{
         if(conn) { conn.close() }
     }
 })
