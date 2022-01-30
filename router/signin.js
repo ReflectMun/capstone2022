@@ -8,7 +8,7 @@ signin.get('/', (req, res) => {
     const nickName = req.body['nickName']
     const eMail = req.body['eMail']
 
-    
+    const IDLen = ID
 })
 
 export default signin

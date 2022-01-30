@@ -1,17 +1,34 @@
 import express from 'express'
+import serveStatic from 'serve-static'
+import bodyParser from 'body-parser'
+
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const app = express()
 const port = 14450
+
+app.use(bodyParser.json())
+
+app.use(serveStatic(join(__dirname, 'public/html')))
+app.use(serveStatic(join(__dirname, 'public/js')))
 
 ////////////////////////////////////////////////////////
 // 여기 이 영역은 글로 설명하기엔 힘드니 다음번에 만났을 때
 // 그림 그려가면서 설명해드리겠습니다
 
 import login from './router/login.js'
+import loginPage from './router/pages/loginPage.js'
+
 import signin from './router/signin.js'
 
-app.use('/login', login)
-app.use('/signin', signin)
+app.use('/api/login', login)
+app.use('/login', loginPage)
+
+app.use('/api/signin', signin)
 ////////////////////////////////////////////////////////
 
 // 서버가 응답을 받을 경우 처리 할 동작들을 정의하는 메서드
