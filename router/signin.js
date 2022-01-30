@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 const signin = Router()
 
-signin.get('/', (req, res) => {
+signin.post('/', (req, res) => {
     const ID = req.body['ID']
     const password = req.body['password']
     const nickName = req.body['nickName']
