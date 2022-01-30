@@ -27,7 +27,10 @@ function connect2LoginAPI(ID, Password){
 
         httpRequest.onreadystatechange = () => {
             if(httpRequest.readyState === httpRequest.DONE){
-                console.log(httpRequest.response)
+                if(!httpRequest.response){
+                    resolve({ code: 999, message: '서버 연결 실패'})
+                    return
+                }
 
                 if(httpRequest.response['code'] == 200){
                     if(httpRequest.response['body']['COUNT(UID)'] == 1){
@@ -43,14 +46,9 @@ function connect2LoginAPI(ID, Password){
             }
         }
 
-        try{
-            httpRequest.open('POST', '/api/login', true)
-            httpRequest.responseType = 'json'
-            httpRequest.setRequestHeader('Content-Type', 'application/json')
-            httpRequest.send(JSON.stringify(reqBody))
-        }
-        catch(err){
-            resolve({ code: 999, message: '서버 연결 실패'})
-        }
+        httpRequest.open('POST', '/api/login', true)
+        httpRequest.responseType = 'json'
+        httpRequest.setRequestHeader('Content-Type', 'application/json')
+        httpRequest.send(JSON.stringify(reqBody))
     })
 }
