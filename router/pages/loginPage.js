@@ -4,7 +4,7 @@ import { readFile } from 'fs'
 const loginPage = Router()
 
 loginPage.get('/', (req, res) => {
-    readFile('public/html/loginPage.html', (err, data) => {
+    readFile('public/html/loginPage.html', { encoding: 'utf-8' }, (err, data) => {
         if(err) { res.send('NotFound') }
         else{
             res.writeHead(200, {
