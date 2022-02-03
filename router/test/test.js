@@ -18,4 +18,4 @@ test.get('/s3Image', (req, res) => {
     
 })
 
-export default test
+export default test //망할 커밋
