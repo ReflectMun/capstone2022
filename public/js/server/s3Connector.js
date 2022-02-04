@@ -1,9 +1,15 @@
 import AWS from 'aws-sdk'
 
-function getS3Object(parameter){
+export function getS3Object(parameter){
+    const S3 = new AWS.S3({
+        
+    })
 
+    return new Promise((resolve, reject) => {
+
+    })
 }
 
-function putS3Object(parameter){
+export function putS3Object(parameter){
     
 }
