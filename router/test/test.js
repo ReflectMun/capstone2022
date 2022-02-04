@@ -43,4 +43,4 @@ test.get('/s3Image', (req, res) => {
     })
 })
 
-export default test //망할 커밋
+export default test // tlqkf 이걸 main 브랜치에서 작업하고 있었네
