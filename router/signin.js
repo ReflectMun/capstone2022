@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
+import Pool from '../public/js/server/DBConnector.js'
 
 const signin = Router()
 
@@ -17,12 +18,30 @@ signin.get('/', (req, res) => {
 })
 
 signin.post('/', (req, res) => {
-    const ID = req.body['ID']
-    const password = req.body['password']
-    const nickName = req.body['nickName']
-    const eMail = req.body['eMail']
+    const response = {
+        code: null,
+        body: null,
+        err: null
+    }
 
-    const IDLen = ID
+    let ID
+    let password
+    let passwordCheck
+
+    try{
+        ID = req.body['ID']
+        password = req.body['password']
+        passwordCheck = req.body['passwordCheck']
+    }
+    catch(err){
+        console.log(err.message)
+
+        response.code = 703
+        response.err = { message: '올바르지 않은 데이터 형식입니다' }
+        res.json(response)
+
+        return
+    }
 })
 
 export default signin
