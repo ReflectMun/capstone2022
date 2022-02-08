@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
-import Pool from '../public/js/server/DBConnector.js'
+import Pool from '../private/server/DBConnector.js'
 
 const signin = Router()
 

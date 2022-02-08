@@ -4,8 +4,8 @@ import AWS from 'aws-sdk'
 
 const test = Router()
 const S3 = new AWS.S3({
-    accessKeyId: 'AKIAY6X2UAVIUFOCEBEJ',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIAY6X2UAVITBIQ7V4B',
+    secretAccessKey: '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',
     region: 'us-east-1'
 })
 

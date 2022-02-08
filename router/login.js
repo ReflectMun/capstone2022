@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import Pool from '../public/js/server/DBConnector.js'
+import Pool from '../private/server/DBConnector.js'
 
 const login = Router()
 

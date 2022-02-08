@@ -14,8 +14,7 @@ const port = 14450
 app.use(bodyParser.json())
 
 app.use(serveStatic(join(__dirname, 'public/html')))
-app.use(serveStatic(join(__dirname, 'public/js/server')))
-app.use(serveStatic(join(__dirname, 'public/js/webPage')))
+app.use(serveStatic(join(__dirname, 'public/js')))
 app.use(serveStatic(join(__dirname, 'public/css')))
 
 ////////////////////////////////////////////////////////
