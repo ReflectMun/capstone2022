@@ -8,7 +8,12 @@ export function getS3Object(parameter){
     })
 
     return new Promise((resolve, reject) => {
-        
+        S3.getObject({ Bucket: parameter.Bucket, Key: parameter.fileName }, (err, data) => {
+            if(err) { reject(err) }
+            else{
+                resolve(data)
+            }
+        })
     })
 }
 
