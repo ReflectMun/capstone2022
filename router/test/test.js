@@ -7,8 +7,8 @@ const test = Router()
 // 로컬에서 테스트 시엔 이 코드를 주석 해제하고 테스트 해보시면 됩니다
 // 주석 설정 단축키 : ctrl(command) + /
 const S3 = new AWS.S3({
-    accessKeyId: 'AKIAY6X2UAVIUFOCEBEJ',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIAY6X2UAVITBIQ7V4B',
+    secretAccessKey: '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',
     region: 'us-east-1'
 })
 
