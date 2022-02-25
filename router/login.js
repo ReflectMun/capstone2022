@@ -3,35 +3,90 @@ import Pool from '../private/server/DBConnector.js'
 
 const login = Router()
 
-login.post('/', async (req, res) => {
-    console.log('POST 호출')
-    
+login.post('/', requestLogLoginService, getLoginParameter, checkLoginUserSession, connect2DB)
+
+function requestLogLoginService(req, res, next){
+    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
+    next()
+}
+
+function getLoginParameter(req, res, next){
+    let paramID
+    let password
+
     const response = {
         code: null,
         body: null,
         err: null
     }
     
-    let ID
-    let password
     try{
-        ID = req.body['ID']
+        paramID = req.body['ID']
         password = req.body['password']
+
+        req.parmaBox = {
+            paramID: paramID,
+            password: password
+        }
     }
     catch(err){
         console.log(err)
         
         response.code = 404
         response.err = { message: '올바르지 않은 데이터 형식' }
-        res.json(response)
         
-        return
+        return res.json(response)
+    }
+
+    next()
+}
+
+function checkLoginUserSession(req, res, next){
+    const { paramID } = req.parmaBox
+
+    const response = {
+        code: null,
+        body: null,
+        err: null
+    }
+
+    const body = {
+        'COUNT(UID)': null,
+        UID: null,
+        message: null
     }
     
-    console.log(`${ID}, ${password}`)
+    if(req.session.user){
+        console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 이미 로그인한 유저 ${paramID}`)
+
+        response.code = 100
+        body.message = 'An user who already logged in'
+        response.body = body
+
+        return res.json(response)
+    }
+
+    next()
+}
+
+async function connect2DB(req, res, next){
     let conn = null
+    const { paramID, password } = req.parmaBox
+
+    const response = {
+        code: null,
+        body: null,
+        err: null
+    }
+
+    const body = {
+        'COUNT(UID)': null,
+        UID: null,
+        message: null
+    }
+
     try{
-        const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${ID}' AND Password = '${password}'`
+        const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${password}'`
         conn = await Pool.getConnection(conn => conn) // 커넥션 Pool에서 연결을 받아오는 메서드
         
         await conn.beginTransaction() // 트랜잭션 시작 알림
@@ -40,7 +95,20 @@ login.post('/', async (req, res) => {
         
         // query 결과물은 row에 저장됨, fields는 신경안써도 무방
         response.code = 200
-        response.body = row[0]
+
+        body['COUNT(UID)'] = row[0]['COUNT(UID)']
+        body.UID = row[0]['UID']
+
+        response.body = body
+
+        if(row[0]['UID']){
+            req.session.user = {
+                UID: row[0]['UID'],
+                ID: paramID,
+                name: 'nickname',
+                authroized: true
+            }
+        }
     }
     catch(err){
         console.log(err) // 에러내용 출력
@@ -49,11 +117,11 @@ login.post('/', async (req, res) => {
         response.err = { message: '유저 테이블 조회중 에러 발생' }
     }
     finally{
-        if(conn) { conn.close() } // 할당된 연결이 있다면 연결을 삭제
+        if(conn) { conn.release() } // 할당된 연결이 있다면 연결을 삭제
         
         res.json(response) // 받아온 내용을 응답
     }
-})
+}
 
 // main 브랜치에서 작성한 커밋 메시지 남기기용 코멘트
 // DB 연결 테스트

@@ -17,31 +17,75 @@ signin.get('/', (req, res) => {
     })
 })
 
-signin.post('/', (req, res) => {
+signin.post(
+    '/',
+    requestLogSigninService,
+    getSigninParameters)
+
+function requestLogSigninService(req, res, next){
+    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
+    next()
+}
+
+function getSigninParameters(req, res, next){
+    let ID, Password, email
+
     const response = {
         code: null,
         body: null,
         err: null
     }
 
-    let ID
-    let password
-    let passwordCheck
-
     try{
         ID = req.body['ID']
         password = req.body['password']
-        passwordCheck = req.body['passwordCheck']
+        email = req.body['email']
+
+        req.paramBox = {
+            paramID: ID,
+            password: password,
+            email: email
+        }
     }
     catch(err){
         console.log(err.message)
 
-        response.code = 703
-        response.err = { message: '올바르지 않은 데이터 형식입니다' }
-        res.json(response)
+        response.code = 1000
+        response.err = { message: '잘못된 데이터 형식' }
 
-        return
+        return res.json(response)
     }
-})
+
+    next()
+}
+
+async function checkRegistered(req, res, next){
+    const { paramID } = req.paramBox
+    let conn
+
+    const response = {
+        code: null,
+        body: null,
+        err: null
+    }
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${paramID}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        conn.release()
+    }
+    catch(err){
+        if(conn) { conn.release() }
+
+        return 
+    }
+
+    next()
+}
 
 export default signin // tlqkf 이걸 main 브랜치에서 작업하고 있었네;;;

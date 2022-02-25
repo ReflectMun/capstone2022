@@ -33,6 +33,7 @@ window.onload = function(){
             })
             .then(res => res.json())
             .then(data => {
+                console.log(data)
                 if(data.code == 200){
                     if(data.body['COUNT(UID)'] == 1){
                         resolve({ code: 200, message: '로그인 성공'})
@@ -41,11 +42,15 @@ window.onload = function(){
                         resolve({ code: 305, message: 'ID 혹은 비밀번호가 틀림' })
                     }
                 }
+                else if(data.code == 100){
+                    resolve({ code: 100, message: '이미 로그인한 유저' })
+                }
                 else{
                     resolve({ code: 404, message: data.err.message })
                 }
             })
             .catch(err => {
+                console.log(err)
                 resolve({ code: 999, message: '서버 연결 실패'})
             })
         })
