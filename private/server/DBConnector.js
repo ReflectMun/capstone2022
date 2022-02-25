@@ -8,6 +8,12 @@ const credentialFile = readFileSync(
 
 const DBCredentialJSON = JSON.parse(credentialFile)
 
-const Pool = createPool(DBCredentialJSON)
+const Pool = createPool({
+    host: DBCredentialJSON.host,
+    user: DBCredentialJSON.user,
+    password: DBCredentialJSON.password,
+    database: DBCredentialJSON.database,
+    port: DBCredentialJSON.port
+})
 
 export default Pool

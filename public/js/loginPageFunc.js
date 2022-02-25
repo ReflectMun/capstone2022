@@ -20,39 +20,39 @@ window.onload = function(){
     }
     
     function connect2LoginAPI(ID, Password){
+        const reqBody = {
+            ID: ID,
+            password: Password
+        }
+
         return new Promise((resolve, reject) => {
-            const httpRequest = new XMLHttpRequest()
-    
-            const reqBody = {
-                ID: ID,
-                password: Password
-            }
-    
-            httpRequest.onreadystatechange = () => {
-                if(httpRequest.readyState === httpRequest.DONE){
-                    if(!httpRequest.response){
-                        resolve({ code: 999, message: '서버 연결 실패'})
-                        return
-                    }
-    
-                    if(httpRequest.response['code'] == 200){
-                        if(httpRequest.response['body']['COUNT(UID)'] == 1){
-                            resolve({ code: 200, message: '로그인 성공' })
-                        }
-                        else{
-                            resolve({ code: 305, message: 'ID 혹은 비밀번호가 틀림' })
-                        }
+            fetch(serverURL + '/api/login', {
+                method: 'post',
+                body: JSON.stringify(reqBody),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if(data.code == 200){
+                    if(data.body['COUNT(UID)'] == 1){
+                        resolve({ code: 200, message: '로그인 성공'})
                     }
                     else{
-                        resolve({ code: 404, message: httpRequest.response['err']['message'] })
+                        resolve({ code: 305, message: 'ID 혹은 비밀번호가 틀림' })
                     }
                 }
-            }
-    
-            httpRequest.open('POST', '/api/login', true)
-            httpRequest.responseType = 'json'
-            httpRequest.setRequestHeader('Content-Type', 'application/json')
-            httpRequest.send(JSON.stringify(reqBody))
+                else if(data.code == 100){
+                    resolve({ code: 100, message: '이미 로그인한 유저' })
+                }
+                else{
+                    resolve({ code: 404, message: data.err.message })
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                resolve({ code: 999, message: '서버 연결 실패'})
+            })
         })
     }
 }

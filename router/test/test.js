@@ -1,47 +1,32 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
-import AWS from 'aws-sdk'
 
 const test = Router()
 
-// 로컬에서 테스트 시엔 이 코드를 주석 해제하고 테스트 해보시면 됩니다
-// 주석 설정 단축키 : ctrl(command) + /
-const S3 = new AWS.S3({
-    accessKeyId: 'AKIAY6X2UAVITBIQ7V4B',
-    secretAccessKey: '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',
-    region: 'us-east-1'
-})
+test.get('/', show)
 
-// 서버로 푸시할 땐 반드시 이거 주석 해제하시고, 위 코드는 주석 처리 후 푸시해주세요
-// const S3 = new AWS.S3()
+function show(req, res, next){
+    res.send('Hello, World!')
+}
 
-const bucketName = 'capsotnestorage'
+test.get('/param/:num', param)
 
-test.get('/', (req, res) => {
-    readFile('public/html/test.html', { encoding: 'utf-8' }, (err, data) => {
-        if(err) { res.send('Not Found') }
-        else{
-            res.writeHead(200, {
-                'Content-Type': 'text/html; charset=utf-8'
-            })
-            .write(data)
+function param(req, res, next){
+    const { num: uid } = req.params
+    console.log(req.params)
 
-            res.end()
-        }
-    })
-})
+    const doc = 
+    `
+    <!DOCTYPE html>
+    <html>
+        <body>
+            <h1>Your Parameters</h1>
+            <h2>${uid}</h2>
+        </body>
+    </html>
+    `
 
-test.get('/s3Image', (req, res) => {
-    console.log('이미지 요청')
-    S3.getObject({ Bucket: 'capstonestorage', Key:'Fox.jpeg' }, (err, data) => {
-        if(err) { console.log(err) }
-        else{
-            // console.log(data)
-            res.send(data.Body)
-        }
-    })
-})
+    res.send(doc)
+}
 
 export default test
-
-////
