@@ -1,4 +1,4 @@
-const serverURL = 'http://ec2-52-207-214-20.compute-1.amazonaws.com:14450'
+const serverURL = 'ec2-15-164-170-224.ap-northeast-2.compute.amazonaws.com:14450'
 //const serverURL = 'http://localhost:14450'
 
 // vanilla ajax 사용해서 서버와 통신
