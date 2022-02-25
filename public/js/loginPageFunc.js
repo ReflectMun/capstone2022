@@ -1,5 +1,5 @@
-//const serverURL = 'ec2-15-164-170-224.ap-northeast-2.compute.amazonaws.com:14450'
-const serverURL = 'http://localhost:14450'
+const serverURL = 'ec2-15-164-170-224.ap-northeast-2.compute.amazonaws.com:14450'
+//const serverURL = 'http://localhost:14450'
 
 window.onload = function(){
     const loginButton = document.getElementById('loginButton')
