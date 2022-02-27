@@ -17,10 +17,25 @@ signin.get('/', (req, res) => {
     })
 })
 
+/////////////////////////////////////////////////////////////////////
+// Router
 signin.post(
     '/',
     requestLogSigninService,
-    getSigninParameters)
+    getSigninParameters,
+    checkRegisteredMiddle,
+    processRegister
+)
+
+signin.post('/check_registered', getSigninParameters, checkRegistered)
+
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+// Middle ware
+function getResponseObject(){
+    return { code: null, body: null, err: null }
+}
 
 function requestLogSigninService(req, res, next){
     console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
@@ -29,16 +44,11 @@ function requestLogSigninService(req, res, next){
 
 function getSigninParameters(req, res, next){
     let ID, Password, email
-
-    const response = {
-        code: null,
-        body: null,
-        err: null
-    }
+    const response = getResponseObject()
 
     try{
         ID = req.body['ID']
-        password = req.body['password']
+        Password = req.body['password']
         email = req.body['email']
 
         req.paramBox = {
@@ -59,15 +69,24 @@ function getSigninParameters(req, res, next){
     next()
 }
 
-async function checkRegistered(req, res, next){
+function checkRegisteredMiddle(req, res, next){
     const { paramID } = req.paramBox
-    let conn
+    const response = getResponseObject()
 
-    const response = {
-        code: null,
-        body: null,
-        err: null
+    const isRegistered = await getRegisteredCheck()
+
+    if(isRegistered == 1){
+        response.code = 705
+        response.body = { message: '이미 등록된 사용자입니다' }
+        
+        res.json(response)
     }
+
+    next()
+}
+
+async function getRegisteredCheck(paramID){
+    let conn
 
     try{
         const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${paramID}'`
@@ -78,14 +97,47 @@ async function checkRegistered(req, res, next){
         await conn.commit()
 
         conn.release()
+
+        const result = row[0]['COUNT(UID)']
+        return result
     }
     catch(err){
         if(conn) { conn.release() }
+        console.log(err)
 
-        return 
+        throw new Error(err.message)
     }
-
-    next()
 }
 
-export default signin // tlqkf 이걸 main 브랜치에서 작업하고 있었네;;;
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+// Controller
+function checkRegistered(req, res, next){
+    const { paramID } = req.paramBox
+    const response = getResponseObject()
+
+    const isRegistered = await getRegisteredCheck()
+
+    if(isRegistered == 1){
+        response.code = 705
+        response.body = { message: '이미 등록된 사용자입니다' }
+        
+        res.json(response)
+    }
+    else{
+        response.code = 205
+        response.body = { message: '사용가능한 ID 입니다' }
+
+        res.json(response)
+    }
+}
+
+function processRegister(req, res, next){
+    const { paramID: Account, Password, email } = req.paramBox
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
+export default signin
