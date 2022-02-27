@@ -38,7 +38,7 @@ function getResponseObject(){
 }
 
 function requestLogSigninService(req, res, next){
-    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
+    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 회원가입 요청`)
     next()
 }
 
@@ -48,12 +48,12 @@ function getSigninParameters(req, res, next){
 
     try{
         ID = req.body['ID']
-        Password = req.body['password']
+        Password = req.body['Password']
         email = req.body['email']
 
         req.paramBox = {
             paramID: ID,
-            password: password,
+            password: Password,
             email: email
         }
     }
@@ -69,17 +69,28 @@ function getSigninParameters(req, res, next){
     next()
 }
 
-function checkRegisteredMiddle(req, res, next){
+async function checkRegisteredMiddle(req, res, next){
     const { paramID } = req.paramBox
     const response = getResponseObject()
 
-    const isRegistered = await getRegisteredCheck()
+    try{
+        const isRegistered = await getRegisteredCheck(paramID)
 
-    if(isRegistered == 1){
-        response.code = 705
-        response.body = { message: '이미 등록된 사용자입니다' }
+        if(isRegistered != 0){
+            response.code = 705
+            response.body = { message: '이미 등록된 사용자입니다' }
         
-        res.json(response)
+            res.json(response)
+            return
+        }
+    }
+    catch(err){
+        console.log(err)
+
+        response.code = 812
+        response.err = { message: err.message }
+
+        return
     }
 
     next()
@@ -113,29 +124,65 @@ async function getRegisteredCheck(paramID){
 
 /////////////////////////////////////////////////////////////////////
 // Controller
-function checkRegistered(req, res, next){
+async function checkRegistered(req, res, next){
     const { paramID } = req.paramBox
     const response = getResponseObject()
 
-    const isRegistered = await getRegisteredCheck()
+    try{
+        const isRegistered = await getRegisteredCheck(paramID)
 
-    if(isRegistered == 1){
-        response.code = 705
-        response.body = { message: '이미 등록된 사용자입니다' }
+        if(isRegistered != 0){
+            response.code = 705
+            response.body = { message: '이미 등록된 사용자입니다' }
         
-        res.json(response)
+            res.json(response)
+        }
+        else{
+            response.code = 205
+            response.body = { message: '사용가능한 ID 입니다' }
+
+            res.json(response)
+        }
     }
-    else{
-        response.code = 205
-        response.body = { message: '사용가능한 ID 입니다' }
+    catch(err){
+        console.log(err)
+
+        response.code = 403
+        response.err = { message: err.message }
 
         res.json(response)
     }
 }
 
-function processRegister(req, res, next){
-    const { paramID: Account, Password, email } = req.paramBox
+async function processRegister(req, res, next){
+    const { paramID: Account, password: Password, email } = req.paramBox
+    const response = getResponseObject()
 
+    let conn
+    try{
+        const queryString = `INSERT INTO Users(Account, Password, EMail) VALUES('${Account}', '${Password}', '${email}')`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ rows, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        response.code = 207
+        response.body = { message: '회원가입이 완료되었습니다' }
+
+        res.json(response)
+    }
+    catch(err){
+        console.log(err)
+
+        response.code = 604
+        response.err = { message: 'DB와 통신중 오류가 발생했습니다' }
+
+        res.json(response)
+    }
+    finally{
+        if(conn) { conn.release() }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////
