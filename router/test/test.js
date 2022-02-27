@@ -4,18 +4,7 @@ import AWS from 'aws-sdk'
 
 const test = Router()
 
-test.get('/', (req, res) => {
-    readFile('./public/html/test/test.html', { encoding: 'utf-8' }, (err, data) => {
-        if(err) { res.send('404 Not Found') }
-        else{
-            res.writeHead(200, {
-                'Content-Type': 'text/html; encoding=utf-8'
-            })
-            res.write(data)
-            res.end()
-        }
-    })
-})
+test.get('/', testS3Image)
 
 test.get('/s3Image', (req, res) => {
     const S3 = new AWS.S3({
@@ -53,6 +42,19 @@ function param(req, res, next){
     `
 
     res.send(doc)
+}
+
+function testS3Image(req, res, next){
+    readFile('./public/html/test/test.html', { encoding: 'utf-8' }, (err, data) => {
+        if(err) { res.send('404 Not Found') }
+        else{
+            res.writeHead(200, {
+                'Content-Type': 'text/html; encoding=utf-8'
+            })
+            res.write(data)
+            res.end()
+        }
+    })
 }
 
 export default test
