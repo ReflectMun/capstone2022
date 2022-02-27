@@ -22,7 +22,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     rolling: true,
-    cookie: { maxAge: 1000 * 5 }
+    cookie: { maxAge: 1000 * 60 }
 }))
 
 app.use(serveStatic(join(__dirname, 'public/html')))
@@ -37,10 +37,12 @@ import login from './router/login.js'
 import loginPage from './router/pages/loginPage.js'
 import signin from './router/signin.js'
 import test from './router/test/test.js'
+import logout from './router/logout.js'
 
 app.use('/api/login', login)
 app.use('/login', loginPage)
 app.use('/signin', signin)
+app.use('/logout', logout)
 
 app.use('/test', test)
 ////////////////////////////////////////////////////////

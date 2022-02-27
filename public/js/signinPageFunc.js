@@ -73,5 +73,8 @@ async function sendSignin(ID, Password, eMail){
                 resolve({ code: responseCode, message: data.err.message })
             }
         })
+        .catch(err => {
+            resolve({ code: 1099, message: err.message} )
+        })
     })
 }
