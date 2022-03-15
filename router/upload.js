@@ -1,23 +1,19 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url';
 
-import multer from 'multer';
-import multerS3 from 'multer-s3';
+import multer from 'multer'
+import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-AWS.config.loadFromPath(__dirname + "/../private/credential/s3.json");
+AWS.config.loadFromPath('./private/credential/s3.json')
 
 const upload = Router()
 const s3 = new AWS.S3()
 const upload_func = multer({
     storage: multerS3({
-        s3: s3, bucket: 'capstonestorage',
-        acl: 'public-read',
+        s3: s3,
+        bucket: 'capstonestorage',
+        // acl: 'public-read',
         key: function (req, file, cb) {
             console.log(file.originalname)
             cb(null,file.originalname)
@@ -44,8 +40,8 @@ function uploadform(req, res) {
 }
 
 upload.post('/putS3', upload_func.single('img'), (req, res) => {
+    console.log('여기까지 넘어오긴 하나')
     let imgFile = req.file
-    res.json(imgFile)
 })
 
 upload.get('/getS3/:filename', function (req, res, next) {
@@ -53,11 +49,11 @@ upload.get('/getS3/:filename', function (req, res, next) {
     try {
         console.log(filename)
         let fileToSend = s3.getObject({ Bucket: "capstonestorage", Key: filename }).createReadStream()
-        fileToSend.pipe(res);
+        fileToSend.pipe(res)
     } catch (error) {
         res.send({ error: "server error" })
     }
-});
+})
 // upload.get('/s3Image', (req, res) => {
 //     const S3 = new AWS.S3({
 //         accessKeyId: '',
