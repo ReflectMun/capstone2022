@@ -3,7 +3,7 @@ import Pool from '../private/server/DBConnector.js'
 
 const login = Router()
 
-login.post('/', requestLogLoginService, getLoginParameter, checkLoginUserSession, connect2DB)
+login.post('/', requestLogLoginService, getLoginParameter, checkLoginUserSession, processLogin)
 
 function requestLogLoginService(req, res, next){
     console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
@@ -69,7 +69,7 @@ function checkLoginUserSession(req, res, next){
     next()
 }
 
-async function connect2DB(req, res, next){
+async function processLogin(req, res, next){
     let conn = null
     const { paramID, password } = req.parmaBox
 
