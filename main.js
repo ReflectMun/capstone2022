@@ -36,7 +36,7 @@ app.use(serveStatic(join(__dirname, 'public/css')))
 import login from './router/login.js'
 import loginPage from './router/pages/loginPage.js'
 import signin from './router/signin.js'
-import test from './router/test/test.js'
+import upload from './router/upload.js'
 import logout from './router/logout.js'
 
 app.use('/api/login', login)
@@ -44,7 +44,7 @@ app.use('/login', loginPage)
 app.use('/signin', signin)
 app.use('/logout', logout)
 
-app.use('/test', test)
+app.use('/upload', upload)
 ////////////////////////////////////////////////////////
 
 // 서버가 응답을 받을 경우 처리 할 동작들을 정의하는 메서드
