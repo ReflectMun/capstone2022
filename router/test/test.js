@@ -2,6 +2,8 @@ import { Router } from 'express'
 import { readFile } from 'fs'
 import AWS from 'aws-sdk'
 
+import { sign } from 'jsonwebtoken'
+
 const test = Router()
 
 test.get('/', testS3Image)
