@@ -38,13 +38,15 @@ import loginPage from './router/pages/loginPage.js'
 import signin from './router/signin.js'
 import upload from './router/upload.js'
 import logout from './router/logout.js'
+import test from './router/test/test.js'
 
 app.use('/api/login', login)
 app.use('/login', loginPage)
 app.use('/signin', signin)
 app.use('/logout', logout)
-
 app.use('/upload', upload)
+
+app.use('/test', test)
 ////////////////////////////////////////////////////////
 
 // 서버가 응답을 받을 경우 처리 할 동작들을 정의하는 메서드

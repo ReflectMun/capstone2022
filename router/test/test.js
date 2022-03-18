@@ -2,9 +2,17 @@ import { Router } from 'express'
 import { readFile } from 'fs'
 import AWS from 'aws-sdk'
 
-import { sign } from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
+import passport from 'passport'
+import { Strategy, ExtractJwt } from 'passport-jwt'
 
 const test = Router()
+
+test.get('/jwt', OK)
+
+function OK(req, res, nest){ 
+
+}
 
 test.get('/', testS3Image)
 
