@@ -3,6 +3,7 @@ import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
+import passport from 'passport'
 
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -24,6 +25,7 @@ app.use(session({
     rolling: true,
     cookie: { maxAge: 1000 * 60 }
 }))
+app.use(passport.initialize())
 
 app.use(serveStatic(join(__dirname, 'public/html')))
 app.use(serveStatic(join(__dirname, 'public/js')))
