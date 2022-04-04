@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>write</title>
+    <style>
+        input:focus{
+            outline:none;
+        }
+        textarea{
+            resize:none;
+        }
+        textarea:focus{
+            outline: none;
+        }
+        .write-container{
+            border: solid 2px rgb(196, 191, 191);
+            border-radius: 3px;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+        }
+        .wrap-title{
+            border-bottom: solid 2px #9F81F7;
+        }
+        .title{
+            font-size: 1.3rem;
+            width: 95%;
+            margin:0px;
+            border: none;
+        }
+        .wrap-write-text{
+            border: solid 1px rgb(196, 191, 191); 
+        }
+        .write-text{
+            font-size: 0.9rem;
+            width: 95%;
+            height: 300px;;
+            margin:0px;
+            border:none;
+        }
+        .write-btn{
+            width:100px;
+            height: 30px;
+            background-color:#9F81F7;
+            border:none;
+            color:white;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+        @media(min-width:450px){
+            .write-container{
+            width:600px;
+            margin:auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="write-container">
+        <form class="write" action="">
+            <p class = wrap-title>
+                <input class="title" autocomplete="off" placeholder="제목">
+            </p>
+            <p class="wrap-write-text">
+                <textarea class="write-text" placeholder="이곳에 글을 적으면 되지 않을까 하옵니다."></textarea>
+            </p>
+            <input type="file" class="add-file">
+            <button class="write-btn">등록</button>
+        </form>
+            
+    </div>
+</body>
+</html>
