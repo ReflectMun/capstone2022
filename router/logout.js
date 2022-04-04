@@ -11,13 +11,13 @@ function requestLogLogoutService(req, res, next){
 
 function processLogout(req, res, next){
     if(req.session.user){
-        console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : ${req.session.user.ID} 로그아웃 함`)
+        const LoggedOutID = req.session.ID
         req.session.destroy((err) => {
             if(err) { 
                 console.log('삭제시 에러 일으킴')
                 return
             }
-            console.log('세션 삭제됨')
+            console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : ${LoggedOutID} 로그아웃 함`)
 
             res.json({ code: 2001, message: '로그아웃 완료' })
         })

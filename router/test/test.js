@@ -8,8 +8,8 @@ test.get('/', testS3Image)
 
 test.get('/s3Image', (req, res) => {
     const S3 = new AWS.S3({
-        accessKeyId: 'AKIAY6X2UAVITBIQ7V4B',
-        secretAccessKey: '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',
+        accessKeyId: '',
+        secretAccessKey: '',
         region: 'ap-northeast-2'
     })
 
