@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board</title>
+
+    <style>
+    a{
+        text-decoration: none;
+        color:inherit;
+    }
+    /* ul{
+        list-style:none;
+    }
+    li{
+        float: left;
+        padding:1px;
+        margin:3px
+    } */
+    .board-container{
+        border: solid 2px rgb(196, 191, 191);
+        border-radius: 3px;
+        padding: 20px;
+        margin: 10px;
+    }
+    /*
+    .major{
+        border:solid 2px rgb(196, 191, 191);
+        border-radius: 5px;
+        padding: 5px;
+    }*/
+    
+    article{
+        border:solid 1px rgb(196, 191, 191);
+        border-radius: 5px;
+        margin:3px 0px 3px 0px;
+    }
+    .wrap-title-content{
+       float: left;
+    }
+    .article-title{
+        padding-left: 5px;
+    }
+    .article-content{
+      margin-left: 5px;
+      font-size: 1rem;
+    }
+    .thumbnail{
+        border: solid 1px gray;
+        width: 80px;
+        height: 80px;
+        border-radius: 3px;
+        margin: 5px;
+        float: right;
+    }
+    .write-time{
+        margin: 20px 1px 2px 5px;
+        clear: both;
+    }
+    .writer{
+        margin: 20px 1px 2px 5px;
+        clear: both;
+    }
+    @media(min-width:450px){
+    .board-container{
+      width:600px;
+      margin:auto;
+    }
+  }
+    </style>
+</head>
+<body>
+    <div class="board-container">
+        <!-- <h3 class="major">컴퓨터공학과(학과이름)</h3> -->
+        <article>
+            <a class="article" href="content link">
+                <div class="wrap-title-content">
+                    <h3 class="article-title">글 제목</h3>
+                    <p class="article-content">내용 한줄 출력...이러쿵 저러쿵 솰라솰라</p>
+                </div>
+                <img src="" class="thumbnail">
+                
+                <!-- <time class="write-time">time</time> -->
+                <h4 class="writer">작성자</h4>
+                <!-- <div class="wrap-status">
+                    <ul class="status">
+                        <li title="좋아요" class="like">like</li>
+                        <li title="답변수" class="answer">answer</li>
+                    </ul>
+                </div> -->
+            </a>
+        </article>          
+    </div>
+</body>
+</html>
