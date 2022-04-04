@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# 연결용 컨픽 파일
+private/credential/db.json
+private/credential/s3.json
