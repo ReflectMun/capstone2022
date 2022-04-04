@@ -11,7 +11,37 @@ const test = Router()
 test.get('/jwt', OK)
 
 function OK(req, res, nest){ 
+    console.log('dddd')
+    try{
+        passport.authenticate('login', (err, user, info) => {
+            console.log('dks')
+            if(err || !user){
+                res.send('로그인 실패')
+                return
+            }
+            else{
+                req.login(user, { session: false }, (loginErr) => {
+                    if(loginErr){
+                        res.send(loginErr)
+                        return
+                    }
+                    else{
+                        const token = jwt.sign(
+                            { 
+                                id: user.id,
+                            },
+                            'password'
+                        )
 
+                        res.json(token)
+                    }
+                })
+            }
+        })
+    }
+    catch(err){
+        res.send(err)
+    }
 }
 
 test.get('/', testS3Image)

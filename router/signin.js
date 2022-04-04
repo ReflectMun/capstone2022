@@ -43,18 +43,20 @@ function requestLogSigninService(req, res, next){
 }
 
 function getSigninParameters(req, res, next){
-    let ID, Password, email
+    let ID, Password, email, nickname
     const response = getResponseObject()
 
     try{
         ID = req.body['ID']
         Password = req.body['Password']
         email = req.body['email']
+        nickname = req.body['nickname']
 
         req.paramBox = {
             paramID: ID,
             password: Password,
-            email: email
+            email: email,
+            nickname: nickname
         }
     }
     catch(err){
@@ -114,7 +116,6 @@ async function getRegisteredCheck(paramID){
     }
     catch(err){
         if(conn) { conn.release() }
-        console.log(err)
 
         throw new Error(err.message)
     }
@@ -155,12 +156,12 @@ async function checkRegistered(req, res, next){
 }
 
 async function processRegister(req, res, next){
-    const { paramID: Account, password: Password, email } = req.paramBox
+    const { paramID: Account, password: Password, email, nickname } = req.paramBox
     const response = getResponseObject()
 
     let conn
     try{
-        const queryString = `INSERT INTO Users(Account, Password, EMail) VALUES('${Account}', '${Password}', '${email}')`
+        const queryString = `INSERT INTO Users(Account, Password, EMail, Nickname) VALUES('${Account}', '${Password}', '${email}', '${nickname}')`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -176,7 +177,7 @@ async function processRegister(req, res, next){
         console.log(err)
 
         response.code = 604
-        response.err = { message: 'DB와 통신중 오류가 발생했습니다' }
+        response.err = { message: err.message }
 
         res.json(response)
     }

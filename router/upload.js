@@ -24,7 +24,6 @@ const upload_func = multer({
     }
 });
 
-
 upload.get('/', uploadform)
 function uploadform(req, res) {
     readFile('./public/html/upload/upload.html', { encoding: 'utf-8' }, (err, data) => {

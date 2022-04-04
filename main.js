@@ -1,12 +1,12 @@
 import express, { urlencoded } from 'express'
 import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
-import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
 
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import passportConfig from './private/apis/passportAuth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -18,14 +18,8 @@ const port = 14450
 
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(session({
-    secret: 'oKvIld1552DJFO38a9S1azzo339DKskz34ALxl1120z',
-    resave: false,
-    saveUninitialized: true,
-    rolling: true,
-    cookie: { maxAge: 1000 * 60 }
-}))
 app.use(passport.initialize())
+passportConfig()
 
 app.use(serveStatic(join(__dirname, 'public/html')))
 app.use(serveStatic(join(__dirname, 'public/js')))
