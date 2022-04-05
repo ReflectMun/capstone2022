@@ -1,3 +1,4 @@
+import './private/apis/env.js'
 import express, { urlencoded } from 'express'
 import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
