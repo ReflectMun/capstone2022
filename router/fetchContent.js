@@ -1,13 +1,20 @@
 import { Router } from 'express'
-import Pool from './private/server/DBConnector/js'
+import Pool from '../private/server/DBConnector.js'
+import { getObjectFromS3 } from '../private/server/S3Connector.js'
 
 const fetchContent = Router()
 
 fetchContent.get(
     '/:board/:postNum',
-    extractQueryString,
     checkExistingBoard,
-    checkExistingPost
+    checkExistingPost,
+    ContentViewerController
+)
+
+fetchContent.get(
+    '/:board',
+    checkExistingBoard,
+    LoadPostListController
 )
 
 /////////////////////////////////////////////////////////
@@ -20,27 +27,22 @@ function getResponseObject(){
 
     return obj
 }
+
+function getPostHTMLContent(boardURI, postNum){
+    const objectKey = `/${boardURI}/${postNum}`
+    const content = getObjectFromS3('contentHTML', objectKey)
+    return content
+}
 /////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////
 // Middle ware
-function extractQueryString(req, res, next){
-    const { board, postNum } = req.params
-
-    req.paramBox = {
-        boardName: board,
-        postNum: postNum
-    }
-
-    next()
-}
-
 function checkExistingBoard(req, res, next){
     let conn
     try{
-        const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${req.paramBox.boardName}'`
+        const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${req.params['board']}'`
         conn = Pool.createConnection(conn => conn)
-        
+
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
         await conn.commit()
@@ -76,7 +78,7 @@ function checkExistingBoard(req, res, next){
 function checkExistingPost(req, res, next){
     let conn
     try{
-        const queryString = `SELECT COUNT(PostID), isDeleted FROM Posts WHERE PostID = ${req.paramBox.postNum}`
+        const queryString = `SELECT COUNT(PostID), isDeleted FROM Posts WHERE PostID = ${req.params['postNum']}`
         conn = Pool.createConnection(conn => conn)
         
         await conn.beginTransaction()
@@ -116,7 +118,12 @@ function checkExistingPost(req, res, next){
 /////////////////////////////////////////////////////////
 // Controller
 function ContentViewerController(req, res, next){
-    
+    const contentText = getPostHTMLContent(req.params['board'], req.params['postNum'])
+    let d
+}
+
+function LoadPostListController(req, res, next){
+    const postList = []
 }
 /////////////////////////////////////////////////////////
 
