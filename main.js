@@ -15,6 +15,7 @@ const port = 14450
 
 // const sessionStorage = new MySQLStore()
 
+app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
 app.use(session({
@@ -38,7 +39,10 @@ import loginPage from './router/pages/loginPage.js'
 import signin from './router/signin.js'
 import upload from './router/upload.js'
 import logout from './router/logout.js'
+import comment from './router/comment.js'
 
+app.use('/api/comment',comment)  // /api/comment 라우터 추가
+                                 
 app.use('/api/login', login)
 app.use('/login', loginPage)
 app.use('/signin', signin)
