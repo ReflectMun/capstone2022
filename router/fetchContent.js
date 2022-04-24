@@ -13,6 +13,7 @@ fetchContent.get(
 
 fetchContent.get(
     '/:board',
+    extractPageNum,
     checkExistingBoard,
     LoadPostListController
 )
@@ -37,6 +38,18 @@ function getPostHTMLContent(boardURI, postNum){
 
 /////////////////////////////////////////////////////////
 // Middle ware
+function extractPageNum(req, res, next){
+    const { pageNum } = req.body
+    if(!pageNum){
+        console.log('Error : extractPage : pageNum not defined')
+        res.json({ code: 9973, message: '올바르지 않은 데이터 형식' })
+    }
+    else{
+        req.paramBox = { pageNum: pageNum }
+        next()
+    }
+}
+
 function checkExistingBoard(req, res, next){
     let conn
     try{
@@ -62,7 +75,7 @@ function checkExistingBoard(req, res, next){
         }
     }
     catch(err){
-        console.log(`Error - message: ${err.message}`)
+        console.log(`Error : checkExistingBoard : ${err.message}`)
 
         const responseObject = getResponseObject()
         responseObject.code = 3304
@@ -100,7 +113,7 @@ function checkExistingPost(req, res, next){
         }
     }
     catch(err){
-        console.log(`Error - message: ${err.message}`)
+        console.log(`Error : checkoExistingPost : ${err.message}`)
 
         const responseObj = getResponseObject()
 
@@ -118,8 +131,14 @@ function checkExistingPost(req, res, next){
 /////////////////////////////////////////////////////////
 // Controller
 function ContentViewerController(req, res, next){
-    const contentText = getPostHTMLContent(req.params['board'], req.params['postNum'])
-    let d
+    try{
+        const contentText = getPostHTMLContent(req.params['board'], req.params['postNum'])
+        res.json({ code: 100, content: contentText })
+    }
+    catch(err){
+        console.log(`Error : ContentViewerController : ${err.message}`)
+        res.json({ code: 723, content: '원인을 알 수 없는 에러가 발생하였습니다' })
+    }
 }
 
 function LoadPostListController(req, res, next){
