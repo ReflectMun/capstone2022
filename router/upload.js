@@ -53,35 +53,5 @@ upload.get('/getS3/:filename', function (req, res, next) {
         res.send({ error: "server error" })
     }
 })
-// upload.get('/s3Image', (req, res) => {
-//     const S3 = new AWS.S3({
-//         accessKeyId: '',
-//         secretAccessKey: '',
-//         region: 'ap-northeast-2'
-//     })
-
-//     S3.getObject({
-//         Bucket: 'capstonestorage',
-//         Key: 'Fox.jpeg'
-//     }, (err, data) => {
-//         if(err) { console.log(`S3 Bucket에 파일이 존재하지 않음`) }
-//         else{
-//             res.send(data.Body)
-//         }
-//     })
-// })
-
-// function uploadS3Image(req, res, next){
-//     readFile('./public/html/upload/upload.html', { encoding: 'utf-8' }, (err, data) => {
-//         if(err) { res.send('404 Not Found') }
-//         else{
-//             res.writeHead(200, {
-//                 'Content-Type': 'text/html; encoding=utf-8'
-//             })
-//             res.write(data)
-//             res.end()
-//         }
-//     })
-// }
 
 export default upload
