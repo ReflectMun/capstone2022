@@ -34,6 +34,35 @@ function getPostHTMLContent(boardURI, postNum){
     const content = getObjectFromS3('contentHTML', objectKey)
     return content
 }
+
+function getPostList(boardURI, startNum, pagePerPost){
+    let connection
+    try{
+        const queryString = 
+            `SELECT PostID, Title, Author, Date, Time
+            FROM(
+                SELECT PostID, Title, Author, Date, Time
+                FROM MainDB.Posts
+                WHERE BoardURI = '${boardURI}' AND isDeleted = 0
+                ORDER BY PostID DESC
+            )
+            LIMIT ${startNum}, ${pagePerPost}`
+        connection = await Pool.createConnection(connection => connection)
+
+        await connection.beginTransaction()
+        const [ data, fields ] = await connection.query(queryString)
+        await connection.commit()
+
+        return data
+    }
+    catch(err){
+        console.log(`Error : checkExistingBoard : ${err.message}`)
+        throw new Error('게시글 목록을 불러오는 중 오류가 발생함')
+    }
+    finally{
+        if(connection) { connection.release() }
+    }
+}
 /////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////
@@ -142,7 +171,9 @@ function ContentViewerController(req, res, next){
 }
 
 function LoadPostListController(req, res, next){
-    const postList = []
+    try{
+        const postList = getPostList(req.params)
+    }
 }
 /////////////////////////////////////////////////////////
 

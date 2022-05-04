@@ -3,7 +3,13 @@ import Pool from '../private/server/DBConnector.js'
 
 const login = Router()
 
-login.post('/', requestLogLoginService, getLoginParameter, checkLoginUserSession, processLogin)
+login.post(
+    '/',
+    requestLogLoginService,
+    getLoginParameter,
+    checkLoginUserSession,
+    processLogin
+)
 
 function requestLogLoginService(req, res, next){
     console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 요청`)
@@ -23,6 +29,10 @@ function getLoginParameter(req, res, next){
     try{
         paramID = req.body['ID']
         password = req.body['password']
+
+        if(paramID == null || password == null){
+            throw new Error('올바르지 않은 데이터 형식')
+        }
 
         req.parmaBox = {
             paramID: paramID,
@@ -95,11 +105,7 @@ async function processLogin(req, res, next){
         
         // query 결과물은 row에 저장됨, fields는 신경안써도 무방
         response.code = 200
-
-        body['COUNT(UID)'] = row[0]['COUNT(UID)']
-        body.UID = row[0]['UID']
-
-        response.body = body
+        response.body = 'Login Succeed'
 
         if(row[0]['UID']){
             req.session.user = {
