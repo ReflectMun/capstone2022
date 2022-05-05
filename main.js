@@ -28,25 +28,14 @@ app.use(serveStatic(join(__dirname, 'public/js')))
 app.use(serveStatic(join(__dirname, 'public/css')))
 
 ////////////////////////////////////////////////////////
-// 여기 이 영역은 글로 설명하기엔 힘드니 다음번에 만났을 때
-// 그림 그려가면서 설명해드리겠습니다
-
+// Router들
 import test from './router/test/test.js'
-import login from './router/login.js'
-import loginPage from './router/pages/loginPage.js'
-import signin from './router/signin.js'
-import upload from './router/upload.js'
-import logout from './router/logout.js'
-import comment from './router/comment.js'
+import api from './router/api.js'
+import loginPage from './router/login/loginPage.js'
 
-app.use('/comment',comment)  // /api/comment 라우터 추가
-app.use('/login', login)
 app.use('/login', loginPage)
-app.use('/signin', signin)
-app.use('/logout', logout)
-app.use('/upload', upload)
-
 app.use('/test', test)
+app.use('/api', api)
 ////////////////////////////////////////////////////////
 
 // 서버가 응답을 받을 경우 처리 할 동작들을 정의하는 메서드

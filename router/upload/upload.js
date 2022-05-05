@@ -5,7 +5,7 @@ import multer from 'multer'
 import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
 
-AWS.config.loadFromPath('./private/credential/s3.json')
+AWS.config.loadFromPath('../../private/credential/s3.json')
 
 const upload = Router()
 const s3 = new AWS.S3()

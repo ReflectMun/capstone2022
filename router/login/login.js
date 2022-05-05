@@ -1,11 +1,13 @@
 import { Router } from 'express'
-import Pool from '../private/server/DBConnector.js'
+import Pool from '../../private/server/DBConnector.js'
+import { jwtVerifyForSignin } from '../../private/apis/verifyJWT.js'
 
 const login = Router()
 
 login.post(
     '/',
     requestLogLoginService,
+    jwtVerifyForSignin,
     getLoginParameter,
     checkLoginUserSession,
     processLogin

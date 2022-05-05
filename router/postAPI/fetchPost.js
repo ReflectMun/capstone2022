@@ -1,18 +1,21 @@
 import { Router } from 'express'
-import Pool from '../private/server/DBConnector.js'
-import { getObjectFromS3 } from '../private/server/S3Connector.js'
+import Pool from '../../private/server/DBConnector.js'
+import { getObjectFromS3 } from '../../private/server/S3Connector.js'
+import { jwtVerify } from '../../private/apis/verifyJWT.js'
 
-const fetchContent = Router()
+const fetchPost = Router()
 
-fetchContent.get(
-    '/:board/:postNum',
+fetchPost.get(
+    '/fetch/post',
+    jwtVerify,
     checkExistingBoard,
     checkExistingPost,
     ContentViewerController
 )
 
-fetchContent.get(
-    '/:board',
+fetchPost.get(
+    '/fetch/postlist',
+    jwtVerify,
     extractPageNum,
     checkExistingBoard,
     LoadPostListController
@@ -35,7 +38,7 @@ function getPostHTMLContent(boardURI, postNum){
     return content
 }
 
-function getPostList(boardURI, startNum, pagePerPost){
+async function getPostList(boardURI, startNum, pagePerPost){
     let connection
     try{
         const queryString = 
@@ -79,7 +82,7 @@ function extractPageNum(req, res, next){
     }
 }
 
-function checkExistingBoard(req, res, next){
+async function checkExistingBoard(req, res, next){
     let conn
     try{
         const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${req.params['board']}'`
@@ -117,7 +120,7 @@ function checkExistingBoard(req, res, next){
     }
 }
 
-function checkExistingPost(req, res, next){
+async function checkExistingPost(req, res, next){
     let conn
     try{
         const queryString = `SELECT COUNT(PostID), isDeleted FROM Posts WHERE PostID = ${req.params['postNum']}`
@@ -174,7 +177,10 @@ function LoadPostListController(req, res, next){
     try{
         const postList = getPostList(req.params)
     }
+    catch(err){
+        console.log(err.message)
+    }
 }
 /////////////////////////////////////////////////////////
 
-export default fetchContent
+export default fetchPost
