@@ -5,7 +5,7 @@ import multer from 'multer'
 import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
 
-AWS.config.loadFromPath('../../private/credential/s3.json')
+AWS.config.loadFromPath('./private/credential/s3.json')
 
 const upload = Router()
 const s3 = new AWS.S3()
@@ -38,7 +38,7 @@ function uploadform(req, res) {
     })
 }
 
-upload.post('/putS3', upload_func.single('img'), (req, res) => {
+upload.put('/putS3', upload_func.single('img'), (req, res) => {
     console.log('여기까지 넘어오긴 하나')
     let imgFile = req.file
 })

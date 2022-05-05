@@ -6,7 +6,7 @@ import { jwtVerify } from '../../private/apis/verifyJWT.js'
 const fetchPost = Router()
 
 fetchPost.get(
-    '/fetch/post',
+    '/fetch/content',
     jwtVerify,
     checkExistingBoard,
     checkExistingPost,

@@ -8,7 +8,7 @@ export function jwtVerify(req, res, next){
         next()
     }
     catch(err){
-        console.log('')
+        console.log(err.message)
         res.json({ code: 908, error: '손상되거나 유효하지 않은 JWT토큰' })
     }
 }

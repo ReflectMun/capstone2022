@@ -19,5 +19,6 @@ api.use('/signin', signin) // 회원가입 처리 API 컨트롤러
 api.use('/logout', logout) // 로그아웃 처리 API 컨트롤러
 api.use('/upload', upload) // 파일 업로드 API 컨트롤러
 api.use('/post', fetchPost) // 게시글 내용 불러오기 API 컨트롤러
+api.use('/jwtissue', issuingJwt) // 사용자 인증 JWT 발급
 
 export default api
