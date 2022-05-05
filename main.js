@@ -33,12 +33,14 @@ app.use(serveStatic(join(__dirname, 'public/css')))
 // 여기 이 영역은 글로 설명하기엔 힘드니 다음번에 만났을 때
 // 그림 그려가면서 설명해드리겠습니다
 
+import test from './router/test/test.js'
 import login from './router/login.js'
 import loginPage from './router/pages/loginPage.js'
 import signin from './router/signin.js'
 import upload from './router/upload.js'
 import logout from './router/logout.js'
 
+app.use('/test', test)
 app.use('/api/login', login)
 app.use('/login', loginPage)
 app.use('/signin', signin)
