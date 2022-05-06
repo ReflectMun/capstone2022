@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TEST</title>
+        <meta charset="UTF-8">
+        <!-- <script src="/uploadScript.js"></script> -->
+        <style>
+            form{
+                border-style: solid;
+                border-color: black;
+                border-width: medium;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+    <form action="/api/upload/putText" method="POST" enctype="multipart/form-data">
+        <h1>AWS S3 Text upload</h1>
+            <input id="fileUploader" type="file" name="text" multiple>
+        <input id="uploadButton" type="submit" value="업로드">
+    </form>
+    </body>
+</html>
