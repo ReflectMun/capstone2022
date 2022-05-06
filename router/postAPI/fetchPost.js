@@ -35,6 +35,11 @@ function getResponseObject(){
 function getPostHTMLContent(boardURI, postNum){
     const objectKey = `/${boardURI}/${postNum}`
     const content = getObjectFromS3('contentHTML', objectKey)
+
+    if(!content){
+        throw new EmptyContentFetched()
+    }
+
     return content
 }
 
@@ -71,14 +76,24 @@ async function getPostList(boardURI, startNum, pagePerPost){
 /////////////////////////////////////////////////////////
 // Middle ware
 function extractPageNum(req, res, next){
-    const { pageNum } = req.body
-    if(!pageNum){
-        console.log('Error : extractPage : pageNum not defined')
-        res.json({ code: 9973, message: '올바르지 않은 데이터 형식' })
-    }
-    else{
+    try{
+        const { pageNum } = req.body
+
+        if(!pageNum){
+            throw new PageNumExtractFailed()
+        }
+
         req.paramBox = { pageNum: pageNum }
         next()
+    }
+    catch(err){
+        console.log(err.message)
+        if(err instanceof PageNumExtractFailed){
+            res.json({ code: 9973, message: '올바르지 않은 데이터 형식: 페이지 번호 없음' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류 발생' })
+        }
     }
 }
 
@@ -169,7 +184,12 @@ function ContentViewerController(req, res, next){
     }
     catch(err){
         console.log(`Error : ContentViewerController : ${err.message}`)
-        res.json({ code: 723, content: '원인을 알 수 없는 에러가 발생하였습니다' })
+        if(err instanceof EmptyContentFetched){
+            res.json({ code: 4473, message: '컨텐츠가 존재하지 않습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '원인을 알 수 없는 오류가 발생하였습니다' })
+        }
     }
 }
 
@@ -184,3 +204,6 @@ function LoadPostListController(req, res, next){
 /////////////////////////////////////////////////////////
 
 export default fetchPost
+
+class EmptyContentFetched extends Error{ constructor() { super('컨텐츠가 존재하지 않음') } }
+class PageNumExtractFailed extends Error{ constructor() { super('페이지 번호 추출 실패') } }

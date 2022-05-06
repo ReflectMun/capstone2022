@@ -23,5 +23,8 @@
     "main": "main.js",
     "repository": "https://github.com/ReflectMun/capstone2022.git",
     "author": "ReflectMun <wksh229@gmail.com>",
-    "license": "MIT"
+    "license": "MIT",
+    "scripts": {
+        "start": "node main.js"
+    }
 }
