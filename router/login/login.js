@@ -1,5 +1,7 @@
 import express, { Router } from 'express'
 import Pool from '../../private/server/DBConnector.js'
+import { stringify as queryStringify } from 'querystring'
+
 import { jwtVerifyForSignin } from '../../private/apis/verifyJWT.js'
 import { normalLog, errorLog } from '../../private/apis/logger.js'
 import issuingJwt from '../jwt/issuingJwt.js'
@@ -26,7 +28,7 @@ function getLoginParameter(req, res, next){
         const { ID, password } = req.body
 
         if(ID == null || password == null){
-            throw new Error('올바르지 않은 데이터 형식')
+            throw new InvalidDataType()
         }
 
         req.parmaBox = {
@@ -37,10 +39,16 @@ function getLoginParameter(req, res, next){
     catch(err){
         errorLog(req, controllerName, err.message)
         
-        response.code = 404
-        response.err = { message: '올바르지 않은 데이터 형식' }
-        
-        return res.json(response)
+        if(err instanceof InvalidDataType){
+            response.code = 404
+            response.err = { message: '올바르지 않은 데이터 형식' }
+            return res.json(response)
+        }
+        else{
+            response.code = 9999
+            response.err = { message: '알 수 없는 타입의 오류가 발생하였습니다' }
+            return res.json(response)
+        }
     }
 
     next()
@@ -78,16 +86,17 @@ async function processLogin(req, res){
         response.code = 200
         response.body = 'Login Succeed'
 
-        if(row[0]['UID']){
-            req.session.user = {
+        if(row[0]['COUNT(UID)'] == 1){
+            const UrlQuery = queryStringify({
                 UID: row[0]['UID'],
-                ID: paramID,
-                name: 'nickname',
-                authroized: true
-            }
+                account: paramID
+            })
+            res.redirect('/api/login/issue?' + UrlQuery)
+        }
+        else{
+            res.json({ code: 300, message: '계정 혹은 비밀번호가 틀림'})
         }
 
-        res.redirect('/api/login/issue')
     }
     catch(err){
         errorLog(req, controllerName, err.message)
@@ -103,3 +112,5 @@ async function processLogin(req, res){
 }
 
 export default login
+
+class InvalidDataType extends Error{ constructor(){ super('올바르지 않은 데이터 타입') } }
