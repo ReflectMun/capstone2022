@@ -1,33 +1,39 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
+import { errorLog, normalLog } from '../../private/apis/logger'
+import { jwtVerify } from '../../private/apis/verifyJWT'
+import Pool from '../../private/server/DBConnector'
 
 const logout = Router()
+const controllerName = 'logout'
 
-logout.get('/', requestLogLogoutService, processLogout)
+logout.get(
+    '/', 
+    jwtVerify,
+    processLogout
+)
 
-function requestLogLogoutService(req, res, next){
-    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그아웃 요청`)
-    next()
-}
+/**
+ * 로그아웃을 진행하는 API. DB에 저장되어 있는 RefreshToken을 제거함 
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+function processLogout(req, res){
+    let conn
+    try{
+        const queryString =
+        `DELETE FROM RefreshTokens WHERE UID = '${req.paramBox['UID']}'`
 
-function processLogout(req, res, next){
-    if(req.session.user){
-        const LoggedOutID = req.session.ID
-        req.session.destroy((err) => {
-            if(err) { 
-                console.log('삭제시 에러 일으킴')
-                return
-            }
-            console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : ${LoggedOutID} 로그아웃 함`)
+        conn = await Pool.createConnection(conn => conn)
 
-            res.json({ code: 2001, message: '로그아웃 완료' })
-        })
+        await conn.beginTransaction()
+        await conn.query(queryString)
+        await conn.commit()
+
+        normalLog(req, controllerName, `유저 ${req.paramBox['Account']} 로그아웃 및 RefreshToken 파기 완료`)
     }
-    else{
-        console.log(
-        `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 로그인 되어있지 않은 유저`
-        )
-
-        res.json({ code: 2003, message: '로그인 되어있지 않은 유저' })
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        res.json({ code: 4403, message: '로그아웃 중 서버에서 오류가 발생하였습니다' })
     }
 }
 

@@ -11,6 +11,7 @@ const S3 = new AWS.S3()
  * 
  * @param {string} bucket - 연결할 S3 버킷 이름 
  * @param {string} objectName - 버킷에서 꺼내올 파일의 이름
+ * @return {object} S3로부터 fetch한 컨텐츠
  */
 export function getObjectFromS3(bucket, objectName){
     S3.getObject({
@@ -18,7 +19,7 @@ export function getObjectFromS3(bucket, objectName){
         Key: objectName
     }, function(err, data){
         if(err){
-            throw err
+            throw new ErrorOnS3Fetching(err)
         }
         else{
             return data.Body
@@ -39,10 +40,13 @@ export function putObjectToS3(bucket, objectName){
         Key: objectName
     }, function(err, data){
         if(err){
-            throw err
+            throw new ErrorOnS3Inserting(err)
         }
         else{
             return data
         }
     })
 }
+
+export class ErrorOnS3Fetching extends Error{ constructor(err){ super(err.message) } }
+export class ErrorOnS3Inserting extends Error{ constructor(err){ super(err.message) } }

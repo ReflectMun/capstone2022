@@ -1,42 +1,61 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
+import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 
 const signin = Router()
+const controllerName = 'signin'
 
 /////////////////////////////////////////////////////////////////////
 // Router
 signin.post(
     '/',
-    requestLogSigninService,
     getSigninParameters,
     checkRegisteredMiddle,
     processRegister
 )
 
-signin.post('/check_registered', getSigninParameters, checkRegistered)
+signin.post(
+    '/check_registered',
+    getSigninParameters,
+    checkRegistered
+)
 
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
 // Middle ware
-function getResponseObject(){
-    return { code: null, body: null, err: null }
-}
 
-function requestLogSigninService(req, res, next){
-    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} : ${req.ip} : 회원가입 요청`)
-    next()
-}
-
+/**
+ * 회원가입 진행에 쓰일 파라미터들을 추출하는 미들웨어.
+ * 명시한 파라미터들이 존재하는지, 올바른 타입으로 전송한 것이 맞는지 체크
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ * @returns {void}
+ */
 function getSigninParameters(req, res, next){
-    let ID, Password, email, nickname
-    const response = getResponseObject()
-
     try{
-        ID = req.body['ID']
-        Password = req.body['Password']
-        email = req.body['email']
-        nickname = req.body['nickname']
+        const { ID, Password, email, nickname } = req.body
+
+        if(typeof ID != 'string'){
+            errorLog(req, controllerName, 'ID must be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof Password != 'string'){
+            errorLog(req, controllerName, 'Password must be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof email != 'string'){
+            errorLog(req, controllerName, 'EMail msust be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof nickname != 'string'){
+            errorLog(req, controllerName, 'Nickname must be string')
+            throw new ValuesIsMalformed()
+        }
 
         req.paramBox = {
             paramID: ID,
@@ -46,37 +65,13 @@ function getSigninParameters(req, res, next){
         }
     }
     catch(err){
-        console.log(err.message)
-
-        response.code = 1000
-        response.err = { message: '잘못된 데이터 형식' }
-
-        return res.json(response)
-    }
-
-    next()
-}
-
-async function checkRegisteredMiddle(req, res, next){
-    const { paramID } = req.paramBox
-    const response = getResponseObject()
-
-    try{
-        const isRegistered = await getRegisteredCheck(paramID)
-
-        if(isRegistered != 0){
-            response.code = 705
-            response.body = { message: '이미 등록된 사용자입니다' }
-        
-            res.json(response)
-            return
+        errorLog(req, controllerName, err.message)
+        if(err instanceof ValuesIsMalformed){
+            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
         }
-    }
-    catch(err){
-        console.log(err)
-
-        response.code = 812
-        response.err = { message: err.message }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
 
         return
     }
@@ -84,6 +79,46 @@ async function checkRegisteredMiddle(req, res, next){
     next()
 }
 
+/**
+ * ID 중복 체크용 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ * @returns {void}
+ */
+async function checkRegisteredMiddle(req, res, next){
+    const { paramID } = req.paramBox
+
+    try{
+        const isRegistered = await getRegisteredCheck(paramID)
+
+        if(isRegistered != 0){
+            throw new RegisterdUser()
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdUser){
+            res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생하였습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
+        }
+
+        return
+    }
+
+    next()
+}
+
+/**
+ * 실제로 DB와 연결해 이미 사용중인 ID인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} paramID 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
 async function getRegisteredCheck(paramID){
     let conn
 
@@ -99,73 +134,90 @@ async function getRegisteredCheck(paramID){
 
         const result = row[0]['COUNT(UID)']
         return result
-    }
-    catch(err){
+    } catch(err){
+        throw new ErrorOnRegisterChecking(err.message)
+    } finally{
         if(conn) { conn.release() }
-
-        throw new Error(err.message)
     }
 }
 
+/**
+ * 지정된 글자 수 이내인지, 제한된 양식은 잘 지켰는지, 올바른 이메일인지 등등
+ * 
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function checkCorrectData(req, res, next){
+    const { paramID, password, email, nickname } = req.paramBox
+
+    try{
+
+    } catch(err) {
+        errorLog(req, controllerName, err.message)
+    }
+}
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
 // Controller
-async function checkRegistered(req, res, next){
+/**
+ * 별개로 제공하는 ID 중복 체크 API
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function checkRegistered(req, res){
     const { paramID } = req.paramBox
-    const response = getResponseObject()
 
     try{
         const isRegistered = await getRegisteredCheck(paramID)
 
         if(isRegistered != 0){
-            response.code = 705
-            response.body = { message: '이미 등록된 사용자입니다' }
-        
-            res.json(response)
+            throw new RegisterdUser()
         }
         else{
-            response.code = 205
-            response.body = { message: '사용가능한 ID 입니다' }
-
-            res.json(response)
+            res.json({ code: 202, message: '사용할 수 있는 ID 입니다' })
         }
     }
     catch(err){
-        console.log(err)
-
-        response.code = 403
-        response.err = { message: err.message }
-
-        res.json(response)
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdUser){
+            res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생하였습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
+        }
     }
 }
 
-async function processRegister(req, res, next){
+/**
+ * 회원가입을 진행하는 API 컨트롤러
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function processRegister(req, res){
     const { paramID: Account, password: Password, email, nickname } = req.paramBox
-    const response = getResponseObject()
 
     let conn
     try{
-        const queryString = `INSERT INTO Users(Account, Password, EMail, Nickname) VALUES('${Account}', '${Password}', '${email}', '${nickname}')`
+        const queryString = 
+        `INSERT INTO Users(Account, Password, EMail, Nickname) VALUES('${Account}', '${Password}', '${email}', '${nickname}')`
+
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
-        const [ rows, fields ] = await conn.query(queryString)
+        await conn.query(queryString)
         await conn.commit()
 
-        response.code = 207
-        response.body = { message: '회원가입이 완료되었습니다' }
-
-        res.json(response)
+        res.json({ code: 401, message: '회원가입에 성공하였습니다' })
+        normalLog(req, controllerNamem, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
-        console.log(err)
-
-        response.code = 604
-        response.err = { message: err.message }
-
-        res.json(response)
+        errorLog(req, controllerName, err.message)
+        res.json({ code: 1021, message: '회원가입 도중 오류가 발생하였습니다' })
     }
     finally{
         if(conn) { conn.release() }
@@ -175,3 +227,8 @@ async function processRegister(req, res, next){
 /////////////////////////////////////////////////////////////////////
 
 export default signin
+
+///// Error controll class
+class ValuesIsMalformed extends Error{ constructor(){ super('올바르지 않은 데이터 형식이 전송됨') } }
+class RegisterdUser extends Error{ constructor(){ super('이미 회원가입이 완료된 유저') } }
+class ErrorOnRegisterChecking extends Error{ constructor(err){ super(err.message) } }

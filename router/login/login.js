@@ -17,17 +17,25 @@ login.post(
 )
 login.use('/issue', issuingJwt)
 
+/**
+ * 로그인에 쓰일 파라미터들을 추출하는 미들웨어.
+ * 명시한 파라미터가 모두 있는지, 올바른 형식으로 보낸 것이 맞는지 체크
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ * @returns {void}
+ */
 function getLoginParameter(req, res, next){
-    const response = {
-        code: null,
-        body: null,
-        err: null
-    }
-    
     try{
         const { ID, password } = req.body
 
-        if(ID == null || password == null){
+        if(typeof ID != 'string'){
+            errorLog(req, controllerName, 'ID must be string')
+            throw new InvalidDataType()
+        }
+
+        if(typeof password != 'string'){
+            errorLog(req, controllerName, 'Password must be string')
             throw new InvalidDataType()
         }
 
@@ -38,41 +46,26 @@ function getLoginParameter(req, res, next){
     }
     catch(err){
         errorLog(req, controllerName, err.message)
-        
         if(err instanceof InvalidDataType){
-            response.code = 404
-            response.err = { message: '올바르지 않은 데이터 형식' }
-            return res.json(response)
+            res.json({ code: 151, message: '올바르지 않은 데이터 형식이 전송되었습니다' })
         }
         else{
-            response.code = 9999
-            response.err = { message: '알 수 없는 타입의 오류가 발생하였습니다' }
-            return res.json(response)
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
         }
+
+        return
     }
 
     next()
 }
 
 /**
+ * 로그인을 진행하는 API 컨트롤러. 정상적으로 처리시 토큰을 발급하는 페이지로 리다이렉트
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
 async function processLogin(req, res){
     let conn = null
-    const { paramID, password } = req.parmaBox
-
-    const response = {
-        code: null,
-        body: null,
-        err: null
-    }
-
-    const body = {
-        'COUNT(UID)': null,
-        UID: null,
-        message: null
-    }
 
     try{
         const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${password}'`
@@ -92,19 +85,17 @@ async function processLogin(req, res){
                 account: paramID
             })
             res.redirect('/api/login/issue?' + UrlQuery)
+
+            normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}, Password = ${password}`)
         }
         else{
-            res.json({ code: 300, message: '계정 혹은 비밀번호가 틀림'})
+            res.json({ code: 300, message: '계정 혹은 비밀번호가 틀였습니다'})
         }
 
     }
     catch(err){
         errorLog(req, controllerName, err.message)
-        
-        response.code = 404
-        response.err = { message: '유저 테이블 조회중 에러 발생' }
-
-        res.json(response)
+        res.json({ code: 150, message: '로그인을 위해 DB 조회중 오류가 발생하였습니다' })
     }
     finally{
         if(conn) { conn.release() } // 할당된 연결이 있다면 연결을 삭제

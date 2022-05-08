@@ -4,6 +4,7 @@ import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
+import cors from 'cors'
 
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -20,8 +21,10 @@ const port = 14450
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(passport.initialize())
-passportConfig()
+app.use(cors({
+    origin: 'localhost:14450',
+    credentials: true
+}))
 
 app.use(serveStatic(join(__dirname, 'public/html')))
 app.use(serveStatic(join(__dirname, 'public/js')))
