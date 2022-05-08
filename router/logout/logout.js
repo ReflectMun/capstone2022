@@ -1,7 +1,7 @@
 import express, { Router } from 'express'
-import { errorLog, normalLog } from '../../private/apis/logger'
-import { jwtVerify } from '../../private/apis/verifyJWT'
-import Pool from '../../private/server/DBConnector'
+import { errorLog, normalLog } from '../../private/apis/logger.js'
+import { jwtVerify } from '../../private/apis/verifyJWT.js'
+import Pool from '../../private/server/DBConnector.js'
 
 const logout = Router()
 const controllerName = 'logout'
@@ -17,7 +17,7 @@ logout.get(
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-function processLogout(req, res){
+async function processLogout(req, res){
     let conn
     try{
         const queryString =

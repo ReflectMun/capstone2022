@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import express from 'express'
-import { errorLog } from './logger'
-import Pool from '../server/DBConnector'
+import { errorLog } from './logger.js'
+import Pool from '../server/DBConnector.js'
 
 const { sign, verify } = jwt
 const controllerName = 'jwtVerify'

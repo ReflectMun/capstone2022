@@ -280,7 +280,7 @@ async function checkExistingPost(req, res, next){
             throw new PostNotExist()
         }
         else if(exist > 1){
-            throw new UnknownDuplicateOnDataBase('post', req.params['postNum'])
+            throw new UnknownDuplicateOnDataBase('post', req.paramBox['postNum'])
         }
         else{
             next()
@@ -324,7 +324,7 @@ function ContentViewerController(req, res, next){
     const resObj = getResponseObject()
 
     try{
-        const contentText = getPostHTMLContent(req.params['board'], req.params['postNum'])
+        const contentText = getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
         res.json({ code: 100, content: contentText })
     }
     catch(err){

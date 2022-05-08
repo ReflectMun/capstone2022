@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import express, { Router } from 'express'
-import { errorLog, normalLog } from '../../private/apis/logger'
+import { errorLog, normalLog } from '../../private/apis/logger.js'
 
 const issuingJwt = Router()
 const { sign } = jwt
