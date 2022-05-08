@@ -1,97 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../css/ans-style.css">
-  <title>Post</title>
-  <style>
-    img{
-      padding:3px;
-      margin: 2px;
-      width: 70%;
-    }
-    p{
-      margin-left: 10px;
-    }
-    .q-icon{
-      font-size: 50px;
-      margin : 10px;
-      color: #9F81F7;
-    }
-    .post-title{
-      font-size: 30px;
-      margin : 10px;
-    }
-    .wrap-post{
-      border: solid 1.5px rgb(196, 191, 191);
-      border-radius: 5px;
-    }
-    .wrap-ans-btn{
-      border: solid 1px rgba(224, 224, 224, 0.918) ;
-      background-color: rgba(224, 224, 224, 0.918);
-      padding: 5px;
-      margin: 5px;
-      text-align: right;
-    }
-    #ans-btn{
-      border: none;
-      color: white;
-      background-color: #9F81F7;
-      width:100px;
-      height: 30px;
-      cursor: pointer;
-    }
-    .wrap-answer{
-      border: solid 1.5px rgb(196, 191, 191);
-      border-radius: 5px;
-    }
-    .wrap-ans-name{
-      border-bottom: solid 1.5px rgb(196, 191, 191);
-      margin: 3px;
-    }
-    .a-icon{
-      font-size: 30px;
-      margin: 10px;
-      color:#9F81F7;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap-post">
-    <article>
-      <div class="wrap-title">
-        <span class="q-icon">Q</span>
-        <span class="post-title">이것은 무엇을 의미하는건지요?</span>
-      </div>
-      <div class="wrap-contents">
-        <p>이 부분은 어떻게 작동하는 것인지요?</p>
-        <img src="../img/q-sample.png" alt="이미지를 가져올 수 없습니다.">
-      </div>
-    </article>
-  </div>
-  <div class="wrap-ans-btn">
-    <span>답변을 해봅시다</span>
-    <button id="ans-btn">답변하기</button>
-  </div>
-  <!-- area for answer -->
-  <div class="answers-area">
-    <div class="wrap-answer">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/ans-style.css" />
+    <title>Post</title>
+    <style>
+      img {
+        padding: 3px;
+        margin: 2px;
+        width: 70%;
+      }
+      p {
+        margin-left: 10px;
+      }
+      .q-icon {
+        font-size: 50px;
+        margin: 10px;
+        color: #9f81f7;
+      }
+      .post-title {
+        font-size: 30px;
+        margin: 10px;
+      }
+      .wrap-post {
+        border: solid 1.5px rgb(196, 191, 191);
+        border-radius: 5px;
+      }
+      .wrap-ans-btn {
+        border: solid 1px rgba(224, 224, 224, 0.918);
+        background-color: rgba(224, 224, 224, 0.918);
+        padding: 5px;
+        margin: 5px;
+        text-align: right;
+      }
+      #ans-btn {
+        border: none;
+        color: white;
+        background-color: #9f81f7;
+        width: 100px;
+        height: 30px;
+        cursor: pointer;
+      }
+      .wrap-answer {
+        border: solid 1.5px rgb(196, 191, 191);
+        border-radius: 5px;
+      }
+      .wrap-ans-name {
+        border-bottom: solid 1.5px rgb(196, 191, 191);
+        margin: 3px;
+      }
+      .a-icon {
+        font-size: 30px;
+        margin: 10px;
+        color: #9f81f7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap-post">
       <article>
-        <div class="wrap-ans-name">
-          <span class="a-icon">A</span>
-          <span class="a-name">asdf1234(작성자 닉네임)</span>
+        <div class="wrap-title">
+          <span class="q-icon">Q</span>
+          <span class="post-title">이것은 무엇을 의미하는건지요?</span>
         </div>
-        <p>이러이러하고...</p>
-        <p>저러저러하고</p>
-        <p>그러그러하기 때문에</p>
-        <p>이러저러그러한 것 이죠.</p>        
+        <div class="wrap-contents">
+          <p>이 부분은 어떻게 작동하는 것인지요?</p>
+          <img src="../img/q-sample.png" alt="이미지를 가져올 수 없습니다." />
+        </div>
       </article>
-      <div class="write-answer">
-
+    </div>
+    <div class="wrap-ans-btn">
+      <span>답변을 해봅시다</span>
+      <button id="ans-btn">답변하기</button>
+    </div>
+    <!-- area for answer -->
+    <div class="answers-area">
+      <div class="wrap-answer">
+        <article>
+          <div class="wrap-ans-name">
+            <span class="a-icon">A</span>
+            <span class="a-name">asdf1234(작성자 닉네임)</span>
+          </div>
+          <p>이러이러하고...</p>
+          <p>저러저러하고</p>
+          <p>그러그러하기 때문에</p>
+          <p>이러저러그러한 것 이죠.</p>
+        </article>
+        <div class="write-answer"></div>
       </div>
     </div>
-  </div>
-  <script src="../js/answer.js"></script>
-</body>
+    <script src="../js/answer.js"></script>
+  </body>
 </html>

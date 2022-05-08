@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="..\ckeditor\ckeditor.js"></script>
+    <script src="..\ckeditor\ko.js"></script>
+    <title>ckEditor</title>
+
+    <style>
+      .ck.ck-editor {
+        max-width: 700px;
+      }
+      .ck-editor__editable {
+        min-height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Classic Editor</h3>
+    <div id="classic">
+      <p>This is a sample content</p>
+    </div>
+    <script>
+      ClassicEditor.create(document.querySelector("#classic"), {
+        language: "ko", //언어설정
+      }).catch((error) => {
+        console.error(error);
+      });
+    </script>
+  </body>
+</html>
