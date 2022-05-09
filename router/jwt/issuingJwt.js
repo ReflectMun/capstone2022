@@ -51,6 +51,7 @@ async function insertTokenToDB(refreshToken, UID){
  * @param {express.NextFunction} next 
  */
 function extractUserInfo(req, res, next){
+    console.log(req.query)
     try{
         const { UID, account } = req.query
         
