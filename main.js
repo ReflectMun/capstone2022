@@ -3,12 +3,10 @@ import express, { urlencoded } from 'express'
 import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import passport from 'passport'
 import cors from 'cors'
 
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import passportConfig from './private/apis/passportAuth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
