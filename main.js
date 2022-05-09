@@ -59,4 +59,4 @@ app.listen(port, () => {
     console.log('Server start')
 })
 
-// fucking conflict
+// 나는 충돌이 싫다
