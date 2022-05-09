@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
 import AWS from 'aws-sdk'
+import jwt from 'jsonwebtoken'
 
 const test = Router()
 

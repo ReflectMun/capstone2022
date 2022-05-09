@@ -1,76 +1,89 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="..\ckeditor\ckeditor.js"></script>
+    <script src="..\ckeditor\ko.js"></script>
     <title>write</title>
     <style>
-        input:focus{
-            outline:none;
+      input:focus {
+        outline: none;
+      }
+      textarea {
+        resize: none;
+      }
+      textarea:focus {
+        outline: none;
+      }
+      .write-container {
+        border: solid 2px rgb(196, 191, 191);
+        border-radius: 3px;
+        padding: 10px;
+        margin: 10px;
+        text-align: center;
+      }
+      .wrap-title {
+        border-bottom: solid 2px #9f81f7;
+      }
+      .title {
+        font-size: 1.3rem;
+        width: 95%;
+        margin: 0px;
+        border: none;
+      }
+      .wrap-write-text {
+        border: solid 1px rgb(196, 191, 191);
+      }
+      .write-text {
+        font-size: 0.9rem;
+        width: 95%;
+        height: 300px;
+        margin: 0px;
+        border: none;
+      }
+      .write-btn {
+        width: 100px;
+        height: 30px;
+        background-color: #9f81f7;
+        border: none;
+        color: white;
+        font-size: 16px;
+        outline: none;
+        cursor: pointer;
+      }
+      @media (min-width: 450px) {
+        .write-container {
+          width: 600px;
+          margin: auto;
         }
-        textarea{
-            resize:none;
-        }
-        textarea:focus{
-            outline: none;
-        }
-        .write-container{
-            border: solid 2px rgb(196, 191, 191);
-            border-radius: 3px;
-            padding: 10px;
-            margin: 10px;
-            text-align: center;
-        }
-        .wrap-title{
-            border-bottom: solid 2px #9F81F7;
-        }
-        .title{
-            font-size: 1.3rem;
-            width: 95%;
-            margin:0px;
-            border: none;
-        }
-        .wrap-write-text{
-            border: solid 1px rgb(196, 191, 191); 
-        }
-        .write-text{
-            font-size: 0.9rem;
-            width: 95%;
-            height: 300px;;
-            margin:0px;
-            border:none;
-        }
-        .write-btn{
-            width:100px;
-            height: 30px;
-            background-color:#9F81F7;
-            border:none;
-            color:white;
-            font-size: 16px;
-            outline: none;
-            cursor: pointer;
-        }
-        @media(min-width:450px){
-            .write-container{
-            width:600px;
-            margin:auto;
-            }
-        }
+      }
+      .ck.ck-editor {
+        max-width: 700px;
+      }
+      .ck-editor__editable {
+        min-height: 300px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="write-container">
-        <form class="write" action="">
-            <p class = wrap-title>
-                <input class="title" autocomplete="off" placeholder="제목">
-            </p>
-            <p class="wrap-write-text">
-                <textarea class="write-text" placeholder="이곳에 글을 적으면 되지 않을까 하옵니다."></textarea>
-            </p>
-            <input type="file" class="add-file">
-            <button class="write-btn">등록</button>
-        </form>
-            
+      <form class="write" action="">
+        <p class="wrap-title">
+          <input class="title" autocomplete="off" placeholder="제목" />
+        </p>
+        <div id="classic">
+          <p>내용 작성하기</p>
+        </div>
+        <button class="write-btn">등록</button>
+      </form>
     </div>
-</body>
+    <script>
+      ClassicEditor.create(document.querySelector("#classic"), {
+        language: "ko", //언어설정
+      }).catch((error) => {
+        console.error(error);
+      });
+    </script>
+  </body>
 </html>

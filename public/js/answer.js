@@ -1,6 +1,6 @@
 const HIDDEN_CLASSNAME = "hidden";
 
-function writeAnswer(){
+function writeAnswer() {
   const btnWrap = document.querySelector(".wrap-ans-btn");
   const ansArea = document.querySelector(".answers-area");
   btnWrap.classList.add(HIDDEN_CLASSNAME);
@@ -11,4 +11,4 @@ function writeAnswer(){
 //and text editor appear
 const ansButton = document.querySelector("#ans-btn");
 
-ansButton.addEventListener("click",writeAnswer);
+ansButton.addEventListener("click", writeAnswer);
