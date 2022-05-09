@@ -13,6 +13,7 @@ const controllerName = 'jwtVerify'
  */
 async function checkVaildRefreshToken(UID){
     let conn
+    
     try{
         const queryString = `SELECT Token FROM RefreshTokens WHERE UID = ${UID}`
 
@@ -23,9 +24,10 @@ async function checkVaildRefreshToken(UID){
         await conn.commit()
 
         const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET)
+
         return true
     } catch(err) {
-        return false
+        throw new RefreshTokenExpired()
     } finally {
         if(conn) { conn.release() }
     }
@@ -53,15 +55,14 @@ function issueNewAccessToken(UID, Account){
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  */
-export function jwtVerify(req, res, next){
+export async function jwtVerify(req, res, next){
     req.paramBox = {}
     req.tokenBox = {}
 
     const token = req.headers.authorization
     try{
         const verifiedToken = verify(token, process.env.JWT_SECRET)
-        const refreshIsVaild = checkVaildRefreshToken(verifiedToken['UID'])
-        if(refreshIsVaild){
+        if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
             req.paramBox['Account'] = verifiedToken['Account']
             next()
@@ -70,20 +71,20 @@ export function jwtVerify(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
         if(err.message == 'jwt expired'){
             const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
-            const refreshIsVaild = checkVaildRefreshToken(expToken['UID'])
-            if(refreshIsVaild){
+            if(await checkVaildRefreshToken(expToken['UID'])){
                 const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
                 req.tokenBox['token'] = newAccessToken
                 next()
             }
             else{
+                errorLog(req, controllerName, err.message)
                 res.json({ code: 908, error: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
             }
         }
         else{
+            errorLog(req, controllerName, err.message)
             res.json({ code: 908, error: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
         }
     }
@@ -103,8 +104,7 @@ export function jwtVerifyForSignin(req, res, next){
     }
     catch(err){
         const vaildToken = verify(token, process.env.JWT_SECRET)
-        const refreshIsVaild = checkVaildRefreshToken(vaildToken['UID'])
-        if(!refreshIsVaild){
+        if(!checkVaildRefreshToken(vaildToken['UID'])){
             next()
         }
         else{

@@ -320,11 +320,11 @@ async function checkExistingPost(req, res, next){
 
 /////////////////////////////////////////////////////////
 // Controller
-function ContentViewerController(req, res, next){
+async function ContentViewerController(req, res, next){
     const resObj = getResponseObject()
 
     try{
-        const contentText = getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
+        const contentText = await getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
         res.json({ code: 100, content: contentText })
     }
     catch(err){
@@ -355,9 +355,9 @@ function ContentViewerController(req, res, next){
     }
 }
 
-function LoadPostListController(req, res, next){
+async function LoadPostListController(req, res, next){
     try{
-        const postList = getPostList()
+        const postList = await getPostList()
     }
     catch(err){
         console.log(err.message)

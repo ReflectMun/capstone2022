@@ -27,21 +27,21 @@ login.use('/issue', issuingJwt)
  */
 function getLoginParameter(req, res, next){
     try{
-        const { ID, password } = req.body
+        const { ID, Password } = req.body
 
         if(typeof ID != 'string'){
             errorLog(req, controllerName, 'ID must be string')
             throw new InvalidDataType()
         }
 
-        if(typeof password != 'string'){
+        if(typeof Password != 'string'){
             errorLog(req, controllerName, 'Password must be string')
             throw new InvalidDataType()
         }
 
         req.parmaBox = {
             paramID: ID,
-            password: password
+            password: Password
         }
     }
     catch(err){

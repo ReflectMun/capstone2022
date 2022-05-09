@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken'
 import express, { Router } from 'express'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
-import { stringify as queryStringify } from 'querystring'
 import Pool from '../../private/server/DBConnector.js'
 
 const issuingJwt = Router()
@@ -24,7 +23,7 @@ const controllerName = 'issuingJwt'
  * @param {string} UID 
  */
 async function insertTokenToDB(refreshToken, UID){
-    let conn
+    let conn = null
 
     try{
         const queryString =
@@ -35,8 +34,6 @@ async function insertTokenToDB(refreshToken, UID){
         await conn.beginTransaction()
         await conn.query(queryString)
         await conn.commit()
-        
-        conn.release()
     } catch(err) {
         throw new ErrorOnInsertingRefreshToken(err)
     } finally{
@@ -90,7 +87,7 @@ function extractUserInfo(req, res, next){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-function issueJwtToken(req, res){
+async function issueJwtToken(req, res){
     const { UID, Account } = req.paramBox
     try{
         // 서비스 이용에 쓰이는 액세스 토큰 발급
@@ -106,13 +103,8 @@ function issueJwtToken(req, res){
             { issuer: 'SaviorQNA', expiresIn: '12h' }
         )
 
+        await insertTokenToDB(refreshToken, UID)
         res.json({ token: accessToken })
-        insertTokenToDB(refreshToken, UID)
-        
-        const UrlQuery = queryStringify({
-            UID: UID,
-            Account: Account
-        })
 
         normalLog(req, controllerName, `유저 ${UID} 인증토큰 발급 완료`)
     }
@@ -131,4 +123,4 @@ export default issuingJwt
 
 ////////// Error Type Class Define ////////// 
 class ValueIsUndefined extends Error{ constructor(){ super('UID 또는 계정정보가 누락됨') } }
-class ErrorOnInsertingRefreshToken extends Error{ constructor(err){ super(err.message) } }
+class ErrorOnInsertingRefreshToken extends Error{ constructor(){ super('토큰 보관을 위해 DB와 통신하는 중 에러가 발생함') } }

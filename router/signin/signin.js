@@ -120,7 +120,7 @@ async function checkRegisteredMiddle(req, res, next){
  * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
  */
 async function getRegisteredCheck(paramID){
-    let conn
+    let conn, result
 
     try{
         const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${paramID}'`
@@ -130,15 +130,14 @@ async function getRegisteredCheck(paramID){
         const [ row, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        conn.release()
-
-        const result = row[0]['COUNT(UID)']
-        return result
+        result = row[0]['COUNT(UID)']
     } catch(err){
-        throw new ErrorOnRegisterChecking(err.message)
+        throw new ErrorOnRegisterChecking()
     } finally{
         if(conn) { conn.release() }
     }
+    
+    return result
 }
 
 /**
@@ -231,4 +230,4 @@ export default signin
 ///// Error controll class
 class ValuesIsMalformed extends Error{ constructor(){ super('올바르지 않은 데이터 형식이 전송됨') } }
 class RegisterdUser extends Error{ constructor(){ super('이미 회원가입이 완료된 유저') } }
-class ErrorOnRegisterChecking extends Error{ constructor(err){ super(err.message) } }
+class ErrorOnRegisterChecking extends Error{ constructor(){ super('중복유저 확인을 위해 DB와 통신 중 오류 발생') } }

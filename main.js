@@ -1,3 +1,5 @@
+////////////////////////////////////////////////////////////////
+// 서버 작동을 위한 라이브러리들
 import './private/apis/env.js'
 import express, { urlencoded } from 'express'
 import serveStatic from 'serve-static'
@@ -8,13 +10,13 @@ import cors from 'cors'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 
+// 
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
 const port = 14450
-
-// const sessionStorage = new MySQLStore()
 
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
