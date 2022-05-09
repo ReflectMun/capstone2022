@@ -82,7 +82,7 @@ async function processLogin(req, res){
         if(row[0]['COUNT(UID)'] == 1){
             const UrlQuery = queryStringify({
                 UID: row[0]['UID'],
-                account: paramID
+                Account: paramID
             })
             res.redirect('/api/login/issue?' + UrlQuery)
 

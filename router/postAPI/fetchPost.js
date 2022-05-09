@@ -78,7 +78,7 @@ async function getPostList(boardURI, startNum, pagePerPost){
                 ORDER BY PostID DESC
             )
             LIMIT ${startNum}, ${pagePerPost}`
-        connection = await Pool.createConnection(connection => connection)
+        connection = await Pool.getConnection(connection => connection)
 
         await connection.beginTransaction()
         const [ data, fields ] = await connection.query(queryString)
@@ -216,7 +216,7 @@ async function checkExistingBoard(req, res, next){
 
     try{
         const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${req.paramBox['board']}'`
-        conn = Pool.createConnection(conn => conn)
+        conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
@@ -269,7 +269,7 @@ async function checkExistingPost(req, res, next){
 
     try{
         const queryString = `SELECT COUNT(PostID), isDeleted FROM Posts WHERE PostID = ${req.paramBox['postNum']}`
-        conn = Pool.createConnection(conn => conn)
+        conn = await Pool.getConnection(conn => conn)
         
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)

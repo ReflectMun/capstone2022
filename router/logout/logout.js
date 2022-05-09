@@ -23,7 +23,7 @@ async function processLogout(req, res){
         const queryString =
         `DELETE FROM RefreshTokens WHERE UID = '${req.paramBox['UID']}'`
 
-        conn = await Pool.createConnection(conn => conn)
+        conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         await conn.query(queryString)

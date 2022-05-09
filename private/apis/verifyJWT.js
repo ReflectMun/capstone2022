@@ -22,7 +22,7 @@ async function checkVaildRefreshToken(UID){
         const [ row, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET, { algorithms: 'RS512' })
+        const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET)
         return true
     } catch(err) {
         return false
@@ -41,7 +41,7 @@ function issueNewAccessToken(UID, Account){
     const newToken = sign(
         { UID: UID, Account: Account },
         process.env.JWT_SECRET,
-        { issuer:'SaiorQNA', algorithm: 'RS512', expiresIn: '20m'}
+        { issuer:'SaiorQNA', expiresIn: '20m'}
     )
 
     return newToken
@@ -59,7 +59,7 @@ export function jwtVerify(req, res, next){
 
     const token = req.headers.authorization
     try{
-        const verifiedToken = verify(token, process.env.JWT_SECRET, { algorithms: 'RS512' })
+        const verifiedToken = verify(token, process.env.JWT_SECRET)
         const refreshIsVaild = checkVaildRefreshToken(verifiedToken['UID'])
         if(refreshIsVaild){
             req.paramBox['UID'] = verifiedToken['UID']
@@ -72,7 +72,7 @@ export function jwtVerify(req, res, next){
     catch(err){
         errorLog(req, controllerName, err.message)
         if(err.message == 'jwt expired'){
-            const expToken = verify(token, process.env.JWT_SECRET, { algorithms: 'RS512', ignoreExpiration: true }) 
+            const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
             const refreshIsVaild = checkVaildRefreshToken(expToken['UID'])
             if(refreshIsVaild){
                 const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
@@ -102,7 +102,7 @@ export function jwtVerifyForSignin(req, res, next){
         res.json({ code: 222, error: '이미 로그인한 사람입니다.' })
     }
     catch(err){
-        const vaildToken = verify(token, process.env.JWT_SECRET, { algorithms: 'RS512' })
+        const vaildToken = verify(token, process.env.JWT_SECRET)
         const refreshIsVaild = checkVaildRefreshToken(vaildToken['UID'])
         if(!refreshIsVaild){
             next()

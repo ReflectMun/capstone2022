@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken'
 import express, { Router } from 'express'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
+import { stringify as queryStringify } from 'querystring'
+import Pool from '../../private/server/DBConnector.js'
 
 const issuingJwt = Router()
 const { sign } = jwt
@@ -28,7 +30,7 @@ async function insertTokenToDB(refreshToken, UID){
         const queryString =
         `INSERT INTO RefreshTokens(UID, Token) VALUES(${UID}, '${refreshToken}')`
         
-        conn = Pool.createConnection(conn => conn)
+        conn = await Pool.getConnection(conn => conn)
         
         await conn.beginTransaction()
         await conn.query(queryString)
@@ -51,27 +53,26 @@ async function insertTokenToDB(refreshToken, UID){
  * @param {express.NextFunction} next 
  */
 function extractUserInfo(req, res, next){
-    console.log(req.query)
     try{
-        const { UID, account } = req.query
+        const { UID, Account } = req.query
         
         // UID or account 정보가 없어서 null, undefined 등 false 값일 경우
         if(typeof UID != 'string'){
             throw new ValueIsUndefined()
         }
 
-        if(typeof account != 'string'){
+        if(typeof Account != 'string'){
             throw new ValueIsUndefined()
         }
 
         // 추출에 성공했다면 리퀘스트 객체에 값을 담아서 다음 미들웨어로 넘김
         req.paramBox = {
             UID: UID,
-            Account: account
+            Account: Account
         }
     }
     catch(err){
-        console.log(err.message)
+        errorLog(req, controllerName, err.message)
         if(err instanceof ValueIsUndefined){ // UID, account 값 누락시
             res.json({ code: 351, message: '계정정보가 누락되었습니다' })
         }
@@ -96,21 +97,24 @@ function issueJwtToken(req, res){
         const accessToken = sign(
             { UID: UID, Account: Account },
             process.env.JWT_SECRET,
-            { issuer: 'SaviorQNA', expiresIn: '20m', algorithm: 'RS512' }
+            { issuer: 'SaviorQNA', expiresIn: '20m' }
         )
-
-        // 서비스 이용 중 액세스 토큰 만료시 이를 재발급 하기 위한 리프레시 토큰 발급
+        
         const refreshToken = sign(
             { UID: UID, Account: Account },
             process.env.JWT_SECRET,
-            { issuer: 'SaviorQNA', expiresIn: '12h', algorithm: 'RS512' }
+            { issuer: 'SaviorQNA', expiresIn: '12h' }
         )
 
         res.json({ token: accessToken })
         insertTokenToDB(refreshToken, UID)
+        
+        const UrlQuery = queryStringify({
+            UID: UID,
+            Account: Account
+        })
 
         normalLog(req, controllerName, `유저 ${UID} 인증토큰 발급 완료`)
-        res.redirect('/index')
     }
     catch(err){
         errorLog(req, controllerName, err.message)
