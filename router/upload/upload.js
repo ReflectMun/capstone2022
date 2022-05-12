@@ -63,7 +63,7 @@ upload.get('/Imgtest', (req, res) => {
         }
     })
 })
-
+//DB추가
 upload.post('/putImg',upload_func.array('img',25),PutImg)
 async function PutImg (req, res) {
     let conn=null
