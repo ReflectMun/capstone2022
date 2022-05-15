@@ -1,4 +1,5 @@
-import styles from "./Header.module.css";
+import { Link } from "react-router-dom";
+//import styles from "./Header.module.css";
 
 const Header = () => {
   return (
@@ -12,7 +13,11 @@ const Header = () => {
             <li>POINT({0})</li>
             <li>ACCOUNT</li>
             <li>MSG</li>
-            <li>log in</li>
+            <li>
+              <Link to={"/login"} style={{ textDecoration: "none" }}>
+                LOGIN
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
