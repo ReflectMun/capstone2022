@@ -28,7 +28,10 @@ function Login() {
           </div>
         </form>
         <div className={styles.sign_up}>
-          <Link to={"/signup"} style={{ textDecoration: "none" }}>
+          <Link
+            to={"/signup"}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             회원가입
           </Link>
         </div>

@@ -1,0 +1,42 @@
+body {
+  background-color: white;
+}
+.writer_container {
+  border: solid 2px rgb(196, 191, 191);
+  border-radius: 3px;
+  padding: 10px;
+  text-align: center;
+}
+.wrap_title {
+  margin: 5px 5px;
+  border-bottom: solid 2px #9f81f7;
+}
+.title {
+  font-size: 1.3rem;
+  width: 100%;
+  border: none;
+  outline: none;
+}
+.editor {
+  margin: 10px 0px 0px 0px;
+  border: solid 1px gray;
+  width: 600px;
+  height: 450px;
+}
+.write_btn {
+  width: 100px;
+  height: 30px;
+  border: none;
+  background-color: #9f81f7;
+  color: white;
+  font-size: 16px;
+  outline: none;
+  cursor: pointer;
+  margin: 10px 0px 0px 0px;
+}
+@media (min-width: 450px) {
+  .writer_container {
+    width: 600px;
+    margin: auto;
+  }
+}
