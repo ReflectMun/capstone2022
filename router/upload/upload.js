@@ -39,7 +39,7 @@ function uploadform(req, res) {
         }
     })
 }
-upload.get('/Textest', (req, res) => {
+upload.get('/saviorcontent', (req, res) => {
     readFile('./public/html/upload/Texttest.html', { encoding: 'utf-8' }, (err, data) => {
         if (err) { res.send('404 Not Found') }
         else {
@@ -51,7 +51,7 @@ upload.get('/Textest', (req, res) => {
         }
     })
 })
-upload.get('/Imgtest', (req, res) => {
+upload.get('/saviorimg', (req, res) => {
     readFile('./public/html/upload/Imgtest.html', { encoding: 'utf-8' }, (err, data) => {
         if (err) { res.send('404 Not Found') }
         else {
