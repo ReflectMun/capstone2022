@@ -120,7 +120,7 @@ function extractBoardName(req, res, next){
         errorLog(req, controllerName, err.message)
         if(err instanceof BoardURIExtractFailed){
             resObj.code = 9972
-            resObj.message = '게시판 이름이 없습니다'
+            resObj.message = '게시판 이름이 손상되거나 누락되었습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -157,8 +157,8 @@ function extractPostNum(req, res, next){
     catch(err){
         errorLog(req, controllerName, err.message)
         if(err instanceof PostNumExtractFailed){
-            resObj.code = 9972
-            resObj.message = '게시판 이름이 없습니다'
+            resObj.code = 9653
+            resObj.message = '게시판 번호가 손상되거나 누락되었습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -325,13 +325,13 @@ async function ContentViewerController(req, res, next){
 
     try{
         const contentText = await getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
-        res.json({ code: 100, content: contentText })
+        res.json({ code: 210, content: contentText })
     }
     catch(err){
         console.log(`Error : ContentViewerController : ${err.message}`)
         if(err instanceof EmptyContentFetched){
             resObj.code = 4473
-            resObj.message = '컨텐츠가 존재하지 않습니다'
+            resObj.message = '볼 수 없는 게시글 입니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -358,9 +358,11 @@ async function ContentViewerController(req, res, next){
 async function LoadPostListController(req, res, next){
     try{
         const postList = await getPostList()
+        res.json({ code: 210, postlist: postList })
     }
     catch(err){
-        console.log(err.message)
+        errorLog(req, controllerName, err.message)
+        res.json({ code: 8334, message: '게시글 리스트를 불러오는 도중 오류가 발생하였습니다' })
     }
 }
 /////////////////////////////////////////////////////////
