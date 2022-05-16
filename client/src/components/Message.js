@@ -7,6 +7,7 @@ function Message() {
     }
     const onChangeReceiver = () => {};
     const onChangeContent = () => {}; 
+    const sendMessage = () => {};
     return (
       <div className={styled.messagePopup}>
         <button id ={styled.toggleBtn}onClick={togglePopup} />
@@ -39,7 +40,10 @@ function Message() {
                 <footer>
                     <button 
                         id ={styled.sendBtn}
-                        onClick={togglePopup}
+                        onClick={()=>{
+                            togglePopup()
+                            sendMessage()
+                        }}
                     >
                         Send
                     </button>
