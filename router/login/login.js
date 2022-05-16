@@ -41,7 +41,7 @@ function getLoginParameter(req, res, next){
 
         req.parmaBox = {
             paramID: ID,
-            password: Password
+            Password: Password
         }
     }
     catch(err){
@@ -66,19 +66,16 @@ function getLoginParameter(req, res, next){
  */
 async function processLogin(req, res){
     let conn = null
+    const { paramID, Password } = req.parmaBox
 
     try{
-        const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${password}'`
+        const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${Password}'`
         conn = await Pool.getConnection(conn => conn) // 커넥션 Pool에서 연결을 받아오는 메서드
         
         await conn.beginTransaction() // 트랜잭션 시작 알림
         const [ row, fields ] = await conn.query(queryString) // queryString을 기준으로 DB에 쿼리 실행 후 결과물 받아옴
         await conn.commit() // 실행을 commit 해서 DB에 완료되었음을 알리고 종료
         
-        // query 결과물은 row에 저장됨, fields는 신경안써도 무방
-        response.code = 200
-        response.body = 'Login Succeed'
-
         if(row[0]['COUNT(UID)'] == 1){
             const UrlQuery = queryStringify({
                 UID: row[0]['UID'],
@@ -86,10 +83,10 @@ async function processLogin(req, res){
             })
             res.redirect('/api/login/issue?' + UrlQuery)
 
-            normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}, Password = ${password}`)
+            normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}, Password = ${Password}`)
         }
         else{
-            res.json({ code: 300, message: '계정 혹은 비밀번호가 틀였습니다'})
+            res.json({ code: 300, message: '계정 혹은 비밀번호가 틀렸습니다'})
         }
 
     }

@@ -30,6 +30,7 @@ async function processLogout(req, res){
         await conn.commit()
 
         normalLog(req, controllerName, `유저 ${req.paramBox['Account']} 로그아웃 및 RefreshToken 파기 완료`)
+        res.json({ code: 203, message: '로그아웃을 완료하였습니다' })
     }
     catch(err){
         errorLog(req, controllerName, err.message)

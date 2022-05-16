@@ -17,7 +17,7 @@ async function checkVaildRefreshToken(UID){
     try{
         const queryString = `SELECT Token FROM RefreshTokens WHERE UID = ${UID}`
 
-        conn = await Pool.createConnection(conn => conn)
+        conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
@@ -27,6 +27,7 @@ async function checkVaildRefreshToken(UID){
 
         return true
     } catch(err) {
+        console.log(err.message)
         throw new RefreshTokenExpired()
     } finally {
         if(conn) { conn.release() }
@@ -61,6 +62,9 @@ export async function jwtVerify(req, res, next){
 
     const token = req.headers.authorization
     try{
+        if(!token){
+            throw new TokenDosentContained()
+        }
         const verifiedToken = verify(token, process.env.JWT_SECRET)
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
@@ -68,24 +72,34 @@ export async function jwtVerify(req, res, next){
             next()
         }
         else{
+            throw new RefreshTokenExpired()
         }
     }
     catch(err){
         if(err.message == 'jwt expired'){
-            const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
-            if(await checkVaildRefreshToken(expToken['UID'])){
-                const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
-                req.tokenBox['token'] = newAccessToken
-                next()
+            try{
+                const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
+                if(await checkVaildRefreshToken(expToken['UID'])){
+                    const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
+                    req.tokenBox['token'] = newAccessToken
+                    next()
+                }
+                else{
+                    errorLog(req, controllerName, err.message)
+                    res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+                }
             }
-            else{
+            catch(err){
                 errorLog(req, controllerName, err.message)
-                res.json({ code: 908, error: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+                res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
             }
         }
         else{
             errorLog(req, controllerName, err.message)
-            res.json({ code: 908, error: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+            if(err instanceof TokenDosentContained){
+                res.json({ code: 906, message: '로그인 정보가 없습니다. 로그인을 해 주세요' })
+            }
+            res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
         }
     }
 }
@@ -96,22 +110,34 @@ export async function jwtVerify(req, res, next){
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  */
-export function jwtVerifyForSignin(req, res, next){
+export async function jwtVerifyForSignin(req, res, next){
     const token = req.headers.authorization
+    if(!token){
+        next()
+        return 
+    }
+
     try{
         verify(token, process.env.JWT_SECRET)
-        res.json({ code: 222, error: '이미 로그인한 사람입니다.' })
+        res.json({ code: 905, error: '이미 로그인한 사람입니다.' })
     }
     catch(err){
-        const vaildToken = verify(token, process.env.JWT_SECRET)
-        if(!checkVaildRefreshToken(vaildToken['UID'])){
-            next()
+        const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
+        try{
+            if(!await checkVaildRefreshToken(vaildToken['UID'])){
+                next()
+            }
+            else{
+                errorLog(req, controllerName, err.message)
+                res.json({ code: 905, error: '이미 로그인한 사람입니다.' })
+            } 
         }
-        else{
-            res.json({ code: 222, error: '이미 로그인한 사람입니다.' })
+        catch(err){
+            next()
         }
     }
 }
 
 ///
 class RefreshTokenExpired extends Error{ constructor(){ super('RefreshToken 만료됨') } }
+class TokenDosentContained extends Error{ constructor(){ super('Payload에 토큰 정보가 없음') } }
