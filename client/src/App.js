@@ -1,9 +1,9 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./routes/Home";
+import Login from "./routes/Login";
+import Signup from "./routes/Signup";
+import Writer from "./components/Writer";
 
-// import{
-//   BrowserRouter as Router,
-//   Routes, //라우터 (url)찾는 역할
-//   Route,
-// } from "react-router-dom";
 import Message from "./components/Message";
 import Nav from "./components/Nav";
 function App() {
@@ -14,5 +14,16 @@ function App() {
     </div>
   );
 }
-
+// function App() {
+//   return (
+//     <Router>
+//       <Routes>
+//         <Route path="/" element={<Home />} />
+//         <Route path="/login" element={<Login />} />
+//         <Route path="/signup" element={<Signup />} />
+//       </Routes>
+//     </Router>
+//     //<Writer />
+//   );
+// }
 export default App;
