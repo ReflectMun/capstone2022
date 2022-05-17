@@ -1,5 +1,6 @@
 import styles from "./Mainarea.module.css";
 import Board from "./Board";
+
 function Mainarea() {
   const major = "선택한 전공";
   return (

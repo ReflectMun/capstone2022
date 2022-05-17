@@ -1,0 +1,41 @@
+.wrap_post {
+  border: solid 1.5px rgb(196, 191, 191);
+  border-radius: 5px;
+}
+.q_icon {
+  font-size: 50px;
+  margin: 10px;
+  color: #9f81f7;
+}
+.question_title {
+  font-size: 30px;
+  margin: 10px;
+}
+.wrap_ans_btn {
+  border: solid 1px rgba(224, 224, 224, 0.918);
+  background-color: rgba(224, 224, 224, 0.918);
+  padding: 5px;
+  margin: 5px;
+  text-align: right;
+}
+.ans_btn {
+  border: none;
+  color: white;
+  background-color: #9f81f7;
+  width: 100px;
+  height: 30px;
+  cursor: pointer;
+}
+.wrap_ans_name {
+  border-bottom: solid 1.5px rgb(196, 191, 191);
+  margin: 3px;
+}
+.a_icon {
+  font-size: 30px;
+  margin: 10px;
+  color: #9f81f7;
+}
+.wrap_answer {
+  border: solid 1.5px rgb(196, 191, 191);
+  border-radius: 5px;
+}
