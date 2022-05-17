@@ -106,3 +106,11 @@ dist
 # 연결용 컨픽 파일
 private/credential/db.json
 private/credential/s3.json
+
+# 도커 이미지 빌드용 dockerfile
+dockerfile
+.dockerignore
+
+# 업데이트 스크립트
+update
+update.sh
