@@ -1,5 +1,11 @@
 import styles from "./Signup.module.css";
 import logoImage from "../img/logo_savior.png";
+function onClickEmailBtn(event) {
+  event.preventDefault();
+}
+function onClickSignupBtn(event) {
+  event.preventDefault();
+}
 function Signup() {
   return (
     <div className={styles.signup_main}>
@@ -31,7 +37,9 @@ function Signup() {
             <input type="text" className={styles.signup_info} />
           </div>
           <div className={styles.mail_btn_wrap}>
-            <button className={styles.mail_btn}>인증</button>
+            <button className={styles.mail_btn} onClick={onClickEmailBtn}>
+              인증
+            </button>
           </div>
         </div>
         <div className={styles.signup_btn_wrap}>
@@ -40,6 +48,7 @@ function Signup() {
             name="signup_btn"
             value="가입"
             className={styles.signup_btn}
+            onClick={onClickSignupBtn}
           />
         </div>
       </form>
