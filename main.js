@@ -37,6 +37,7 @@ import test from './router/test/test.js'
 import api from './router/api.js'
 import loginPage from './router/login/loginPage.js'
 import { readFile } from 'fs'
+import { normalLog } from './private/apis/logger.js'
 
 app.use('/login', loginPage)
 app.use('/test', test)
@@ -53,6 +54,7 @@ app.get('/', (req, res) => {
         }
         else{
             res.send(data)
+            normalLog(req, 'main', '메인페이지 요청')
         }
     })
 })
