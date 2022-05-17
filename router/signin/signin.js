@@ -35,9 +35,9 @@ signin.post(
  */
 function getSigninParameters(req, res, next){
     try{
-        const { ID, Password, email, nickname } = req.body
+        const { Account, Password, EMail, Nickname } = req.body
 
-        if(typeof ID != 'string'){
+        if(typeof Account != 'string'){
             errorLog(req, controllerName, 'ID must be string')
             throw new ValuesIsMalformed()
         }
@@ -47,21 +47,21 @@ function getSigninParameters(req, res, next){
             throw new ValuesIsMalformed()
         }
 
-        if(typeof email != 'string'){
+        if(typeof EMail != 'string'){
             errorLog(req, controllerName, 'EMail msust be string')
             throw new ValuesIsMalformed()
         }
 
-        if(typeof nickname != 'string'){
+        if(typeof Nickname != 'string'){
             errorLog(req, controllerName, 'Nickname must be string')
             throw new ValuesIsMalformed()
         }
 
         req.paramBox = {
-            paramID: ID,
+            paramID: Account,
             password: Password,
-            email: email,
-            nickname: nickname
+            email: EMail,
+            nickname: Nickname
         }
     }
     catch(err){
@@ -211,7 +211,7 @@ async function processRegister(req, res){
         await conn.query(queryString)
         await conn.commit()
 
-        res.json({ code: 401, message: '회원가입에 성공하였습니다' })
+        res.json({ code: 204, message: '회원가입에 성공하였습니다' })
         normalLog(req, controllerNamem, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
