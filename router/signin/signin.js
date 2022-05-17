@@ -10,16 +10,100 @@ const controllerName = 'signin'
 signin.post(
     '/',
     getSigninParameters,
-    checkRegisteredMiddle,
+    checkCorrectData,
+    checkRegisteredAccountMiddle,
+    checkRegisteredNicknameMiddle,
+    checkRegisteredEMailMiddle,
     processRegister
 )
 
 signin.post(
     '/check_registered',
     getSigninParameters,
-    checkRegistered
+    checkRegisteredAccount
 )
 
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+// Functions
+/**
+ * 실제로 DB와 연결해 이미 사용중인 ID인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} paramID 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
+ async function getRegisteredAccountCheck(paramID){
+    let conn, result
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${paramID}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        result = row[0]['COUNT(UID)']
+    } catch(err){
+        throw new ErrorOnRegisterChecking()
+    } finally{
+        if(conn) { conn.release() }
+    }
+    
+    return result
+}
+
+/**
+ * 실제로 DB와 연결해 이미 사용중인 닉네임인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} Nickname 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
+ async function getRegisteredNicknameCheck(Nickname){
+    let conn, result
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE Nickname = '${Nickname}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        result = row[0]['COUNT(UID)']
+    } catch(err){
+        throw new ErrorOnRegisterChecking()
+    } finally{
+        if(conn) { conn.release() }
+    }
+    
+    return result
+}
+
+/**
+ * 실제로 DB와 연결해 이미 사용중인 닉네임인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} email 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
+ async function getRegisteredEMailCheck(email){
+    let conn, result
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE EMail = '${email}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        result = row[0]['COUNT(UID)']
+    } catch(err){
+        throw new ErrorOnRegisterChecking()
+    } finally{
+        if(conn) { conn.release() }
+    }
+    
+    return result
+}
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
@@ -63,6 +147,8 @@ function getSigninParameters(req, res, next){
             email: EMail,
             nickname: Nickname
         }
+
+        next()
     }
     catch(err){
         errorLog(req, controllerName, err.message)
@@ -80,20 +166,61 @@ function getSigninParameters(req, res, next){
 }
 
 /**
+ * 지정된 글자 수 이내인지, 제한된 양식은 잘 지켰는지, 올바른 이메일인지 등등
+ * 
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function checkCorrectData(req, res, next){
+    const { paramID, password, email, nickname } = req.paramBox
+
+    try{
+        if(paramID.length > 20){
+            res.json({ code: 2120, message: '아이디는 16글자 이내여야 합니다' })
+            return
+        }
+
+        if(password.length > 20){
+            res.json({ code: 2121, message: '비밀번호는 20글자 이내여야 합니다' })
+            return
+        }
+
+        if(email.length > 45){
+            res.json({ code: 2122, message: '이메일은 45글자 이내여야 합니다' })
+            return
+        }
+
+        if(nickname.length > 20){
+            res.json({ code: 2123, message: '닉네임은 20글자 이내여야 합니다' })
+            return
+        }
+
+        next()
+    } catch(err) {
+        errorLog(req, controllerName, err.message)
+        res.json({ code: 2130, message: '값을 검증하는 중 오류가 발생하였습니다' })
+    }
+}
+
+/**
  * ID 중복 체크용 미들웨어
  * @param {express.Request} req 
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  * @returns {void}
  */
-async function checkRegisteredMiddle(req, res, next){
+async function checkRegisteredAccountMiddle(req, res, next){
     const { paramID } = req.paramBox
 
     try{
-        const isRegistered = await getRegisteredCheck(paramID)
+        const isRegistered = await getRegisteredAccountCheck(paramID)
 
         if(isRegistered != 0){
             throw new RegisterdUser()
+        }
+        else{
+            next()
         }
     }
     catch(err){
@@ -115,45 +242,72 @@ async function checkRegisteredMiddle(req, res, next){
 }
 
 /**
- * 실제로 DB와 연결해 이미 사용중인 ID인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
- * @param {string} paramID 중복인지 체크하려는 ID
- * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
- */
-async function getRegisteredCheck(paramID){
-    let conn, result
-
-    try{
-        const queryString = `SELECT COUNT(UID) FROM Users WHERE Account = '${paramID}'`
-        conn = await Pool.getConnection(conn => conn)
-
-        await conn.beginTransaction()
-        const [ row, fields ] = await conn.query(queryString)
-        await conn.commit()
-
-        result = row[0]['COUNT(UID)']
-    } catch(err){
-        throw new ErrorOnRegisterChecking()
-    } finally{
-        if(conn) { conn.release() }
-    }
-    
-    return result
-}
-
-/**
- * 지정된 글자 수 이내인지, 제한된 양식은 잘 지켰는지, 올바른 이메일인지 등등
- * 
+ * 닉네임 중복 체크용 미들웨어
  * @param {express.Request} req 
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  */
-function checkCorrectData(req, res, next){
-    const { paramID, password, email, nickname } = req.paramBox
+async function checkRegisteredNicknameMiddle(req, res, next){
+    const { nickname } = req.paramBox
 
     try{
+        const isRegistered = await getRegisteredNicknameCheck(nickname)
 
-    } catch(err) {
+        if(isRegistered != 0){
+            throw new RegisterdNickname()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
         errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdNickname){
+            res.json({ code: 1012, message: '이미 사용중인 닉네임 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생했습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+
+        return
+    }
+}
+
+/**
+ * 닉네임 중복 체크용 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+async function checkRegisteredEMailMiddle(req, res, next){
+    const { email } = req.paramBox
+
+    try{
+        const isRegistered = await getRegisteredEMailCheck(email)
+
+        if(isRegistered != 0){
+            throw new RegisterdEMail()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdEMail){
+            res.json({ code: 1013, message: '이미 사용중인 이메일 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생했습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+
+        return
     }
 }
 /////////////////////////////////////////////////////////////////////
@@ -165,11 +319,11 @@ function checkCorrectData(req, res, next){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-async function checkRegistered(req, res){
+async function checkRegisteredAccount(req, res){
     const { paramID } = req.paramBox
 
     try{
-        const isRegistered = await getRegisteredCheck(paramID)
+        const isRegistered = await getRegisteredAccountCheck(paramID)
 
         if(isRegistered != 0){
             throw new RegisterdUser()
@@ -230,4 +384,6 @@ export default signin
 ///// Error controll class
 class ValuesIsMalformed extends Error{ constructor(){ super('올바르지 않은 데이터 형식이 전송됨') } }
 class RegisterdUser extends Error{ constructor(){ super('이미 회원가입이 완료된 유저') } }
+class RegisterdNickname extends Error{ constructor(){ super('이미 사용중인 닉네임') } }
+class RegisterdEMail extends Error{ constructor(){ super('이미 사용중인 이메일') } }
 class ErrorOnRegisterChecking extends Error{ constructor(){ super('중복유저 확인을 위해 DB와 통신 중 오류 발생') } }
