@@ -36,6 +36,8 @@ app.use(serveStatic(join(__dirname, 'public/css')))
 import test from './router/test/test.js'
 import api from './router/api.js'
 import loginPage from './router/login/loginPage.js'
+import { readFile } from 'fs'
+import { normalLog } from './private/apis/logger.js'
 
 app.use('/login', loginPage)
 app.use('/test', test)
@@ -46,15 +48,15 @@ app.use('/api', api)
 // 첫번째 인자는 엔드포인트 이름 / 만 있으면 따로 엔드포인트를 지정하지 않았다는 의미
 // 두번째 인자는 해당 엔드포인트로 연결했을 때 실행될 동작들에 대한 정보가 담긴 콜백 함수
 app.get('/', (req, res) => {
-    // req는 서버에 요청을 날린 클라이언트의 정보가 담긴 객체
-    // res는 서버에 요청을 날린 클라이언트에게 응답할 객체
-    const response = {
-        code: 200,
-        body: 'Hello, World!'
-    }
-    
-    // json의 형태로 응답하는 메서드
-    res.json(response)
+    readFile('wellcome.html', { encoding: 'utf-8' }, (err, data) => {
+        if(err){
+            res.send('No Such File or Directory')
+        }
+        else{
+            res.send(data)
+            normalLog(req, 'main', '메인페이지 요청')
+        }
+    })
 })
 
 app.listen(port, () => {

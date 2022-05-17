@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 const messageRouter = Router()
 
-import fetchSendedMessage from './fetchMessage.js'
-messageRouter.use('/fetch', fetchSendedMessage)
-messageRouter.use('/send')
+import fetchMessage from './fetchMessage.js'
+messageRouter.use('/fetch', fetchMessage)
+// messageRouter.use('/send')
 
 export default messageRouter
