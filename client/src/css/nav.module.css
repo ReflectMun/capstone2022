@@ -18,7 +18,7 @@
 {
    display: block;
    position: absolute;
-   top: 30px;
+   top: 40px;
    left: 30px;
    
    z-index: 1;
@@ -182,6 +182,15 @@
 .logoContainer{
     position: absolute;
     left: 100px;
+}
+#logo{
+  color: #9278da;
+  font-size: 3em;
+  padding-left: 20px;
+}
+
+#info{
+  font-size: 1.5em;
 }
 #id{
     padding-right: 20px;    
