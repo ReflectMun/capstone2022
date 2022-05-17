@@ -161,8 +161,6 @@ function getSigninParameters(req, res, next){
 
         return
     }
-
-    next()
 }
 
 /**
@@ -237,8 +235,6 @@ async function checkRegisteredAccountMiddle(req, res, next){
 
         return
     }
-
-    next()
 }
 
 /**
@@ -366,7 +362,7 @@ async function processRegister(req, res){
         await conn.commit()
 
         res.json({ code: 204, message: '회원가입에 성공하였습니다' })
-        normalLog(req, controllerNamem, `사용자 ${Account} 회원가입 성공`)
+        normalLog(req, controllerName, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
         errorLog(req, controllerName, err.message)
