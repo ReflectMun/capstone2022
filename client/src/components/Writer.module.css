@@ -1,11 +1,10 @@
-body {
-  background-color: white;
-}
 .writer_container {
   border: solid 2px rgb(196, 191, 191);
   border-radius: 3px;
   padding: 10px;
   text-align: center;
+  background-color: white;
+  width: 90%;
 }
 .wrap_title {
   margin: 5px 5px;
@@ -33,10 +32,4 @@ body {
   outline: none;
   cursor: pointer;
   margin: 10px 0px 0px 0px;
-}
-@media (min-width: 450px) {
-  .writer_container {
-    width: 600px;
-    margin: auto;
-  }
 }

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styled from "../css/nav.module.css";
@@ -33,11 +34,18 @@ function Nav() {
       <div className={styled.info}>
         <ul id={styled.info}>
           <li id={styled.id} onClick={Info}>
-            id
+            ACCOUNT
           </li>
-          <li id={styled.point}>point</li>
+          <li id={styled.point}>POINT</li>
           <li id={styled.message}>쪽지</li>
-          <li id={styled.login}>로그인/로그아웃</li>
+          <li id={styled.login}>
+            <Link
+              to={"/login"}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              로그인
+            </Link>
+          </li>
         </ul>
       </div>
     </nav>

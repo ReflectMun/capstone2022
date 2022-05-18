@@ -1,13 +1,14 @@
-import Header from "../components/Header";
+import Message from "../components/Message";
+import Nav from "../components/Nav";
 import Mainarea from "../components/Mainarea";
 
-const Home = () => {
+function Home() {
   return (
     <div>
-      <Header />
+      <Nav />
       <Mainarea />
+      <Message />
     </div>
   );
-};
-
+}
 export default Home;

@@ -13,7 +13,14 @@ function Writer() {
           />
         </div>
         <div className={styles.editor}>여기 에디터 들어올 곳</div>
-        <input type="submit" className={styles.write_btn} value="등록" />
+        <input
+          type="submit"
+          className={styles.write_btn}
+          value="등록"
+          onClick={(event) => {
+            event.preventDefault();
+          }}
+        />
       </form>
     </div>
   );

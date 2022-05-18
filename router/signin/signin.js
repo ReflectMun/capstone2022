@@ -10,116 +10,29 @@ const controllerName = 'signin'
 signin.post(
     '/',
     getSigninParameters,
-    checkRegisteredMiddle,
+    checkCorrectData,
+    checkRegisteredAccountMiddle,
+    checkRegisteredNicknameMiddle,
+    checkRegisteredEMailMiddle,
     processRegister
 )
 
 signin.post(
     '/check_registered',
     getSigninParameters,
-    checkRegistered
+    checkRegisteredAccount
 )
 
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
-// Middle ware
-
-/**
- * 회원가입 진행에 쓰일 파라미터들을 추출하는 미들웨어.
- * 명시한 파라미터들이 존재하는지, 올바른 타입으로 전송한 것이 맞는지 체크
- * @param {express.Request} req 
- * @param {express.Response} res 
- * @param {express.NextFunction} next 
- * @returns {void}
- */
-function getSigninParameters(req, res, next){
-    try{
-        const { ID, Password, email, nickname } = req.body
-
-        if(typeof ID != 'string'){
-            errorLog(req, controllerName, 'ID must be string')
-            throw new ValuesIsMalformed()
-        }
-
-        if(typeof Password != 'string'){
-            errorLog(req, controllerName, 'Password must be string')
-            throw new ValuesIsMalformed()
-        }
-
-        if(typeof email != 'string'){
-            errorLog(req, controllerName, 'EMail msust be string')
-            throw new ValuesIsMalformed()
-        }
-
-        if(typeof nickname != 'string'){
-            errorLog(req, controllerName, 'Nickname must be string')
-            throw new ValuesIsMalformed()
-        }
-
-        req.paramBox = {
-            paramID: ID,
-            password: Password,
-            email: email,
-            nickname: nickname
-        }
-    }
-    catch(err){
-        errorLog(req, controllerName, err.message)
-        if(err instanceof ValuesIsMalformed){
-            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
-        }
-        else{
-            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
-        }
-
-        return
-    }
-
-    next()
-}
-
-/**
- * ID 중복 체크용 미들웨어
- * @param {express.Request} req 
- * @param {express.Response} res 
- * @param {express.NextFunction} next 
- * @returns {void}
- */
-async function checkRegisteredMiddle(req, res, next){
-    const { paramID } = req.paramBox
-
-    try{
-        const isRegistered = await getRegisteredCheck(paramID)
-
-        if(isRegistered != 0){
-            throw new RegisterdUser()
-        }
-    }
-    catch(err){
-        errorLog(req, controllerName, err.message)
-        if(err instanceof RegisterdUser){
-            res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
-        }
-        else if(err instanceof ErrorOnRegisterChecking){
-            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생하였습니다' })
-        }
-        else{
-            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
-        }
-
-        return
-    }
-
-    next()
-}
-
+// Functions
 /**
  * 실제로 DB와 연결해 이미 사용중인 ID인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
  * @param {string} paramID 중복인지 체크하려는 ID
  * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
  */
-async function getRegisteredCheck(paramID){
+ async function getRegisteredAccountCheck(paramID){
     let conn, result
 
     try{
@@ -141,6 +54,116 @@ async function getRegisteredCheck(paramID){
 }
 
 /**
+ * 실제로 DB와 연결해 이미 사용중인 닉네임인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} Nickname 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
+ async function getRegisteredNicknameCheck(Nickname){
+    let conn, result
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE Nickname = '${Nickname}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        result = row[0]['COUNT(UID)']
+    } catch(err){
+        throw new ErrorOnRegisterChecking()
+    } finally{
+        if(conn) { conn.release() }
+    }
+    
+    return result
+}
+
+/**
+ * 실제로 DB와 연결해 이미 사용중인 닉네임인지 체크하는 함수, UID가 일치하는 Row의 갯수 반환
+ * @param {string} email 중복인지 체크하려는 ID
+ * @returns {number} UID가 일치하는 DB 내부의 Row의 갯수
+ */
+ async function getRegisteredEMailCheck(email){
+    let conn, result
+
+    try{
+        const queryString = `SELECT COUNT(UID) FROM Users WHERE EMail = '${email}'`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        result = row[0]['COUNT(UID)']
+    } catch(err){
+        throw new ErrorOnRegisterChecking()
+    } finally{
+        if(conn) { conn.release() }
+    }
+    
+    return result
+}
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+// Middle ware
+
+/**
+ * 회원가입 진행에 쓰일 파라미터들을 추출하는 미들웨어.
+ * 명시한 파라미터들이 존재하는지, 올바른 타입으로 전송한 것이 맞는지 체크
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ * @returns {void}
+ */
+function getSigninParameters(req, res, next){
+    try{
+        const { Account, Password, EMail, Nickname } = req.body
+
+        if(typeof Account != 'string'){
+            errorLog(req, controllerName, 'ID must be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof Password != 'string'){
+            errorLog(req, controllerName, 'Password must be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof EMail != 'string'){
+            errorLog(req, controllerName, 'EMail msust be string')
+            throw new ValuesIsMalformed()
+        }
+
+        if(typeof Nickname != 'string'){
+            errorLog(req, controllerName, 'Nickname must be string')
+            throw new ValuesIsMalformed()
+        }
+
+        req.paramBox = {
+            paramID: Account,
+            password: Password,
+            email: EMail,
+            nickname: Nickname
+        }
+
+        next()
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof ValuesIsMalformed){
+            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+
+        return
+    }
+}
+
+/**
  * 지정된 글자 수 이내인지, 제한된 양식은 잘 지켰는지, 올바른 이메일인지 등등
  * 
  * @param {express.Request} req 
@@ -151,9 +174,136 @@ function checkCorrectData(req, res, next){
     const { paramID, password, email, nickname } = req.paramBox
 
     try{
+        if(paramID.length > 20){
+            res.json({ code: 2120, message: '아이디는 16글자 이내여야 합니다' })
+            return
+        }
 
+        if(password.length > 20){
+            res.json({ code: 2121, message: '비밀번호는 20글자 이내여야 합니다' })
+            return
+        }
+
+        if(email.length > 45){
+            res.json({ code: 2122, message: '이메일은 45글자 이내여야 합니다' })
+            return
+        }
+
+        if(nickname.length > 20){
+            res.json({ code: 2123, message: '닉네임은 20글자 이내여야 합니다' })
+            return
+        }
+
+        next()
     } catch(err) {
         errorLog(req, controllerName, err.message)
+        res.json({ code: 2130, message: '값을 검증하는 중 오류가 발생하였습니다' })
+    }
+}
+
+/**
+ * ID 중복 체크용 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ * @returns {void}
+ */
+async function checkRegisteredAccountMiddle(req, res, next){
+    const { paramID } = req.paramBox
+
+    try{
+        const isRegistered = await getRegisteredAccountCheck(paramID)
+
+        if(isRegistered != 0){
+            throw new RegisterdUser()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdUser){
+            res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생하였습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
+        }
+
+        return
+    }
+}
+
+/**
+ * 닉네임 중복 체크용 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+async function checkRegisteredNicknameMiddle(req, res, next){
+    const { nickname } = req.paramBox
+
+    try{
+        const isRegistered = await getRegisteredNicknameCheck(nickname)
+
+        if(isRegistered != 0){
+            throw new RegisterdNickname()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdNickname){
+            res.json({ code: 1012, message: '이미 사용중인 닉네임 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생했습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+
+        return
+    }
+}
+
+/**
+ * 닉네임 중복 체크용 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+async function checkRegisteredEMailMiddle(req, res, next){
+    const { email } = req.paramBox
+
+    try{
+        const isRegistered = await getRegisteredEMailCheck(email)
+
+        if(isRegistered != 0){
+            throw new RegisterdEMail()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof RegisterdEMail){
+            res.json({ code: 1013, message: '이미 사용중인 이메일 입니다' })
+        }
+        else if(err instanceof ErrorOnRegisterChecking){
+            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생했습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+
+        return
     }
 }
 /////////////////////////////////////////////////////////////////////
@@ -165,11 +315,11 @@ function checkCorrectData(req, res, next){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-async function checkRegistered(req, res){
+async function checkRegisteredAccount(req, res){
     const { paramID } = req.paramBox
 
     try{
-        const isRegistered = await getRegisteredCheck(paramID)
+        const isRegistered = await getRegisteredAccountCheck(paramID)
 
         if(isRegistered != 0){
             throw new RegisterdUser()
@@ -211,8 +361,8 @@ async function processRegister(req, res){
         await conn.query(queryString)
         await conn.commit()
 
-        res.json({ code: 401, message: '회원가입에 성공하였습니다' })
-        normalLog(req, controllerNamem, `사용자 ${Account} 회원가입 성공`)
+        res.json({ code: 204, message: '회원가입에 성공하였습니다' })
+        normalLog(req, controllerName, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
         errorLog(req, controllerName, err.message)
@@ -230,4 +380,6 @@ export default signin
 ///// Error controll class
 class ValuesIsMalformed extends Error{ constructor(){ super('올바르지 않은 데이터 형식이 전송됨') } }
 class RegisterdUser extends Error{ constructor(){ super('이미 회원가입이 완료된 유저') } }
+class RegisterdNickname extends Error{ constructor(){ super('이미 사용중인 닉네임') } }
+class RegisterdEMail extends Error{ constructor(){ super('이미 사용중인 이메일') } }
 class ErrorOnRegisterChecking extends Error{ constructor(){ super('중복유저 확인을 위해 DB와 통신 중 오류 발생') } }
