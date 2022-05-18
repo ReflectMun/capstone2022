@@ -1,4 +1,4 @@
-import styles from "./Signup.module.css";
+import styles from "../css/Signup.module.css";
 import logoImage from "../img/logo_savior.png";
 
 function onClickEmailBtn(event) {

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import styles from "./Mainarea.module.css";
+import styles from "../css/Mainarea.module.css";
 import Board from "./Board";
 import Writer from "./Writer";
 
