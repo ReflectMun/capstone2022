@@ -48,7 +48,7 @@ app.use('/api', api)
 // 첫번째 인자는 엔드포인트 이름 / 만 있으면 따로 엔드포인트를 지정하지 않았다는 의미
 // 두번째 인자는 해당 엔드포인트로 연결했을 때 실행될 동작들에 대한 정보가 담긴 콜백 함수
 app.get('/', (req, res) => {
-    readFile('wellcome.html', { encoding: 'utf-8' }, (err, data) => {
+    readFile('welcome.html', { encoding: 'utf-8' }, (err, data) => {
         if(err){
             res.send('No Such File or Directory')
         }
