@@ -1,0 +1,20 @@
+.main_area {
+  margin: 60px;
+  text-align: left;
+  border-radius: 3px;
+  width: 45%;
+  background-color: #f2f2f2;
+}
+.write_btn {
+  margin: 23px 0px 0px 0px;
+  border: none;
+  color: white;
+  background-color: #bca6fd;
+  width: 80px;
+  height: 30px;
+  cursor: pointer;
+}
+.major {
+  margin-left: "10px";
+  width: 87%;
+}

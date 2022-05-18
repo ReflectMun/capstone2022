@@ -1,4 +1,9 @@
 .wrap_post {
+  width: 700px;
+  margin: 65px 200px;
+  text-align: left;
+}
+.wrap_question {
   border: solid 1.5px rgb(196, 191, 191);
   border-radius: 5px;
 }
@@ -38,4 +43,9 @@
 .wrap_answer {
   border: solid 1.5px rgb(196, 191, 191);
   border-radius: 5px;
+}
+.box_sample {
+  width: 500px;
+  height: 500px;
+  background-color: tomato;
 }

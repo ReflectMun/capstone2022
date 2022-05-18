@@ -1,8 +1,8 @@
 .board_container {
   border: solid 1px rgb(196, 191, 191);
   border-radius: 5px;
-  margin: 5px 5px;
-  background: transparent;
+  margin: 15px 15px;
+  background: white;
 }
 .wrap_title_contents {
   flex-basis: 85%;

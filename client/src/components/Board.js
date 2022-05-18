@@ -1,4 +1,4 @@
-import styles from "./Board.module.css";
+import styles from "../css/Board.module.css";
 import thumbnail from "./thumbnail_test.png";
 
 function Board() {
