@@ -1,6 +1,27 @@
 import styles from "./Signup.module.css";
 import logoImage from "../img/logo_savior.png";
+
 function Signup() {
+  const GoSignup=(e)=>{
+    const serverURL = 'www.qnasavior.kro.kr:14450'
+      const reqBody ={
+        Account : e.target.value.ID,
+        Password : e.target.value.password,
+        Nickname : e.target.value.nickname,
+        EMail : e.target.value.EMail
+      }
+      fetch(serverURL + '/api/signin',{
+        method :'post',
+        body :JSON.stringify(reqBody),
+        headers : {'Content-Type': 'application/json'}
+      })
+      .then((response) => response.json())
+      .then((result) =>{
+        result.message === "success" ? alert("회원가입 성공") : alert("회원가입 실패")
+      })
+
+  }
+    
   return (
     <div className={styles.signup_main}>
       <header>
@@ -40,6 +61,7 @@ function Signup() {
             name="signup_btn"
             value="가입"
             className={styles.signup_btn}
+            onClick ={GoSignup(e)}
           />
         </div>
       </form>
