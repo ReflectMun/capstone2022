@@ -10,6 +10,7 @@ fetchMessage.get(
     '/sended',
     jwtVerify,
     extractSender,
+    extractPageNum,
     fetchSendedMessageController
 )
 
@@ -44,6 +45,29 @@ function extractRecipient(req, res, next){
     req.paramBox['Recipient'] = Recipient
     next()
 }
+
+/**
+ * 메시지 Fetching에 필요한 값들을 추출하는 미들웨어
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function extractPageNum(req, res, next){
+    try{
+        const { pageNum } = req.query
+
+        if(!pageNum){
+            throw new Error()
+        }
+
+        req.paramBox['pageNum'] = parseInt(pageNum, 10)
+
+        next()
+    }
+    catch(err){
+
+    }
+}
 ////////////////////////////////////////////
 
 ////////////////////////////////////////////
@@ -58,7 +82,9 @@ async function fetchSendedMessageController(req, res){
         const queryString =
         `SELECT Author, Recipient, Date, Time, Content
         FROM Messages
-        WHERE Author = '${req.paramBox['Author']}' && HiddenForAuthor = 0`
+        WHERE Author = '${req.paramBox['Author']}' && HiddenForAuthor = 0
+        ORDER BY MessageID
+        LIMIT ${pageNum}, 15`
 
         conn = await Pool.getConnection(conn => conn)
 

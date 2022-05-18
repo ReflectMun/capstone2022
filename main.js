@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: 'localhost:14450',
+    origin: 'www.qnasavior.kro.kr',
     credentials: true
 }))
 
