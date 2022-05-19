@@ -99,7 +99,12 @@ export async function jwtVerify(req, res, next){
             if(err instanceof TokenDosentContained){
                 res.json({ code: 906, message: '로그인 정보가 없습니다. 로그인을 해 주세요' })
             }
-            res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+            else if(err instanceof RefreshTokenExpired){
+                res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+            }
+            else{
+                res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+            }
         }
     }
 }
