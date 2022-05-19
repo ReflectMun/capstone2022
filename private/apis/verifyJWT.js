@@ -65,7 +65,9 @@ export async function jwtVerify(req, res, next){
         if(!token){
             throw new TokenDosentContained()
         }
+        
         const verifiedToken = verify(token, process.env.JWT_SECRET)
+
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
             req.paramBox['Account'] = verifiedToken['Account']
@@ -79,6 +81,7 @@ export async function jwtVerify(req, res, next){
         if(err.message == 'jwt expired'){
             try{
                 const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
+
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
                     req.tokenBox['token'] = newAccessToken
