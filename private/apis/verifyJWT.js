@@ -127,8 +127,8 @@ export async function jwtVerifyForSignin(req, res, next){
         res.json({ code: 905, error: '이미 로그인한 사람입니다.' })
     }
     catch(err){
-        const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
         try{
+            const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
             if(!await checkVaildRefreshToken(vaildToken['UID'])){
                 next()
             }
