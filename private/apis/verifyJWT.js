@@ -97,6 +97,10 @@ export async function jwtVerify(req, res, next){
                 res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
             }
         }
+        else if(err.message == 'invalid token'){
+            errorLog(req, controllerName, err.message)
+            res.json({ code: 912, message: '로그인용 토큰이 아닌 유효하지 않은 데이터가 전송되었습니다' })
+        }
         else{
             errorLog(req, controllerName, err.message)
             if(err instanceof TokenDosentContained){
