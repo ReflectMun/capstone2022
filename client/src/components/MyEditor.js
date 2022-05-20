@@ -23,7 +23,7 @@ function MyEditor({ handleChange, ...props }) {
               .then((res) => res.json())
               .then((res) => {
                 resolve({
-                  default: `${API_URL}/${res.filename}`,
+                  default: res,
                 });
               })
               .catch((err) => {
