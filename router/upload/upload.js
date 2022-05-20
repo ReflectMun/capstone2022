@@ -19,7 +19,7 @@ const upload_func = multer({
         }
     }),
     limits: {
-        fileSize: 1000 * 1000 * 10
+        fileSize: 1024 * 1024 * 10
     }
 });
 
