@@ -60,5 +60,5 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log('Server start')
-    console.log(`${new Date().toLocaleDateString} ${new Date().toLocaleTimeString()}`)
+    console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
 })
