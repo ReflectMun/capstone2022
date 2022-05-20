@@ -59,6 +59,6 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-    // 서버를 실행시키는 코드, 여기에 정의된 동작들이 서버 실행직후 동작됨
     console.log('Server start')
+    console.log(`${new Date().toLocaleDateString} ${new Date().toLocaleTimeString()}`)
 })
