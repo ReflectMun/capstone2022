@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
 import AWS from 'aws-sdk'
-import jwt from 'jsonwebtoken'
 
 const test = Router()
 
@@ -15,8 +14,8 @@ test.get('/s3Image', (req, res) => {
     })
 
     S3.getObject({
-        Bucket: 'capstonestorage',
-        Key: 'Fox.jpeg'
+        Bucket: 'saviorimg',
+        Key: 'EmperorChick.jpeg'
     }, (err, data) => {
         if(err) { console.log(`S3 Bucket에 파일이 존재하지 않음`) }
         else{

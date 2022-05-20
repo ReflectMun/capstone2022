@@ -1,5 +1,5 @@
 import question_sample from "./q_sample.png";
-import styles from "./Post.module.css";
+import styles from "../css/Post.module.css";
 import Message from "../components/Message";
 import Nav from "../components/Nav";
 import { useState } from "react";

@@ -14,16 +14,17 @@
   flex-direction: row;
   list-style: none;
 }
-.menuToggle {
-  display: block;
-  position: absolute;
-  top: 30px;
-  left: 30px;
 
-  z-index: 1;
-
-  -webkit-user-select: none;
-  user-select: none;
+.menuToggle{
+   display: block;
+   position: absolute;
+   top: 40px;
+   left: 30px;
+   
+   z-index: 1;
+   
+   -webkit-user-select: none;
+   user-select: none;
 }
 .menuToggle li {
   text-decoration: none;
@@ -169,8 +170,18 @@
   position: absolute;
   left: 100px;
 }
-#id {
-  padding-right: 20px;
+
+#logo{
+  color: #9278da;
+  font-size: 3em;
+  padding-left: 20px;
+}
+
+#info{
+  font-size: 1.5em;
+}
+#id{
+    padding-right: 20px;    
 }
 
 #point {

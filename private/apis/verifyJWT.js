@@ -65,7 +65,9 @@ export async function jwtVerify(req, res, next){
         if(!token){
             throw new TokenDosentContained()
         }
+        
         const verifiedToken = verify(token, process.env.JWT_SECRET)
+
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
             req.paramBox['Account'] = verifiedToken['Account']
@@ -79,6 +81,7 @@ export async function jwtVerify(req, res, next){
         if(err.message == 'jwt expired'){
             try{
                 const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
+
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
                     req.tokenBox['token'] = newAccessToken
@@ -94,12 +97,21 @@ export async function jwtVerify(req, res, next){
                 res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
             }
         }
+        else if(err.message == 'invalid token'){
+            errorLog(req, controllerName, err.message)
+            res.json({ code: 912, message: '로그인용 토큰이 아닌 유효하지 않은 데이터가 전송되었습니다' })
+        }
         else{
             errorLog(req, controllerName, err.message)
             if(err instanceof TokenDosentContained){
                 res.json({ code: 906, message: '로그인 정보가 없습니다. 로그인을 해 주세요' })
             }
-            res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+            else if(err instanceof RefreshTokenExpired){
+                res.json({ code: 908, message: '로그인 하지 않았거나 로그인 시간이 만료된 사람입니다.' })
+            }
+            else{
+                res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+            }
         }
     }
 }
@@ -122,8 +134,8 @@ export async function jwtVerifyForSignin(req, res, next){
         res.json({ code: 905, error: '이미 로그인한 사람입니다.' })
     }
     catch(err){
-        const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
         try{
+            const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
             if(!await checkVaildRefreshToken(vaildToken['UID'])){
                 next()
             }

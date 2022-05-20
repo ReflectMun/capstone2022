@@ -2,7 +2,7 @@ import express, { Router } from 'express'
 import Pool from '../../private/server/DBConnector.js'
 import { ErrorOnS3Fetching, getObjectFromS3 } from '../../private/server/S3Connector.js'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
-import { errorLog } from '../../private/apis/logger.js'
+import { errorLog, normalLog } from '../../private/apis/logger.js'
 
 const fetchPost = Router()
 const controllerName = 'fetchPost'
@@ -63,10 +63,9 @@ function getPostHTMLContent(boardURI, postNum){
  * 게시판의 게시글 리스트를 불러와서 리턴하는 함수
  * @param {string} boardURI 게시판의 URI
  * @param {string} startNum 게시글의 시작 번호
- * @param {string} pagePerPost 
  * @returns {Array<object>} 게시글 리스트 배열 객체
  */
-async function getPostList(boardURI, startNum, pagePerPost){
+async function getPostList(boardURI, startNum){
     let connection
     try{
         const queryString = 
@@ -77,7 +76,7 @@ async function getPostList(boardURI, startNum, pagePerPost){
                 WHERE BoardURI = '${boardURI}' AND isDeleted = 0
                 ORDER BY PostID DESC
             )
-            LIMIT ${startNum}, ${pagePerPost}`
+            LIMIT ${startNum}, 15`
         connection = await Pool.getConnection(connection => connection)
 
         await connection.beginTransaction()
@@ -150,7 +149,7 @@ function extractPostNum(req, res, next){
             throw new PostNumExtractFailed()
         }
 
-        req.paramBox['postNum'] = postNum 
+        req.paramBox['postNum'] = parseInt(postNum, 10)
 
         next()
     }
@@ -325,7 +324,8 @@ async function ContentViewerController(req, res, next){
 
     try{
         const contentText = await getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
-        res.json({ code: 210, content: contentText })
+        res.json({ code: 210, content: contentText , newToken: req.tokenBox['token'] })
+        normalLog(req, controllerName, '본문 컨텐츠 전송 완료')
     }
     catch(err){
         console.log(`Error : ContentViewerController : ${err.message}`)
@@ -357,8 +357,9 @@ async function ContentViewerController(req, res, next){
 
 async function LoadPostListController(req, res, next){
     try{
-        const postList = await getPostList()
-        res.json({ code: 210, postlist: postList })
+        const startNum = 15 * req.paramBox['pageNum']
+        const postList = await getPostList(req.paramBox['board'], startNum)
+        res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
     }
     catch(err){
         errorLog(req, controllerName, err.message)

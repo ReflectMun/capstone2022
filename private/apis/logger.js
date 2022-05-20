@@ -11,7 +11,7 @@ import express from 'express'
 export function normalLog(requestObject, controllerName, message){
     const date = new Date().toLocaleDateString()
     const time = new Date().toLocaleTimeString()
-    const ip = requestObject.ip
+    const ip = requestObject.headers['x-real-ip']
 
     console.log(`${date} ${time} : ${controllerName} : ${ip} : ${message}`)
 }
@@ -27,7 +27,7 @@ export function normalLog(requestObject, controllerName, message){
 export function errorLog(requestObject, controllerName, errorMessage){
     const date = new Date().toLocaleDateString()
     const time = new Date().toLocaleTimeString()
-    const ip = requestObject.ip
+    const ip = requestObject.headers['x-real-ip']
 
     console.log(`Error : ${date} ${time} : ${controllerName} : ${ip} : ${errorMessage}`)
 }
