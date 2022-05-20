@@ -94,6 +94,7 @@ upload.post('/putText',async (req,res)=>{
 //DB추가
 upload.post('/putImg',upload_func.single('files'),PutImg)
 async function PutImg (req, res) {
+    console.log(req.file)
     const {originalname} = req.file
 
     const url=`https://saviorimg.s3.ap-northeast-2.amazonaws.com/${originalname}`
