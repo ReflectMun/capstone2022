@@ -1,11 +1,10 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
 import Pool from '../../private/server/DBConnector.js'
-
 import multer from 'multer'
 import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
-
+import {putObjectToS3} from '../../private/server/s3Connector.js'
 AWS.config.loadFromPath('./private/credential/s3.json')
 
 const upload = Router()
@@ -13,10 +12,9 @@ const s3 = new AWS.S3()
 const upload_func = multer({
     storage: multerS3({
         s3: s3,
-        bucket: 'capstonestorage',
+        bucket: 'saviorimg',
         // acl: 'public-read',
         key: function (req, file, cb) {
-            console.log(file.originalname)
             cb(null, file.originalname)
         }
     }),
@@ -63,32 +61,43 @@ upload.get('/saviorimg', (req, res) => {
         }
     })
 })
-//DB추가
-upload.post('/putImg',upload_func.array('img',25),PutImg)
-async function PutImg (req, res) {
+upload.post('/putText',async (req,res)=>{
+    const {boarduri,title,author,date,content} = req.body
     let conn=null
-    const {boarduri,title,author,time,date,content} = req.body
-    const filenums = req.files.length   // 파일 갯수 구함
     try {
+        putObjectToS3('saviorcontent',title+'.txt',content,'text/plain')
         conn = await Pool.getConnection(conn => conn)
         await conn.beginTransaction()
         const queryString1 = `SELECT UID from Users WHERE Account='${author}'` // db 에서 authorUID 가져옴
-        const [row, fields] = await conn.query(queryString1)
-        
-        const uid=row[0]['UID']
-        const queryString2 = `INSERT INTO Posts(BoardURI,Title,Author,AuthorUID,Time,Date,ContentTexts,NumberOfFiles) VALUES('${boarduri}','${title}','${author}','${uid}','${time}','${date}','${content}',${filenums})`
-        await conn.query(queryString2)
-
-        await conn.commit()
+        const [row] = await conn.query(queryString1)
+        if(row[0]){
+            const uid=row[0]['UID']
+            const queryString2 = `INSERT INTO Posts(BoardURI,Title,Author,AuthorUID,Date) VALUES('${boarduri}','${title}','${author}','${uid}','${date}')`
+            await conn.query(queryString2)
+            await conn.commit()
+            res.status(200)
+        }else{
+            console.log("no user found")
+            res.status(500)
+        }
     }
     catch (err) {
         console.log(err) 
-        res.sendStatus(500)
+        res.status(500)
     }
     finally {
         if (conn) { conn.release() } 
-        res.sendStatus(200)
+        res.sendStatus(res.statusCode)  
     }
+    
+})
+//DB추가
+upload.post('/putImg',upload_func.single('img'),PutImg)
+async function PutImg (req, res) {
+    const {originalname} = req.file
+
+    const url=`${s3.endpoint.protocol}//saviorimg.${s3.endpoint.hostname}/${originalname}`
+    res.status(200).send(url)
 }
 upload.post('/putS3', upload_func.single('img'), (req, res) => {
     console.log('여기까지 넘어오긴 하나')
