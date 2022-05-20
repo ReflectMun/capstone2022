@@ -17,7 +17,9 @@ fetchMessage.get(
 fetchMessage.get(
     '/received',
     jwtVerify,
-    extractRecipient
+    extractRecipient,
+    extractPageNum,
+    fetchReceivedMessageController
 )
 
 ////////////////////////////////////////////
@@ -78,12 +80,13 @@ function extractPageNum(req, res, next){
  */
 async function fetchSendedMessageController(req, res){
     let conn
+    const pageNum = req.paramBox['pageNum'] * 15
     try{
         const queryString =
         `SELECT Author, Recipient, Date, Time, Content
         FROM Messages
         WHERE Author = '${req.paramBox['Author']}' && HiddenForAuthor = 0
-        ORDER BY MessageID
+        ORDER BY MessagesID DESC
         LIMIT ${pageNum}, 15`
 
         conn = await Pool.getConnection(conn => conn)
@@ -102,9 +105,56 @@ async function fetchSendedMessageController(req, res){
         else{
             res.json({
                 code: 214,
-                list: messages
+                list: messages,
+                newToken: req.tokenBox['token']
             })
             normalLog(req, controllerName, '보낸 메시지 전송 완료')
+        }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.messages)
+        res.json({ code: 7701, message: '보낸 메시지 목록을 불러오는 중 오류가 발생하였습니다' })
+    }
+    finally{
+        if(conn) { conn.release() }
+    }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function fetchReceivedMessageController(req, res){
+    let conn
+    const pageNum = req.paramBox['pageNum'] * 15
+    try{
+        const queryString =
+        `SELECT Author, Recipient, Date, Time, Content
+        FROM Messages
+        WHERE Recipient = '${req.paramBox['Recipient']}' && HiddenForRecipient = 0
+        ORDER BY MessagesID DESC
+        LIMIT ${pageNum}, 15`
+
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ messages, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        if(!messages){
+            res.json({
+                code: 217,
+                messages: '받은 메시지가 존재하지 않습니다'
+            })
+            normalLog(req, controllerName, '받은 메시지가 없음')
+        }
+        else{
+            res.json({
+                code: 216,
+                list: messages,
+                newToken: req.tokenBox['token']
+            })
+            normalLog(req, controllerName, '받은 메시지 전송 완료')
         }
     }
     catch(err){
