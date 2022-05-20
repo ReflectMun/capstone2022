@@ -3,6 +3,7 @@ import styles from "../css/Post.module.css";
 import Message from "../components/Message";
 import Nav from "../components/Nav";
 import { useState } from "react";
+import MyEditor from "./MyEditor";
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
@@ -61,8 +62,27 @@ function Answer() {
     </div>
   );
 }
-function AnswerBox() {
-  return <div className={styles.box_sample}>Text Editor</div>;
+//ckeditor 사용
+function AnswerBox(props) {
+  const [editor, setEditor] = useState(null);
+  return (
+    <div className={styles.box_sample}>
+      <MyEditor
+        handleChange={(data) => {
+          setEditor(data);
+        }}
+        data={editor}
+        {...props}
+      />
+      <input
+        type="submit"
+        onClick={(event) => {
+          event.preventDefault();
+          console.log(editor);
+        }}
+      />
+    </div>
+  );
 }
 function Post() {
   const [answer, setAnswer] = useState(false);
