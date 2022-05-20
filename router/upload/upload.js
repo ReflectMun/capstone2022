@@ -4,7 +4,7 @@ import Pool from '../../private/server/DBConnector.js'
 import multer from 'multer'
 import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
-import {putObjectToS3} from '../../private/server/s3Connector.js'
+import {putObjectToS3} from '../../private/server/S3Connector.js'
 AWS.config.loadFromPath('./private/credential/s3.json')
 
 const upload = Router()
