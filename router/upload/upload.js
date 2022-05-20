@@ -23,7 +23,6 @@ const upload_func = multer({
     }
 });
 
-
 upload.get('/', uploadform)
 function uploadform(req, res) {
     readFile('./public/html/upload/upload.html', { encoding: 'utf-8' }, (err, data) => {
@@ -37,6 +36,7 @@ function uploadform(req, res) {
         }
     })
 }
+
 upload.get('/saviorcontent', (req, res) => {
     readFile('./public/html/upload/Texttest.html', { encoding: 'utf-8' }, (err, data) => {
         if (err) { res.send('404 Not Found') }
@@ -49,6 +49,7 @@ upload.get('/saviorcontent', (req, res) => {
         }
     })
 })
+
 upload.get('/saviorimg', (req, res) => {
     readFile('./public/html/upload/Imgtest.html', { encoding: 'utf-8' }, (err, data) => {
         if (err) { res.send('404 Not Found') }
@@ -61,6 +62,7 @@ upload.get('/saviorimg', (req, res) => {
         }
     })
 })
+
 upload.post('/putText',async (req,res)=>{
     const {boarduri,title,author,date,content} = req.body
     let conn=null
@@ -91,18 +93,16 @@ upload.post('/putText',async (req,res)=>{
     }
     
 })
+
 //DB추가
-upload.post('/putImg',upload_func.single('files'),PutImg)
+upload.post('/putImg', upload_func.single('files'), PutImg)
+
 async function PutImg (req, res) {
     const {originalname} = req.file
 
     const url=`https://saviorimg.s3.ap-northeast-2.amazonaws.com/${originalname}`
     res.json(url)
 }
-upload.post('/putS3', upload_func.single('img'), (req, res) => {
-    console.log('여기까지 넘어오긴 하나')
-    let imgFile = req.file
-})
 
 upload.get('/getS3/:filename', function (req, res, next) {
     let { filename } = req.params;
