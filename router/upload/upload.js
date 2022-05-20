@@ -92,12 +92,12 @@ upload.post('/putText',async (req,res)=>{
     
 })
 //DB추가
-upload.post('/putImg',upload_func.single('img'),PutImg)
+upload.post('/putImg',upload_func.single('files'),PutImg)
 async function PutImg (req, res) {
     const {originalname} = req.file
 
     const url=`${s3.endpoint.protocol}//saviorimg.${s3.endpoint.hostname}/${originalname}`
-    res.status(200).send(url)
+    res.json(url)
 }
 upload.post('/putS3', upload_func.single('img'), (req, res) => {
     console.log('여기까지 넘어오긴 하나')
