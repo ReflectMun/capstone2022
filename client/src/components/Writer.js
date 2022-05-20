@@ -1,4 +1,4 @@
-import styles from "./Writer.module.css";
+import styles from "../css/Writer.module.css";
 
 function Writer() {
   return (
