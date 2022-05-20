@@ -22,7 +22,8 @@ app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: 'localhost:3000'
+    origin: 'localhost:3000',
+    credentials: true,
 }))
 
 app.use(serveStatic(join(__dirname, 'public/html')))
