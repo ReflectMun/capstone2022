@@ -321,9 +321,19 @@ async function checkExistingPost(req, res, next){
 // Controller
 async function ContentViewerController(req, res, next){
     const resObj = getResponseObject()
+    let conn
 
     try{
         const contentText = await getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
+
+        const queryString =
+        `SELECT Title, Author, AuthorUID, Date, Time FROM Posts WHERE PostID = ${req.paramBox['postNum']}`
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ data, fields ] = await conn.query(queryString)
+        await conn.commit()
+
         res.json({ code: 210, content: contentText , newToken: req.tokenBox['token'] })
         normalLog(req, controllerName, '본문 컨텐츠 전송 완료')
     }

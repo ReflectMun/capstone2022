@@ -96,8 +96,8 @@ upload.post('/putImg',upload_func.single('files'),PutImg)
 async function PutImg (req, res) {
     const {originalname} = req.file
 
-    const url=`${s3.endpoint.protocol}//saviorimg.${s3.endpoint.hostname}/${originalname}`
-    res.send(url)
+    const url=`https://saviorimg.s3.ap-northeast-2.amazonaws.com/${originalname}`
+    res.json(url)
 }
 upload.post('/putS3', upload_func.single('img'), (req, res) => {
     console.log('여기까지 넘어오긴 하나')
