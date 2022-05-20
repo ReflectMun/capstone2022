@@ -80,7 +80,7 @@ function Signup() {
               name="signup_btn"
               value="가입"
               className={styles.signup_btn}
-              onClick={GoSignup(e)}
+              onClick={GoSignup()}
             />
           </div>
         </form>
