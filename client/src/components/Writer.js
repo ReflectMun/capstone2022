@@ -1,6 +1,10 @@
 import styles from "../css/Writer.module.css";
+import MyEditor from "./MyEditor";
+import { useState } from "react";
 
-function Writer() {
+//메인 화면에서 글쓰기 버튼 클릭했을 때 나타나는 것. 게시물 안에서 답변하기 클릭했을 때 나타나는 것 아님. 다른 것
+function Writer(props) {
+  const [editor, setEditor] = useState(null);
   return (
     <div className={styles.writer_container}>
       <form>
@@ -12,15 +16,24 @@ function Writer() {
             placeholder="제목"
           />
         </div>
-        <div className={styles.editor}>여기 에디터 들어올 곳</div>
-        <input
-          type="submit"
-          className={styles.write_btn}
-          value="등록"
-          onClick={(event) => {
-            event.preventDefault();
-          }}
-        />
+        <div className={styles.editor}>
+          <MyEditor
+            handleChange={(data) => {
+              setEditor(data);
+            }}
+            data={editor}
+            {...props}
+          />
+          <input
+            className={styles.write_btn}
+            type="submit"
+            value="등록"
+            onClick={(event) => {
+              event.preventDefault();
+              console.log(editor);
+            }}
+          />
+        </div>
       </form>
     </div>
   );
