@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styles from "./Login.module.css";
+import styles from "../css/Login.module.css";
 import logoImage from "../img/logo_savior.png";
 function onClick(event) {
   event.preventDefault();

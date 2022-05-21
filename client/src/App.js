@@ -16,7 +16,6 @@ function App() {
         <Route path="/answer" element={<Post />} />
       </Routes>
     </Router>
-
   );
 }
 export default App;
