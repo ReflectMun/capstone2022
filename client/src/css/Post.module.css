@@ -41,11 +41,10 @@
   color: #9f81f7;
 }
 .wrap_answer {
+  margin-top: 5px;
   border: solid 1.5px rgb(196, 191, 191);
   border-radius: 5px;
 }
 .box_sample {
-  width: 500px;
-  height: 500px;
-  background-color: tomato;
+  border: solid 1.5px rgb(196, 191, 191);
 }
