@@ -1,5 +1,9 @@
 .nav {
-  padding-top: 10px;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100px;
+  width: 100%;
+  /* padding-top: 10px; */
   display: flex;
   flex-direction: row;
 }
@@ -171,10 +175,9 @@
   left: 100px;
 }
 
-#logo{
-  color: #9278da;
-  font-size: 3em;
-  padding-left: 20px;
+#logo_image{
+  height: 100px;
+  padding-top: 10px;
 }
 
 #info{
