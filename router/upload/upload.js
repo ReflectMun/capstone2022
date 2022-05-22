@@ -5,6 +5,7 @@ import multer from 'multer'
 import multerS3 from 'multer-s3'
 import AWS from 'aws-sdk'
 import {putObjectToS3} from '../../private/server/S3Connector.js'
+
 AWS.config.loadFromPath('./private/credential/s3.json')
 
 const upload = Router()
@@ -13,42 +14,33 @@ const upload_func = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'saviorimg',
-        // acl: 'public-read',
         key: function (req, file, cb) {
-            cb(null, file.originalname)
+            let fileType
+            const fileMimetype = file.mimetype
+
+            switch(fileMimetype){
+                case 'image/jpeg':
+                    fileType = 'jpeg'
+                    break
+                case 'image/png':
+                    fileType = 'png'
+                    break
+                case 'image/gif':
+                    fileType = 'gif'
+                    break
+                default:
+                    fileType = 'jpg'
+                    break
+            }
+
+            file.encodedName = Buffer.from(file.originalname + new Date().getMilliseconds()).toString('base64url') + `.${fileType}`
+            cb(null, file.encodedName)
         }
     }),
     limits: {
         fileSize: 1024 * 1024 * 10
     }
 });
-
-upload.get('/', uploadform)
-function uploadform(req, res) {
-    readFile('./public/html/upload/upload.html', { encoding: 'utf-8' }, (err, data) => {
-        if (err) { res.send('404 Not Found') }
-        else {
-            res.writeHead(200, {
-                'Content-Type': 'text/html; encoding=utf-8'
-            })
-            res.write(data)
-            res.end()
-        }
-    })
-}
-
-upload.get('/saviorcontent', (req, res) => {
-    readFile('./public/html/upload/Texttest.html', { encoding: 'utf-8' }, (err, data) => {
-        if (err) { res.send('404 Not Found') }
-        else {
-            res.writeHead(200, {
-                'Content-Type': 'text/html; encoding=utf-8'
-            })
-            res.write(data)
-            res.end()
-        }
-    })
-})
 
 upload.get('/saviorimg', (req, res) => {
     readFile('./public/html/upload/Imgtest.html', { encoding: 'utf-8' }, (err, data) => {
@@ -99,9 +91,9 @@ upload.post('/putImg', upload_func.single('files'), PutImg)
 
 async function PutImg (req, res) {
     console.log('File URL Return')
-    const {originalname} = req.file
+    const { encodedName } = req.file
 
-    const url=`https://saviorimg.s3.ap-northeast-2.amazonaws.com/${originalname}`
+    const url=`https://saviorimg.s3.ap-northeast-2.amazonaws.com/${encodedName}`
     res.json(url)
 }
 

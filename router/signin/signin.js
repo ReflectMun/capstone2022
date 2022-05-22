@@ -9,7 +9,7 @@ const controllerName = 'signin'
 // Router
 signin.post(
     '/',
-    getSigninParameters,
+    extractSigninParameters,
     checkCorrectData,
     checkRegisteredAccountMiddle,
     checkRegisteredNicknameMiddle,
@@ -19,7 +19,7 @@ signin.post(
 
 signin.post(
     '/check_registered',
-    getSigninParameters,
+    extractSigninParameters,
     checkRegisteredAccount
 )
 
@@ -117,7 +117,7 @@ signin.post(
  * @param {express.NextFunction} next 
  * @returns {void}
  */
-function getSigninParameters(req, res, next){
+function extractSigninParameters(req, res, next){
     try{
         const { Account, Password, EMail, Nickname } = req.body
 

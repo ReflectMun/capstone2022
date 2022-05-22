@@ -342,7 +342,8 @@ async function ContentViewerController(req, res, next){
             Author: data[0]['Author'],
             AuthorUID: data[0]['AuthorUID'],
             Date: data[0]['Date'],
-            Time: data[0]['Time']
+            Time: data[0]['Time'],
+            newToken: req.tokenBox['totken']
         })
         normalLog(req, controllerName, '본문 컨텐츠 전송 완료')
     }
