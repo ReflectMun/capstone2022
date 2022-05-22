@@ -37,18 +37,18 @@ function uploadform(req, res) {
         }
     })
 }
-upload.get('/saviorcontent', (req, res) => {
-    readFile('./public/html/upload/Texttest.html', { encoding: 'utf-8' }, (err, data) => {
-        if (err) { res.send('404 Not Found') }
-        else {
-            res.writeHead(200, {
-                'Content-Type': 'text/html; encoding=utf-8'
-            })
-            res.write(data)
-            res.end()
-        }
-    })
-})
+// upload.get('/saviorcontent', (req, res) => {
+//     readFile('./public/html/upload/Texttest.html', { encoding: 'utf-8' }, (err, data) => {
+//         if (err) { res.send('404 Not Found') }
+//         else {
+//             res.writeHead(200, {
+//                 'Content-Type': 'text/html; encoding=utf-8'
+//             })
+//             res.write(data)
+//             res.end()
+//         }
+//     })
+// })
 upload.get('/saviorimg', (req, res) => {
     readFile('./public/html/upload/Imgtest.html', { encoding: 'utf-8' }, (err, data) => {
         if (err) { res.send('404 Not Found') }
@@ -61,36 +61,36 @@ upload.get('/saviorimg', (req, res) => {
         }
     })
 })
-upload.post('/putText',async (req,res)=>{
-    const {boarduri,title,author,date,content} = req.body
-    let conn=null
-    try {
-        putObjectToS3('saviorcontent',title+'.txt',content,'text/plain')
-        conn = await Pool.getConnection(conn => conn)
-        await conn.beginTransaction()
-        const queryString1 = `SELECT UID from Users WHERE Account='${author}'` // db 에서 authorUID 가져옴
-        const [row] = await conn.query(queryString1)
-        if(row[0]){
-            const uid=row[0]['UID']
-            const queryString2 = `INSERT INTO Posts(BoardURI,Title,Author,AuthorUID,Date) VALUES('${boarduri}','${title}','${author}','${uid}','${date}')`
-            await conn.query(queryString2)
-            await conn.commit()
-            res.status(200)
-        }else{
-            console.log("no user found")
-            res.status(500)
-        }
-    }
-    catch (err) {
-        console.log(err) 
-        res.status(500)
-    }
-    finally {
-        if (conn) { conn.release() } 
-        res.sendStatus(res.statusCode)  
-    }
+// upload.post('/putText',async (req,res)=>{
+//     const {boarduri,title,author,date,content} = req.body
+//     let conn=null
+//     try {
+//         putObjectToS3('saviorcontent',title+'.txt',content,'text/plain')
+//         conn = await Pool.getConnection(conn => conn)
+//         await conn.beginTransaction()
+//         const queryString1 = `SELECT UID from Users WHERE Account='${author}'` // db 에서 authorUID 가져옴
+//         const [row] = await conn.query(queryString1)
+//         if(row[0]){
+//             const uid=row[0]['UID']
+//             const queryString2 = `INSERT INTO Posts(BoardURI,Title,Author,AuthorUID,Date) VALUES('${boarduri}','${title}','${author}','${uid}','${date}')`
+//             await conn.query(queryString2)
+//             await conn.commit()
+//             res.status(200)
+//         }else{
+//             console.log("no user found")
+//             res.status(500)
+//         }
+//     }
+//     catch (err) {
+//         console.log(err) 
+//         res.status(500)
+//     }
+//     finally {
+//         if (conn) { conn.release() } 
+//         res.sendStatus(res.statusCode)  
+//     }
     
-})
+// })
 //DB추가
 upload.post('/putImg',upload_func.single('files'),PutImg)
 async function PutImg (req, res) {

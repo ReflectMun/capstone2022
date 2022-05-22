@@ -9,6 +9,7 @@ import logout from './logout/logout.js'
 import comment from './comment/comment.js'
 import fetchPost from './postAPI/fetchPost.js'
 import issuingJwt from './jwt/issuingJwt.js'
+import content from './content.js'
 ////////////////////////////////////
 
 const api = Router()
@@ -20,5 +21,5 @@ api.use('/logout', logout) // 로그아웃 처리 API 컨트롤러
 api.use('/upload', upload) // 파일 업로드 API 컨트롤러
 api.use('/post', fetchPost) // 게시글 내용 불러오기 API 컨트롤러
 api.use('/jwtissue', issuingJwt) // 사용자 인증 JWT 발급
-
+api.use('/content', content)
 export default api
