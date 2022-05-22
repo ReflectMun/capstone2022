@@ -28,6 +28,9 @@ const upload_func = multer({
                 case 'image/gif':
                     fileType = 'gif'
                     break
+                case 'image/webp':
+                    fileType = 'webp'
+                    break
                 default:
                     fileType = 'jpg'
                     break
