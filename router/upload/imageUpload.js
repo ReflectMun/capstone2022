@@ -10,14 +10,6 @@ AWS.config.loadFromPath('./private/credential/s3.json')
 const imageUpload = Router()
 const S3 = new AWS.S3()
 const controllerName = 'ImageUploader'
-
-imageUpload.put(
-    '/',
-    jwtVerify,
-    imageUploadToS3.single('files'),
-    imageUploadController
-)
-
 const imageUploadToS3 = multer({
     storage: multerS3({
         s3: S3,
@@ -52,6 +44,13 @@ const imageUploadToS3 = multer({
         fileSize: 1024 * 1024 * 10
     }
 });
+
+imageUpload.put(
+    '/',
+    jwtVerify,
+    imageUploadToS3.single('files'),
+    imageUploadController
+)
 
 /**
  * AWS S3에 Put한 파일을 편집기에서 이용할 수 있도록 파일의 퍼블링 링크를 리턴
