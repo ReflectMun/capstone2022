@@ -87,12 +87,12 @@ function extractMessageContent(req, res, next){
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  */
-function checkVaildRecipient(req, res, next){
+async function checkVaildRecipient(req, res, next){
     const { Recipient } = req.paramBox
     let conn
 
     try{
-        const query = `SELECT * FROM Users WHERE Account = '${Recipient}' && isSignedOut = 0`
+        const query = `SELECT * FROM Users WHERE Account = '${Recipient}' AND isSignedOut = 0`
 
         conn = await Pool.getConnection()
 
@@ -131,7 +131,7 @@ function checkVaildRecipient(req, res, next){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-function sendMessageController(req, res){
+async function sendMessageController(req, res){
     let conn = null
     const { Author, Recipient, Content } = req.paramBox
     try{

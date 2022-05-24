@@ -6,6 +6,7 @@ import { errorLog, normalLog } from '../../private/apis/logger.js'
 
 const fetchPost = Router()
 const controllerName = 'fetchPost'
+const NoFileErrorMessage = 'NoFile'
 
 fetchPost.get(
     '/fetch/content',
@@ -44,13 +45,11 @@ function getResponseObject(){
 
 /**
  * S3로부터 지정된 게시판, 지정된 번호에 해당하는 게시글의 HTML을 꺼내오는 함수
- * @param {string} boardURI 
- * @param {string} postNum 
+ * @param {string} contentKeyName S3에서 게시글 파일을 찾기 위한 키
  * @returns {object} HTML 컨텐츠
  */
-function getPostHTMLContent(boardURI, postNum){
-    const objectKey = `/${boardURI}/${postNum}`
-    const content = getObjectFromS3('contentHTML', objectKey)
+function getPostHTMLContent(contentKeyName){
+    const content = getObjectFromS3('saviorcontent', contentKeyName)
 
     if(!content){
         throw new EmptyContentFetched()
@@ -77,6 +76,7 @@ async function getPostList(boardURI, startNum){
                 ORDER BY PostID DESC
             )
             LIMIT ${startNum}, 15`
+
         connection = await Pool.getConnection(connection => connection)
 
         await connection.beginTransaction()
@@ -157,7 +157,7 @@ function extractPostNum(req, res, next){
         errorLog(req, controllerName, err.message)
         if(err instanceof PostNumExtractFailed){
             resObj.code = 9653
-            resObj.message = '게시판 번호가 손상되거나 누락되었습니다'
+            resObj.message = '게시글 번호가 손상되거나 누락되었습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -193,7 +193,7 @@ function extractPageNum(req, res, next){
         errorLog(req, controllerName, err.message)
         if(err instanceof PageNumExtractFailed){
             resObj.code = 9973
-            resObj.message = '페이지 번호가 없습니다'
+            resObj.message = '페이지 번호가 없거나 손상되었습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -211,10 +211,11 @@ function extractPageNum(req, res, next){
 
 async function checkExistingBoard(req, res, next){
     const resObj = getResponseObject()
+    const { board } = req.paramBox
     let conn
 
     try{
-        const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${req.paramBox['board']}'`
+        const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${board}'`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -264,22 +265,27 @@ async function checkExistingBoard(req, res, next){
 
 async function checkExistingPost(req, res, next){
     const resObj = getResponseObject()
+    const { board, postNum } = req.paramBox
     let conn
 
     try{
-        const queryString = `SELECT COUNT(PostID), isDeleted FROM Posts WHERE PostID = ${req.paramBox['postNum']}`
+        const queryString = `SELECT isDeleted FROM Posts WHERE BoardURI = ${board} AND PostID = ${postNum}`
         conn = await Pool.getConnection(conn => conn)
         
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        const exist = row[0]['COUNT(PostID)']
-        if(exist == 0){
+        if(row.length == 0){
             throw new PostNotExist()
         }
         else if(exist > 1){
             throw new UnknownDuplicateOnDataBase('post', req.paramBox['postNum'])
+        }
+
+        const isDeleted = row[0]['isDeleted']
+        if(isDeleted){
+            throw new DeletedPost()
         }
         else{
             next()
@@ -289,13 +295,20 @@ async function checkExistingPost(req, res, next){
         errorLog(req, controllerName, err.message)
         if(err instanceof PostNotExist){
             resObj.code = 3305
-            resObj.message = '존재하지 않거나 삭제된 게시물 입니다'
+            resObj.message = '존재하지 않는 게시물 입니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else if(err instanceof DeletedPost){
+            resObj.code = 3306
+            resObj.message = '삭제된 게시물 입니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof UnknownDuplicateOnDataBase){
-            resObj.code = 3306
+            resObj.code = 3307
             resObj.message = '원인 미상의 오류가 DB에서 발생하였습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
@@ -321,18 +334,24 @@ async function checkExistingPost(req, res, next){
 // Controller
 async function ContentViewerController(req, res, next){
     const resObj = getResponseObject()
+    const { postNum } = req.paramBox
     let conn
 
     try{
-        const contentText = await getPostHTMLContent(req.paramBox['board'], req.paramBox['postNum'])
-
         const queryString =
-        `SELECT Title, Author, AuthorUID, Date, Time FROM Posts WHERE PostID = ${req.paramBox['postNum']}`
+        `SELECT Title, Author, AuthorUID, Date, Time, FileName FROM Posts WHERE PostID = ${postNum} AND isDeleted = 0`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
         const [ data, fields ] = await conn.query(queryString)
         await conn.commit()
+
+        const objectFileName = data[0]['FileName']
+        if(objectFileName == NoFileErrorMessage){
+            throw new PostFileNotExist()
+        }
+
+        const contentText = getPostHTMLContent(objectFileName)
 
         res.json({
             code: 210,
@@ -345,11 +364,18 @@ async function ContentViewerController(req, res, next){
             Time: data[0]['Time'],
             newToken: req.tokenBox['totken']
         })
-        normalLog(req, controllerName, '본문 컨텐츠 전송 완료')
+        normalLog(req, controllerName, `${req.paramBox['Account']}에게 게시글 ${req.paramBox['postNum']} 전송 완료`)
     }
     catch(err){
         console.log(`Error : ContentViewerController : ${err.message}`)
-        if(err instanceof EmptyContentFetched){
+        if(err instanceof PostFileNotExist){
+            resObj.code = 4470
+            resObj.message = '손상되어 불러올 수 없는 게시물 입니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else if(err instanceof EmptyContentFetched){
             resObj.code = 4473
             resObj.message = '볼 수 없는 게시글 입니다'
             if(req.tokenBox['token']){
@@ -376,9 +402,10 @@ async function ContentViewerController(req, res, next){
 }
 
 async function LoadPostListController(req, res, next){
+    const { pageNum, board } = req.paramBox
     try{
-        const startNum = 15 * req.paramBox['pageNum']
-        const postList = await getPostList(req.paramBox['board'], startNum)
+        const startNum = 15 * pageNum
+        const postList = await getPostList(board, startNum)
         res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
     }
     catch(err){
@@ -399,3 +426,5 @@ class UnknownDuplicateOnDataBase extends Error{
     constructor(kindof, item) { super(`원인을 알 수 없는 중복 데이터가 DB에 존재함 : ${kindof} ${item}`) }
 }
 class PostNotExist extends Error{ constructor() { super('존재하지 않는 게시물') } }
+class DeletedPost extends Error{ constructor() { super('삭제된 게시물 입니다') } }
+class PostFileNotExist extends Error{ constructor() { super('게시글 파일이 존재하지 않음') } }

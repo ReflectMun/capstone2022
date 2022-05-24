@@ -194,6 +194,18 @@ function checkCorrectData(req, res, next){
             return
         }
 
+        const IDRegex = /^[a-zA-Z]+[0-9]+/g
+        if(IDRegex.test(paramID) == false){
+            res.json({ code: 2124, message: '아이디에는 영문자와 숫자만 사용가능 합니다' })
+            return
+        }
+
+        const emailRegex = /\w+@(\w+[.]?)+[.]ac[.]kr/g
+        if(emailRegex.test(email) == false){
+            res.json({ code: 2126, message: '이메일이 ac.kr로 끝나는 형식의 올바른 이메일이 아닙니다'})
+            return
+        }
+
         next()
     } catch(err) {
         errorLog(req, controllerName, err.message)
