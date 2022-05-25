@@ -16,7 +16,7 @@ function MyEditor({ handleChange, ...props }) {
             // let headers = new Headers();
             // headers.append("Origin", "http://localhost:3000");
             fetch(`${API_URL}/${UPLOAD_ENDPOINT}`, {
-              method: "post",
+              method: "put",
               body: body,
               // mode: "no-cors"
             })
