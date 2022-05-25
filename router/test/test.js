@@ -1,10 +1,17 @@
 import { Router } from 'express'
 import { readFile } from 'fs'
 import AWS from 'aws-sdk'
+import multer from 'multer'
 
 const test = Router()
+const formData = multer()
 
-test.get('/', testS3Image)
+// test.get('/', testS3Image)
+test.put('/', formData.single('content'), (req, res) => {
+    console.log(req.body)
+    console.log(req.file.originalname)
+    res.json('ok')
+})
 
 test.get('/s3Image', (req, res) => {
     const S3 = new AWS.S3({

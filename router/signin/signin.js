@@ -200,6 +200,12 @@ function checkCorrectData(req, res, next){
             return
         }
 
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9]+)(?=.*[!@#$%^&*()\-_=+{}\[\]:;<>,.?/\\\|~₩'])[a-zA-Z0-9!@#$%^&*()\-_=+{}\[\]:;<>,.?/\\\|~₩']+/g
+        if(passwordRegex.test(password) == false){
+            res.json({ code: 2125, message: '비밀번호에는 대문자, 숫자, 특수문자가 모두 하나 이상 포함되어야 합니다' })
+            return
+        }
+
         const emailRegex = /\w+@(\w+[.]?)+[.]ac[.]kr/g
         if(emailRegex.test(email) == false){
             res.json({ code: 2126, message: '이메일이 ac.kr로 끝나는 형식의 올바른 이메일이 아닙니다'})

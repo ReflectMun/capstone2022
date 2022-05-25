@@ -81,9 +81,9 @@ async function processLogin(req, res){
                 UID: row[0]['UID'],
                 Account: paramID
             })
-            res.redirect('/api/login/issue?' + UrlQuery)
-
             normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}, Password = ${Password}`)
+
+            res.redirect('/api/login/issue?' + UrlQuery)
         }
         else{
             res.json({ code: 300, message: '계정 혹은 비밀번호가 틀렸습니다'})
