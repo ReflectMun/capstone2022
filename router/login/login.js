@@ -94,7 +94,7 @@ function getLoginParameter(req, res, next){
 async function processLogin(req, res){
     let conn = null
     const { paramID, Password } = req.parmaBox
-    const encryptedPassword = encryptPassword(Password)
+    const encryptedPassword = await encryptPassword(Password)
 
     try{
         const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${encryptedPassword}'`
