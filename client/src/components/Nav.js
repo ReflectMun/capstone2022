@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import styled from "../css/nav.module.css";
 import Info from "../routes/Info.js";
 import Major from "./Major.js";
+import logoImage from "../img/logo_savior.png";
+
 function Nav() {
   const [selectCollege, setSelectCollge] = useState("공학");
   const onChangeCollge = (event) => {
@@ -29,7 +31,7 @@ function Nav() {
         </ul>
       </div>
       <div className={styled.logoContainer}>
-        <span id={styled.logo}>SAVIOR</span>
+        <img src={logoImage} id={styled.logo_image} alt="savior" />
       </div>
       <div className={styled.info}>
         <ul id={styled.info}>
