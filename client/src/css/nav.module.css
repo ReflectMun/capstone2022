@@ -1,13 +1,19 @@
 .nav {
-  padding-top: 10px;
+  position: fixed;
+  top: 0; left: 0;
+  height: 60px;
+  width: 100%;
+  /* padding-top: 10px; */
   display: flex;
   flex-direction: row;
+  background-color: #000000
 }
 .info {
   display: flex;
   flex-direction: row;
   position: absolute;
   right: 10px;
+  top : -15px;
 }
 #info {
   display: flex;
@@ -18,7 +24,7 @@
 .menuToggle{
    display: block;
    position: absolute;
-   top: 40px;
+   top: 15px;
    left: 30px;
    
    z-index: 1;
@@ -64,7 +70,8 @@
   margin-bottom: 5px;
   position: relative;
 
-  background: #cdcdcd;
+  background: #ffffff;
+  
   border-radius: 3px;
 
   z-index: 1;
@@ -140,7 +147,6 @@
 .menu li {
   padding: 15px;
   font-size: 22px;
-
   border-bottom: 1px solid #dbdcd2;
 }
 
@@ -171,14 +177,13 @@
   left: 100px;
 }
 
-#logo{
-  color: #9278da;
-  font-size: 3em;
-  padding-left: 20px;
+#logo_image{
+  height: 70px;
 }
 
 #info{
   font-size: 1.5em;
+  color: #ffffff;
 }
 #id{
     padding-right: 20px;    

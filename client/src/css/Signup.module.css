@@ -35,11 +35,17 @@ h4 {
   width: 95%;
   font-size: 17px;
 }
+.signup_info  {
+  font-size: 12px;
+}
 .wrap_email {
   display: flex;
+  flex: 3 1;
+  flex-basis : 150px 15px;
+  /* flex-grow: 3; */
 }
 .mail_btn {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   width: 100%;
   background-color: #9f81f7;
   border: none;
@@ -49,8 +55,9 @@ h4 {
   cursor: pointer;
 }
 .mail_btn_wrap {
-  flex-grow: 1;
-  width: 100%;
+  /* flex-grow: 1; */
+  width: 50px;
+  height: 50px;
   line-height: 40px;
   background-color: #9f81f7;
   cursor: pointer;
@@ -77,3 +84,7 @@ h4 {
   color: white;
   cursor: pointer;
 }
+input ::placeholder {
+  font-size: 8px;
+}
+
