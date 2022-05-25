@@ -1,4 +1,5 @@
 import express, { Router } from 'express'
+import crypto from 'crypto'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 
@@ -103,6 +104,24 @@ signup.post(
     }
     
     return result
+}
+
+/**
+ * 평문 비밀번호 암호화 함수
+ * @param {string} password 
+ * @returns {string}
+ */
+function encryptPassword(password){
+    return new Promise(function(resolve, reject){
+        crypto.scrypt(password, process.env.SALT, 256, (err, key) => {
+            if(err){
+                reject(err)
+            }
+            else{
+                resolve(key.toString('base64url'))
+            }
+        })
+    })
 }
 /////////////////////////////////////////////////////////////////////
 
@@ -367,11 +386,12 @@ async function checkRegisteredAccount(req, res){
  */
 async function processRegister(req, res){
     const { paramID: Account, password: Password, email, nickname } = req.paramBox
+    const encryptedPassword = await encryptPassword(Password)
 
     let conn
     try{
         const queryString = 
-        `INSERT INTO Users(Account, Password, EMail, Nickname) VALUES('${Account}', '${Password}', '${email}', '${nickname}')`
+        `INSERT INTO Users(Account, Password, EMail, Nickname) VALUES('${Account}', '${encryptedPassword}', '${email}', '${nickname}')`
 
         conn = await Pool.getConnection(conn => conn)
 
