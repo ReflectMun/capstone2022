@@ -1,4 +1,5 @@
 import express, { Router } from 'express'
+import crypto from 'crypto'
 import Pool from '../../private/server/DBConnector.js'
 import { stringify as queryStringify } from 'querystring'
 
