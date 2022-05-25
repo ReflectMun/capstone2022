@@ -36,9 +36,28 @@ function onClickSignupBtn(e){
         result.code === 204
           ? alert("🎉회원가입 성공🎉")
           : alert("😥"+result.message+"😥");
-      });
+      })
+
 }
 function Signup() {
+  const [pw,setPw] =useState("")
+  const [pwc,setPwc]= useState("")
+  const [same,setSame] = useState(true)
+  const PasswordHandler=(e)=>{
+    setPw(e.target.value)
+    console.log(pw)
+  }
+  const PasswordCheckHandler=(e)=>{
+    setPwc(e.target.value)
+    console.log(e.target.value)
+  }
+  const checkPw = ()=>{
+    pw === pwc ? (
+      setSame(true)
+      ) : (
+      setSame(false)
+      )
+  }
   return (
     <div className={styles.background}>
       <div className={styles.signup_main}>
@@ -61,6 +80,7 @@ function Signup() {
                 name ="nickname"
                 type="text" 
                 className={styles.signup_info}
+                placeholder="20자 이내"
                  />
             </div>
             <h4>비밀번호</h4>
@@ -68,7 +88,9 @@ function Signup() {
               <input  
                 name ="password" 
                 type="text" 
+                placeholder="대문자, 숫자, 특수문자가 모두 하나 이상을 포함해야 합니다."
                 className={styles.signup_info}
+                onChange={PasswordHandler}
                  />
             </div>
             <h4>비밀번호 확인</h4>
@@ -77,6 +99,11 @@ function Signup() {
                 name="passwordCheck"
                 type="text" 
                 className={styles.signup_info}
+                onChange={() => {
+                  PasswordCheckHandler();
+                  checkPw();
+                }}
+               // onChange={PasswordCheckHandler}
                  />
             </div>
           </div>
@@ -86,6 +113,7 @@ function Signup() {
               <input 
                 name="email"
                 type="text" 
+                placeholder="ac.kr로 끝나는 형식이어야 합니다."
                 className={styles.signup_info}
                  />
             </div>
@@ -110,3 +138,4 @@ function Signup() {
   );
 }
 export default Signup;
+
