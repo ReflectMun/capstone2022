@@ -27,7 +27,7 @@ async function insertTokenToDB(refreshToken, UID){
 
     try{
         const queryString =
-        `INSERT INTO RefreshTokens(UID, Token) VALUES(${UID}, '${refreshToken}')`
+        `INSERT INTO RefreshTokens(UID, Token, Expiration) VALUES(${UID}, '${refreshToken}', NOW() + INTERVAL 12 HOUR)`
         
         conn = await Pool.getConnection(conn => conn)
         
