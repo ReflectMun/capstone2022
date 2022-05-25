@@ -8,27 +8,6 @@ function onClickSignupBtn(event) {
   event.preventDefault();
 }
 function Signup() {
-  const GoSignup = (e) => {
-    const serverURL = "www.qnasavior.kro.kr:14450";
-    const reqBody = {
-      Account: e.target.value.ID,
-      Password: e.target.value.password,
-      Nickname: e.target.value.nickname,
-      EMail: e.target.value.EMail,
-    };
-    fetch(serverURL + "/api/signin", {
-      method: "post",
-      body: JSON.stringify(reqBody),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        result.message === "success"
-          ? alert("회원가입 성공")
-          : alert("회원가입 실패");
-      });
-  };
-
   return (
     <div className={styles.background}>
       <div className={styles.signup_main}>
@@ -72,15 +51,6 @@ function Signup() {
               value="가입"
               className={styles.signup_btn}
               onClick={onClickSignupBtn}
-            />
-          </div>
-          <div className={styles.signup_btn_wrap}>
-            <input
-              type="submit"
-              name="signup_btn"
-              value="가입"
-              className={styles.signup_btn}
-              onClick={GoSignup()}
             />
           </div>
         </form>
