@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import express from 'express'
-import { errorLog } from './logger.js'
+import { errorLog, normalLog } from './logger.js'
 import Pool from '../server/DBConnector.js'
 
 const { sign, verify } = jwt
@@ -71,6 +71,7 @@ export async function jwtVerify(req, res, next){
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
             req.paramBox['Account'] = verifiedToken['Account']
+            normalLog(req, controllerName, `로그인한 사용자 ${verifiedToken['Account']}`)
             next()
         }
         else{
@@ -85,6 +86,7 @@ export async function jwtVerify(req, res, next){
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
                     req.tokenBox['token'] = newAccessToken
+                    normalLog(req, controllerName, `로그인한 사용자 ${verifiedToken['Account']}, 새로운 인증토큰 발급 완료`)
                     next()
                 }
                 else{

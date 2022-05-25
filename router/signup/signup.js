@@ -2,12 +2,12 @@ import express, { Router } from 'express'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 
-const signin = Router()
+const signup = Router()
 const controllerName = 'signin'
 
 /////////////////////////////////////////////////////////////////////
 // Router
-signin.post(
+signup.post(
     '/',
     extractSigninParameters,
     checkCorrectData,
@@ -17,7 +17,7 @@ signin.post(
     processRegister
 )
 
-signin.post(
+signup.post(
     '/check_registered',
     extractSigninParameters,
     checkRegisteredAccount
@@ -393,7 +393,7 @@ async function processRegister(req, res){
 
 /////////////////////////////////////////////////////////////////////
 
-export default signin
+export default signup
 
 ///// Error controll class
 class ValuesIsMalformed extends Error{ constructor(){ super('올바르지 않은 데이터 형식이 전송됨') } }
