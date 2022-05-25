@@ -79,9 +79,7 @@ function errorHandle(err, req, res, next){
  * @param {express.NextFunction} next
  */
 async function putContentController(req, res, next){
-    const { /* Account: Author, UID: AuthorUID,*/ BoardURI, Title } = req.paramBox
-    const Author = 'wksh229'
-    const AuthorUID = '2'
+    const { Account: Author, UID: AuthorUID, BoardURI, Title } = req.paramBox
     const { originalname } = req.file
     let conn
 
