@@ -70,7 +70,10 @@ function Signup() {
           <div>
             <h4>아이디</h4>
             <div className={styles.signup_input}>
-              <input name="id" type="text" className={styles.signup_info} />
+              <input name="id" 
+              type="text" 
+              className={styles.signup_info}
+              placeholder="아이디를 입력해주세요." />
             </div>
             <h4>닉네임</h4>
             <div className={styles.signup_input}>
@@ -78,7 +81,7 @@ function Signup() {
                 name="nickname"
                 type="text"
                 className={styles.signup_info}
-                placeholder="20자 이내"
+                placeholder="16자 이내여야 합니다."
               />
             </div>
             <h4>비밀번호</h4>
@@ -97,17 +100,14 @@ function Signup() {
                 name="passwordCheck"
                 type="text"
                 className={styles.signup_info}
-                // onChange={() => {
-                //  // PasswordCheckHandler();
-                //  // checkPw();
-                // }}
                 onChange={onChangePasswordConfirm}
+                placeholder="비밀번호 확인이 필요합니다."
               />
             </div>
             {(pwc.length > 0 && isPasswordConfirm) ? <span>{passwordConfirmMessage}</span> : <span>{passwordConfirmMessage}</span> }
           </div>
           <h4>이메일 인증</h4>
-          <div className={styles.wrap_email}>
+          <div className={styles.wrap_email} id ={styles.wrap_email}>
             <div className={styles.signup_input}>
               <input
                 name="email"
@@ -115,7 +115,7 @@ function Signup() {
                 placeholder="ac.kr로 끝나는 형식이어야 합니다."
                 className={styles.signup_info}
               />
-            </div>
+            </div> 
             <div className={styles.mail_btn_wrap}>
               <button className={styles.mail_btn} onClick={onClickEmailBtn}>
                 인증
