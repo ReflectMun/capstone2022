@@ -41,18 +41,25 @@ function onClickSignupBtn(e) {
 function Signup() {
   const [pw, setPw] = useState("");
   const [pwc, setPwc] = useState("");
-  const [same, setSame] = useState(true);
+  const [isPasswordConfirm, setIsPasswordConfirm] = useState(false)
+  const [passwordConfirmMessage, setPasswordConfirmMessage] = useState('');
   const PasswordHandler = (e) => {
     setPw(e.target.value);
     console.log(pw);
   };
-  const PasswordCheckHandler = (e) => {
-    setPwc(e.target.value);
-    console.log(e.target.value);
-  };
-  const checkPw = () => {
-    pw === pwc ? setSame(true) : setSame(false);
-  };
+  const onChangePasswordConfirm = (e) => {
+      const passwordConfirmCurrent = e.target.value;
+      setPwc(passwordConfirmCurrent);
+
+      if (pw === passwordConfirmCurrent) {
+        setPasswordConfirmMessage('비밀번호가 일치합니다🙆‍♂️')
+        setIsPasswordConfirm(true)
+      } else {
+        setPasswordConfirmMessage('비밀번호가 일치하지 않습니다🙅‍♂️')
+        setIsPasswordConfirm(false)
+      }
+    //[pw]
+};
   return (
     <div className={styles.background}>
       <div className={styles.signup_main}>
@@ -90,13 +97,14 @@ function Signup() {
                 name="passwordCheck"
                 type="text"
                 className={styles.signup_info}
-                onChange={() => {
-                  PasswordCheckHandler();
-                  checkPw();
-                }}
-                // onChange={PasswordCheckHandler}
+                // onChange={() => {
+                //  // PasswordCheckHandler();
+                //  // checkPw();
+                // }}
+                onChange={onChangePasswordConfirm}
               />
             </div>
+            {(pwc.length > 0 && isPasswordConfirm) ? <span>{passwordConfirmMessage}</span> : <span>{passwordConfirmMessage}</span> }
           </div>
           <h4>이메일 인증</h4>
           <div className={styles.wrap_email}>
@@ -121,6 +129,7 @@ function Signup() {
               value="가입"
               className={styles.signup_btn}
               onClick={onClickSignupBtn}
+              disabled={!(isPasswordConfirm)}
             />
           </div>
         </form>
