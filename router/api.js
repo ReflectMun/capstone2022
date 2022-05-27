@@ -10,6 +10,7 @@ import comment from './comment/comment.js'
 import fetchPost from './postAPI/fetchPost.js'
 import issuingJwt from './jwt/issuingJwt.js'
 import messageRouter from './message/messageRouter.js'
+import boardList from './board.js'
 
 import apitest from './test/apitest.js'
 ////////////////////////////////////
@@ -20,10 +21,11 @@ api.use('/login', login) // 로그인 처리 API 컨트롤러
 api.use('/comment',comment)  // 댓글 처리 API 컨트롤러
 api.use('/signup', signup) // 회원가입 처리 API 컨트롤러
 api.use('/logout', logout) // 로그아웃 처리 API 컨트롤러
-api.use('/upload', uploadAPI) // 파일 업로드 API 컨트롤러
+api.use('/upload', uploadAPI) // 이미지 및 게시글 업로드 API 컨트롤러
 api.use('/post', fetchPost) // 게시글 내용 불러오기 API 컨트롤러
 api.use('/jwtissue', issuingJwt) // 사용자 인증 JWT 발급
-api.use('/message', messageRouter)
+api.use('/message', messageRouter) // 쪽지 수발신 API 컨트롤러
+api.use('/board', boardList) // 게시판 리스트 불러오기 API 컨트롤러
 
 api.use('/test', apitest)
 

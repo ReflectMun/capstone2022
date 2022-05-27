@@ -16,11 +16,12 @@ const fileChecker = multer()
 
 contentUpload.put(
     '/',
-    // jwtVerify,
+    jwtVerify,
     fileChecker.fields([
         { name: 'content' },
         { name: 'BoardURI' },
-        { name: 'Title' }
+        { name: 'Title' },
+        { name: 'Type' }
     ]),
     extractValues,
     putContentController,
@@ -36,7 +37,7 @@ contentUpload.put(
  * @param {express.NextFunction} next 
  */
 function extractValues(req, res, next){
-    const { BoardURI, Title } = req.body
+    const { BoardURI, Title, Type } = req.body
 
     req.file = req.files['content'][0]
 
@@ -46,10 +47,14 @@ function extractValues(req, res, next){
     if(typeof Title != 'string'){
         throw new InvalidValueType('Title')
     }
+    if(typeof Type != 'string'){
+        throw new InvalidValueType('Type')
+    }
 
     req.paramBox = {}
     req.paramBox['BoardURI'] = BoardURI
     req.paramBox['Title'] = Title
+    req.paramBox['Type'] = Type
 
     next()
 }
@@ -79,7 +84,7 @@ function errorHandle(err, req, res, next){
  * @param {express.NextFunction} next
  */
 async function putContentController(req, res, next){
-    const { Account: Author, UID: AuthorUID, BoardURI, Title } = req.paramBox
+    const { Account: Author, UID: AuthorUID, BoardURI, Title, Type } = req.paramBox
     const { originalname } = req.file
     let conn
 
@@ -87,8 +92,8 @@ async function putContentController(req, res, next){
 
     try {
         const queryString =
-        `INSERT INTO Posts(BoardURI, Title, AuthorUID, Author, Date, Time, FileName)
-        VALUES('${BoardURI}', '${Title}', '${AuthorUID}', '${Author}', NOW(), NOW(), '${renamedName}')`
+        `INSERT INTO Posts(BoardURI, Title, AuthorUID, Author, Date, Time, Type, FileName)
+        VALUES('${BoardURI}', '${Title}', '${AuthorUID}', '${Author}', NOW(), NOW(), ${Type}, '${renamedName}')`
 
         conn = await Pool.getConnection(conn => conn)
 
