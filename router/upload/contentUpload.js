@@ -57,6 +57,13 @@ function extractValues(req, res, next){
     next()
 }
 
+/**
+ * 
+ * @param {Error} err 
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function errorHandle(err, req, res, next){
     errorLog(req, controllerName, err.message)
     if(err instanceof InvalidValueType){
