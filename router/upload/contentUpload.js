@@ -1,7 +1,6 @@
 import express, { Router } from 'express'
 import Pool from '../../private/server/DBConnector.js'
 import multer from 'multer'
-import AWS from 'aws-sdk'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
@@ -9,7 +8,6 @@ import { putObjectToS3 } from '../../private/server/S3Connector.js'
 AWS.config.loadFromPath('./private/credential/s3.json')
 
 const contentUpload = Router()
-const s3 = new AWS.S3()
 const controllerName = 'ContentUploader'
 
 const fileChecker = multer()
