@@ -35,13 +35,13 @@ h4 {
   width: 95%;
   font-size: 17px;
 }
-.signup_info  {
+.signup_info {
   font-size: 12px;
 }
 .wrap_email {
   display: flex;
   flex: 3 1;
-  flex-basis : 150px 15px;
+  flex-basis: 150px 15px;
   /* flex-grow: 3; */
 }
 .mail_btn {
@@ -87,4 +87,3 @@ h4 {
 input ::placeholder {
   font-size: 8px;
 }
-
