@@ -15,7 +15,6 @@ function Mainarea() {
       </Link>
     </li>
   ));
-  console.log(boards);
   return (
     <center>
       <div className={styles.main_area}>
