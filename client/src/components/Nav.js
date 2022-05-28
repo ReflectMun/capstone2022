@@ -21,6 +21,13 @@ function boolCheckCookie(key) {
   return getCookie(key) != "" ? true : false;
 }
 
+//쿠키 삭제
+//쿠키는 삭제가 없어서 현재 시각으로 만료 처리를 함.
+function delCookie(key) {
+  let todayDate = new Date();
+  document.cookie = key + "=; path=/; expires=" + todayDate.toGMTString() + ";"; // 현재 시각 이전이면 쿠키가 만료되어 사라짐.
+}
+
 function LoginText() {
   return (
     <div>
@@ -44,14 +51,25 @@ function LogoutText() {
     } else {
       //로그아웃 처리
       return new Promise((resolve, reject) => {
-        // fetch(`${API_URL}/${LOGOUT_API}`, {
-        //   method: "GET",
-        //   header:,
-        // });
+        fetch(`${API_URL}/${LOGOUT_API}`, {
+          method: "GET",
+          header: {
+            authorization: token,
+          },
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+            // resolve({
+            //   code: 4403,
+            //   message: "로그아웃 중 서버에서 오류가 발생하였습니다",
+            // });
+          });
       });
     }
   }
-
   return (
     <div>
       <li
@@ -73,7 +91,12 @@ function Nav(props) {
   const colleges = ["공학", "인문", "자연", "사회", "의약", "예체능"];
   //로그아웃할때 필요한 token cookie 가져오기
 
-  token = getCookie(props.loginId);
+  if (boolCheckCookie(props.loginId)) {
+    token = getCookie(props.loginId);
+  } else {
+    token = null;
+  }
+
   return (
     <nav className={styled.nav}>
       <div className={styled.menuToggle}>
