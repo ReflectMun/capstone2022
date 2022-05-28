@@ -3,11 +3,11 @@ import { useState } from "react";
 import styles from "../css/Login.module.css";
 import logoImage from "../img/logo_savior.png";
 //쿠키 저장
-// expiredays 는 일자 정수 - 365년 1년 쿠키
-function setCookie(key, value, expiredays) {
+//days 는 일자 정수 - 365년 1년 쿠키
+function setCookie(key, value, days) {
   let todayDate = new Date();
-  todayDate.setDate(todayDate.getDate() + expiredays); // 현재 시각 + 일 단위로 쿠키 만료 날짜 변경
-  //todayDate.setTime(todayDate.getTime() + (expiredays * 24 * 60 * 60 * 1000)); // 밀리세컨드 단위로 쿠키 만료 날짜 변경
+  todayDate.setDate(todayDate.getDate() + days); // 현재 시각 + 일 단위로 쿠키 만료 날짜 변경
+  //todayDate.setTime(todayDate.getTime() + (days * 24 * 60 * 60 * 1000)); // 밀리세컨드 단위로 쿠키 만료 날짜 변경
   document.cookie =
     key +
     "=" +
@@ -56,31 +56,33 @@ function Login(props) {
   //버튼클릭, 로그인 이벤트
   const onClickLogin = (event) => {
     event.preventDefault();
-    // if (id === "" || password === "") {
-    //   alert("ID와 비밀번호를 입력해주세요");
-    // } else {
-    //   return new Promise((resolve, reject) => {
-    //     fetch(`${API_URL}/${LOGIN_API}`, {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         authorization: null,
-    //       },
-    //       body: JSON.stringify({ ID: id, Password: password }),
-    //     })
-    //       .then((res) => res.json())
-    //       .then((data) => {
-    //         console.log(data);
-    //         setCookie(id, data, 1);
-    //         alert("로그인 완료");
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-    //   });
-    // }
-    setIsLogin(true);
-    alert("로그인");
+    if (id === "" || password === "") {
+      alert("ID와 비밀번호를 입력해주세요");
+    } else {
+      return new Promise((resolve, reject) => {
+        fetch(`${API_URL}/${LOGIN_API}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: null,
+          },
+          body: JSON.stringify({ ID: id, Password: password }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            //토큰을 cookie 저장
+            setCookie(id, data, 1);
+            alert("로그인 완료");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+    }
+    //해당 아이디로 로그인 했다고 loginId state값 지정
+    props.setLoginId(id);
+    alert("로그인되었습니다.");
     navigate("/");
   };
   return (
