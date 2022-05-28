@@ -3,7 +3,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const API_URL = "http://www.qnasavior.kro.kr";
-const UPLOAD_ENDPOINT = "api/upload/putImg";
+const UPLOAD_ENDPOINT = "api/upload/image";
 
 function MyEditor({ handleChange, ...props }) {
   function uploadAdapter(loader) {
@@ -16,7 +16,7 @@ function MyEditor({ handleChange, ...props }) {
             // let headers = new Headers();
             // headers.append("Origin", "http://localhost:3000");
             fetch(`${API_URL}/${UPLOAD_ENDPOINT}`, {
-              method: "put",
+              method: "PUT",
               body: body,
               // mode: "no-cors"
             })

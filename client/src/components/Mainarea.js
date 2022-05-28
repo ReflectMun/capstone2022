@@ -7,7 +7,7 @@ import Writer from "./Writer";
 function Mainarea() {
   const [write, setWrite] = useState(false);
   const major = "컴퓨터 공학";
-  const boards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const boards = [{ 1: "1" }, { 2: "2" }, { 3: "3" }, { 4: "4" }, { 5: "5" }];
   const boardsList = boards.map((item) => (
     <li style={{ listStyle: "none" }}>
       <Link to={"/answer"} style={{ textDecoration: "none", color: "inherit" }}>
@@ -15,6 +15,7 @@ function Mainarea() {
       </Link>
     </li>
   ));
+  console.log(boards);
   return (
     <center>
       <div className={styles.main_area}>
