@@ -97,9 +97,15 @@ function Nav(props) {
       </div>
       <div className={styled.info}>
         <ul id={styled.info}>
-          <li id={styled.id} onClick={Info}>
-            ACCOUNT
+          <li id={styled.id}>
+            <Link 
+            to ={"/account"}
+            style={{ textDecoration: "none", color: "inherit" }}
+            >
+              계정
+            </Link>
           </li>
+          
           <li id={styled.point}>POINT</li>
           <li id={styled.message}>쪽지</li>
           {

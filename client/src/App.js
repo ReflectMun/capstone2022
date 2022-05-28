@@ -5,6 +5,7 @@ import Login from "./routes/Login";
 import Signup from "./routes/Signup";
 import Post from "./components/Post";
 import React from "react";
+import Info from "./routes/Info";
 
 //쿠키 읽기
 function getCookie(key) {
@@ -54,6 +55,7 @@ function App() {
         />
         <Route path="/signup" element={<Signup />} />
         <Route path="/answer" element={<Post />} />
+        <Route path ="/account" element={<Info />} />
       </Routes>
     </Router>
   );

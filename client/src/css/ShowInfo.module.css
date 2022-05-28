@@ -1,0 +1,32 @@
+.info_container{
+    text-align: left;
+    position: absolute;
+    width:70%;
+    height: 100vh;
+    top : 60px;
+    left : 30%;
+    text-align: right;
+    border-left : solid black;
+    overflow: hidden;
+} 
+.info_ul{
+    margin-top: 0px;
+    margin-bottom: 0;
+    padding-left: 0;
+    display: grid;
+    list-style: none;
+    grid-template-columns: 150px 1fr;
+    /* border-left : solid rgb(43, 42, 42); */
+
+}
+
+.info_li{
+    padding: 20px 20px;
+    border-right : 2px solid black;
+    border-bottom : 2px solid black;
+    text-align: left;
+}
+/* #info_bottom{
+    border-bottom : 2px solid rgb(43, 42, 42);
+    
+} */

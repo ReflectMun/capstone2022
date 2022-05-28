@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import ShowInfo from "../components/ShowInfo.js";
+import Nav from "../components/Nav.js";
+import Message from "../components/Message.js";
 
 function Info() {
   // const [loading,setLoading] = useState(true);
@@ -17,6 +19,11 @@ function Info() {
   //     getInfos()
   // },[]);
   return (
+    <div>
+      <Nav />
+      <ShowInfo />
+      <Message />
+    </div>
     // <div>
     //     {loading? (
     //         <h1>로딩중</h1>
@@ -35,9 +42,9 @@ function Info() {
     // }
     // </div>
 
-    <div>
-      <ShowInfo />
-    </div>
+    // <div>
+    //   <ShowInfo />
+    // </div>
     //console.log("a")
   );
 }
