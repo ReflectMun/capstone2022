@@ -1,67 +1,87 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styles from "../css/Login.module.css";
 import logoImage from "../img/logo_savior.png";
-// function onClick(event) {
-//   event.preventDefault();
-//   const formElement = document.loginForm;
+//쿠키 저장
+// expiredays 는 일자 정수 - 365년 1년 쿠키
+function setCookie(key, value, expiredays) {
+  let todayDate = new Date();
+  todayDate.setDate(todayDate.getDate() + expiredays); // 현재 시각 + 일 단위로 쿠키 만료 날짜 변경
+  //todayDate.setTime(todayDate.getTime() + (expiredays * 24 * 60 * 60 * 1000)); // 밀리세컨드 단위로 쿠키 만료 날짜 변경
+  document.cookie =
+    key +
+    "=" +
+    escape(value) +
+    "; path=/; expires=" +
+    todayDate.toGMTString() +
+    ";";
+}
 
-//   const Account = formElement.login.value;
-//   const Password = formElement.passwordBox.value;
+// 쿠키 읽기
+function getCookie(key) {
+  key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
+  return key.test(document.cookie) ? unescape(RegExp.$1) : ""; // 인자로 받은 키에 해당하는 키가 있으면 값을 반환
+}
 
-//   if (!Account || !Password) {
-//     alert("ID와 비밀번호를 입력해주세요");
-//   } else {
-//     fetch("URL", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": 'application/json; encode="utf8"',
-//         authorization: readCookie("token"),
-//       },
-//       body: JSON.stringify({ ID: Account, Password: Password }),
-//     })
-//       .then((rawData) => rawData.json())
-//       .then((data) => {
-//         data["token"];
-//       });
-//   }
-// }
+//쿠키 삭제
+//쿠키는 삭제가 없어서 현재 시각으로 만료 처리를 함.
+function delCookie(key) {
+  let todayDate = new Date();
+  document.cookie = key + "=; path=/; expires=" + todayDate.toGMTString() + ";"; // 현재 시각 이전이면 쿠키가 만료되어 사라짐.
+}
+
+//쿠키 체크 - 있으면 true 없으면 false
+//getCookie() 에 의존
+function boolCheckCookie(key) {
+  return getCookie(key) != "" ? true : false;
+}
+
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGIN_API = "api/login";
 
-function Login() {
+function Login(props) {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
   const onIdChange = (event) => {
     setId(event.target.value);
   };
   const onPwChange = (event) => {
     setPassword(event.target.value);
   };
+  function setIsLogin(loginValue) {
+    props.setIsLogin(loginValue);
+  }
   //버튼클릭, 로그인 이벤트
   const onClickLogin = (event) => {
     event.preventDefault();
-    if (id === "" || password === "") {
-      alert("ID와 비밀번호를 입력해주세요");
-    } else {
-      return new Promise((resolve, reject) => {
-        fetch(`${API_URL}/${LOGIN_API}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: null,
-          },
-          body: JSON.stringify({ ID: id, Password: password }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      });
-    }
+    // if (id === "" || password === "") {
+    //   alert("ID와 비밀번호를 입력해주세요");
+    // } else {
+    //   return new Promise((resolve, reject) => {
+    //     fetch(`${API_URL}/${LOGIN_API}`, {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         authorization: null,
+    //       },
+    //       body: JSON.stringify({ ID: id, Password: password }),
+    //     })
+    //       .then((res) => res.json())
+    //       .then((data) => {
+    //         console.log(data);
+    //         setCookie(id, data, 1);
+    //         alert("로그인 완료");
+    //       })
+    //       .catch((error) => {
+    //         console.log(error);
+    //       });
+    //   });
+    // }
+    setIsLogin(true);
+    alert("로그인");
+    navigate("/");
   };
   return (
     <div className={styles.background}>
@@ -110,6 +130,14 @@ function Login() {
           </div>
         </section>
       </div>
+      <button
+        onClick={() => {
+          const cookieData = getCookie(id);
+          console.log(cookieData);
+        }}
+      >
+        쿠키 읽기
+      </button>
     </div>
   );
 }

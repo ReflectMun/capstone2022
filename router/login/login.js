@@ -1,4 +1,5 @@
 import express, { Router } from 'express'
+import crypto from 'crypto'
 import Pool from '../../private/server/DBConnector.js'
 import { stringify as queryStringify } from 'querystring'
 
@@ -17,6 +18,29 @@ login.post(
 )
 login.use('/issue', issuingJwt)
 
+/////////////////////////////////////////////////////////////////////
+// Functions
+/**
+ * 평문 비밀번호 암호화 함수
+ * @param {string} password 
+ * @returns {string}
+ */
+ function encryptPassword(password){
+    return new Promise(function(resolve, reject){
+        crypto.scrypt(password, process.env.SALT, 256, (err, key) => {
+            if(err){
+                reject(err)
+            }
+            else{
+                resolve(key.toString('base64url'))
+            }
+        })
+    })
+}
+/////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+// Middle Ware
 /**
  * 로그인에 쓰일 파라미터들을 추출하는 미들웨어.
  * 명시한 파라미터가 모두 있는지, 올바른 형식으로 보낸 것이 맞는지 체크
@@ -58,7 +82,10 @@ function getLoginParameter(req, res, next){
 
     next()
 }
+/////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////
+// Controller
 /**
  * 로그인을 진행하는 API 컨트롤러. 정상적으로 처리시 토큰을 발급하는 페이지로 리다이렉트
  * @param {express.Request} req 
@@ -67,9 +94,10 @@ function getLoginParameter(req, res, next){
 async function processLogin(req, res){
     let conn = null
     const { paramID, Password } = req.parmaBox
+    const encryptedPassword = await encryptPassword(Password)
 
     try{
-        const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${Password}'`
+        const queryString = `SELECT COUNT(UID), UID FROM Users WHERE Account = '${paramID}' AND Password = '${encryptedPassword}'`
         conn = await Pool.getConnection(conn => conn) // 커넥션 Pool에서 연결을 받아오는 메서드
         
         await conn.beginTransaction() // 트랜잭션 시작 알림
@@ -98,6 +126,7 @@ async function processLogin(req, res){
         if(conn) { conn.release() } // 할당된 연결이 있다면 연결을 삭제
     }
 }
+/////////////////////////////////////////////////////////////////////
 
 export default login
 

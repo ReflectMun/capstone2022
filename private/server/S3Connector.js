@@ -33,13 +33,17 @@ export function getObjectFromS3(bucket, objectName){
  * 
  * @param {string} bucket - 연결할 S3 버킷 이름
  * @param {string} objectName - 버킷에 담길 파일 객체의 이름
+ * @param {string} file - 버킷에 담길 파일의 데이터
  */
-export function putObjectToS3(bucket, objectName){
+export function putObjectToS3(bucket, objectName, file){
     S3.putObject({
         Bucket: bucket,
-        Key: objectName
+        Key: objectName,
+        Body: file,
+        ContentType: 'text/html'
     }, function(err, data){
         if(err){
+            err.message += '-S3'
             throw new ErrorOnS3Inserting(err)
         }
         else{
