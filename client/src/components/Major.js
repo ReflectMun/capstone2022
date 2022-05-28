@@ -11,7 +11,7 @@ function Major(props) {
   // console.log(props);
   if (props.college === "공학")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {enrs.map((enr) => (
           <li key={enr}>{enr}</li>
         ))}
@@ -19,7 +19,7 @@ function Major(props) {
     );
   else if (props.college === "인문")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {hmns.map((hmn) => (
           <li key={hmn}>{hmn}</li>
         ))}
@@ -27,7 +27,7 @@ function Major(props) {
     );
   else if (props.college === "자연")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {natures.map((nature) => (
           <li key={nature}>{nature}</li>
         ))}
@@ -35,7 +35,7 @@ function Major(props) {
     );
   else if (props.college === "사회")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {socials.map((social) => (
           <li key={social}>{social}</li>
         ))}
@@ -43,7 +43,7 @@ function Major(props) {
     );
   else if (props.college === "의약")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {meds.map((med) => (
           <li key={med}>{med}</li>
         ))}
@@ -51,7 +51,7 @@ function Major(props) {
     );
   else if (props.college === "예체능")
     return (
-      <ul id={styled.major}>
+      <ul id={styled.majors}>
         {arts.map((art) => (
           <li key={art}>{art}</li>
         ))}

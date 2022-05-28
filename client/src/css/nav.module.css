@@ -6,14 +6,15 @@
   /* padding-top: 10px; */
   display: flex;
   flex-direction: row;
-  background-color: #000000
+  background-color: #000000;
+  z-index: 999;
 }
 .info {
   display: flex;
   flex-direction: row;
   position: absolute;
   right: 10px;
-  top : -15px;
+ 
 }
 #info {
   display: flex;
@@ -121,10 +122,10 @@
  */
 .menu {
   position: absolute;
-  width: 400px;
+  width: 300px;
   height: 100%;
-  margin: 10px 0 0 -30px;
-
+  margin: 20px 0 0 -30px;
+  
   padding-left: 0;
 
   /* padding-top: 125px;  */
@@ -146,7 +147,7 @@
 
 .menu li {
   padding: 15px;
-  font-size: 22px;
+  font-size: 18px;
   border-bottom: 1px solid #dbdcd2;
 }
 
@@ -161,6 +162,7 @@
   text-align: center;
   list-style: none;
   display: grid;
+  font-size: 8px;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
 }
@@ -170,6 +172,13 @@
   text-align: center;
 
   list-style: none;
+  font-size: 18px;
+}
+#majors{
+  padding-left: 0px;
+  text-align: center;
+  list-style: none;
+  font-size: 10px;
 }
 
 .logoContainer {
@@ -182,7 +191,7 @@
 }
 
 #info{
-  font-size: 1.5em;
+  font-size: 1em;
   color: #ffffff;
 }
 #id{
