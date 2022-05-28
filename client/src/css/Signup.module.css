@@ -4,8 +4,9 @@ h4 {
   font-size: 16px;
 }
 .background {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%; 
+  
   background-color: #f2f2f2;
 }
 .label_style {
@@ -15,8 +16,8 @@ h4 {
 }
 .logo_image {
   height: 120px;
-  padding: 20px;
-  margin: 20px;
+  /* padding: 20px; */
+  /* margin: 20px; */
 }
 .signup_main {
   text-align: center;
