@@ -45,7 +45,6 @@ function Signup() {
   const [passwordConfirmMessage, setPasswordConfirmMessage] = useState("");
   const PasswordHandler = (e) => {
     setPw(e.target.value);
-    console.log(pw);
   };
   const onChangePasswordConfirm = (e) => {
     const passwordConfirmCurrent = e.target.value;
@@ -90,7 +89,7 @@ function Signup() {
             <div className={styles.signup_input}>
               <input
                 name="password"
-                type="text"
+                type="password"
                 placeholder="대문자, 숫자, 특수문자가 모두 하나 이상을 포함해야 합니다."
                 className={styles.signup_info}
                 onChange={PasswordHandler}
@@ -100,7 +99,7 @@ function Signup() {
             <div className={styles.signup_input}>
               <input
                 name="passwordCheck"
-                type="text"
+                type="password"
                 className={styles.signup_info}
                 onChange={onChangePasswordConfirm}
                 placeholder="비밀번호 확인이 필요합니다."
