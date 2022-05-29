@@ -33,7 +33,7 @@ fetchPost.get(
     jwtVerify,
     extractPostNum,
     checkExistingPost,
-    fetchAnswerListController
+    FetchAnswerListController
 )
 
 /////////////////////////////////////////////////////////
@@ -104,7 +104,12 @@ async function fetchPostList(boardURI, startNum, Type){
     }) 
 }
 
-function fetchAnswerList(postNum){
+/**
+ * 답변글 목록을 리스트 형태로 반환하는 함수
+ * @param {string} postNum 소스 질문글의 글 번호
+ * @returns {Array<object>} 답변글 목록
+ */
+async function fetchAnswerList(postNum){
     return new Promise(async function(resolve, reject){
         let conn
 
@@ -464,7 +469,6 @@ async function ContentViewerController(req, res){
 
         res.json({
             code: 210,
-            newToken: req.tokenBox['token'],
             PostID: data[0]['PostID'],
             Title: data[0]['Title'],
             Author: data[0]['Author'],
@@ -534,7 +538,7 @@ async function LoadPostListController(req, res){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-async function fetchAnswerListController(req, res){
+async function FetchAnswerListController(req, res){
     const { postNum } = req.paramBox
     try{
         const list = await fetchAnswerList(postNum)
