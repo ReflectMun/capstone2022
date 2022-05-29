@@ -104,7 +104,7 @@ async function fetchPostList(boardURI, startNum){
 async function fetchAnswerList(postNum){
     let conn
     try{
-        const queryString = `SELECT`
+        const queryString = `SELECT `
     }
     catch(err){
         console.log(err.message)

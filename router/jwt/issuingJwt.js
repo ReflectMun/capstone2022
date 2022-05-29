@@ -93,8 +93,8 @@ async function issueJwtToken(req, res){
         // 서비스 이용에 쓰이는 액세스 토큰 발급
         const accessToken = sign(
             { UID: UID, Account: Account },
-            process.env.JWT_SECRET,
-            { issuer: 'SaviorQNA', expiresIn: '20m' }
+            process.env.JWT_PRIVATE,
+            { algorithm:'RS512', issuer: 'SaviorQNA', expiresIn: '20m' }
         )
         
         const refreshToken = sign(

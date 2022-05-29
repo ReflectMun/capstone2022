@@ -4,7 +4,7 @@ import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 
 const signup = Router()
-const controllerName = 'signin'
+const controllerName = 'signup'
 
 /////////////////////////////////////////////////////////////////////
 // Router
