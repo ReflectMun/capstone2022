@@ -74,31 +74,34 @@ async function fetchPostHTMLContent(contentKeyName){
  * @returns {Array<object>} 게시글 리스트 배열 객체
  */
 async function fetchPostList(boardURI, startNum, Type){
-    let connection
-    try{
-        const queryString = 
-            `SELECT PostID, Title, Author, Date, Time
+    return new Promise(async function(resolve, reject){
+        let connection
+        try{
+            const queryString = 
+            `SELECT PostID, Title, Author, Date, Time, Type
             FROM(
-                SELECT PostID, Title, Author, Date, Time
+                SELECT PostID, Title, Author, Date, Time, Type
                 FROM MainDB.Posts
                 WHERE BoardURI = '${boardURI}' AND isDeleted = 0 AND Type = ${Type}
                 ORDER BY PostID DESC
-            )
+            ) AS View
             LIMIT ${startNum}, 15`
-
-        connection = await Pool.getConnection(connection => connection)
-
-        await connection.beginTransaction()
-        const [ data, fields ] = await connection.query(queryString)
-        await connection.commit()
-
-        connection.release()
-        return data
-    }
-    catch(err){
-        if(connection) { connection.release() }
-        throw new Error('게시글 목록을 불러오는 중 오류가 발생함')
-    }
+            
+            connection = await Pool.getConnection(connection => connection)
+            
+            await connection.beginTransaction()
+            const [ data, fields ] = await connection.query(queryString)
+            await connection.commit()
+            
+            connection.release()
+            resolve(data)
+        }
+        catch(err){
+            err.message += '-101'
+            if(connection) { connection.release() }
+            reject(err)
+        }
+    }) 
 }
 
 function fetchAnswerList(postNum){
@@ -106,22 +109,39 @@ function fetchAnswerList(postNum){
         let conn
 
         try{
-            const queryString = 'dd'
+            const queryString =
+            `SELECT PostID, Author, AuthorUID, Date, Time, FileName
+            FROM Posts WHERE isDeleted = 0 AND Type = 3 AND SourceQuestion = ${postNum}`
 
             conn = await Pool.getConnection()
 
             await conn.beginTransaction()
-            const [ list, fields ] = await conn.query(queryString)
+            const [ collection, fields ] = await conn.query(queryString)
             await conn.commit()
 
-            for(row in list){
+            const list = []
 
+            for(const row of collection){
+                const { FileName } = row
+                const file = await getObjectFromS3('saviorcontent', FileName)
+
+                const obj = {
+                    PostID: row['PostID'],
+                    Author: row['Author'],
+                    AuthorUID: row['AuthorUID'],
+                    Date: row['Date'],
+                    Time: row['Time'],
+                    content: file
+                }
+
+                list.push(obj)
             }
 
             conn.release()
-            resolve(true)
+            resolve(list)
         }
         catch(err){
+            err.message += '-102'
             if(conn) { conn.release() }
             reject(err)
         }
@@ -151,7 +171,7 @@ function extractBoardName(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-1')
         if(err instanceof BoardURIExtractFailed){
             resObj.code = 9972
             resObj.message = '게시판 이름이 손상되거나 누락되었습니다'
@@ -189,7 +209,7 @@ function extractPostNum(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-2')
         if(err instanceof PostNumExtractFailed){
             resObj.code = 9653
             resObj.message = '게시글 번호가 손상되거나 누락되었습니다'
@@ -226,7 +246,7 @@ function extractPageNum(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-3')
         if(err instanceof PageNumExtractFailed){
             resObj.code = 9973
             resObj.message = '페이지 번호가 없거나 손상되었습니다'
@@ -263,7 +283,7 @@ function extractPageNum(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-4')
         if(err instanceof PostTypeExtractFailed){
             resObj.code = 9974
             resObj.message = '게시글 타입이 손상되거나 없습니다'
@@ -293,7 +313,7 @@ async function checkExistingBoard(req, res, next){
     let conn
 
     try{
-        const queryString = `SELECT COUNT(BoardsID) FROM Boards WHERE BoardName = '${board}'`
+        const queryString = `SELECT COUNT(BoardID) FROM BoardLists WHERE BoardName = '${board}'`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -312,7 +332,7 @@ async function checkExistingBoard(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-5')
         if(err instanceof BoardNotExist){
             resObj.code = 3304
             resObj.message = '존재하지 않는 게시판 입니다'
@@ -352,7 +372,7 @@ async function checkExistingPost(req, res, next){
     let conn
 
     try{
-        const queryString = `SELECT isDeleted FROM Posts WHERE BoardURI = ${board} AND PostID = ${postNum}`
+        const queryString = `SELECT isDeleted FROM Posts WHERE BoardURI = '${board}' AND PostID = ${postNum}`
         conn = await Pool.getConnection(conn => conn)
         
         await conn.beginTransaction()
@@ -362,7 +382,7 @@ async function checkExistingPost(req, res, next){
         if(row.length == 0){
             throw new PostNotExist()
         }
-        else if(exist > 1){
+        else if(row.length > 1){
             throw new UnknownDuplicateOnDataBase('post', req.paramBox['postNum'])
         }
 
@@ -375,7 +395,7 @@ async function checkExistingPost(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-6')
         if(err instanceof PostNotExist){
             resObj.code = 3305
             resObj.message = '존재하지 않는 게시물 입니다'
@@ -428,7 +448,7 @@ async function ContentViewerController(req, res){
 
     try{
         const queryString =
-        `SELECT Title, Author, AuthorUID, Date, Time, FileName FROM Posts WHERE PostID = ${postNum} AND isDeleted = 0`
+        `SELECT PostID, Title, Author, AuthorUID, Date, Time, FileName, Type FROM Posts WHERE PostID = ${postNum} AND isDeleted = 0`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -444,19 +464,21 @@ async function ContentViewerController(req, res){
 
         res.json({
             code: 210,
-            content: contentText,
             newToken: req.tokenBox['token'],
+            PostID: data[0]['PostID'],
             Title: data[0]['Title'],
             Author: data[0]['Author'],
             AuthorUID: data[0]['AuthorUID'],
             Date: data[0]['Date'],
             Time: data[0]['Time'],
+            Type: data[0]['Type'],
+            content: contentText,
             newToken: req.tokenBox['totken']
         })
         normalLog(req, controllerName, `${req.paramBox['Account']}에게 게시글 ${req.paramBox['postNum']} 전송 완료`)
     }
     catch(err){
-        console.log(`Error : ContentViewerController : ${err.message}`)
+        errorLog(req, controllerName, err.message += '-7')
         if(err instanceof PostFileNotExist){
             resObj.code = 4470
             resObj.message = '손상되어 불러올 수 없는 게시물 입니다'
@@ -500,9 +522,10 @@ async function LoadPostListController(req, res){
         const startNum = 15 * pageNum
         const postList = await fetchPostList(board, startNum, type)
         res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
+        normalLog(req, controllerName, `에게 게시판 ${board}의 게시글 목록 전송완료`)
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-8')
         res.json({ code: 8334, message: '게시글 리스트를 불러오는 도중 오류가 발생하였습니다' })
     }
 }
@@ -512,7 +535,16 @@ async function LoadPostListController(req, res){
  * @param {express.Response} res 
  */
 async function fetchAnswerListController(req, res){
-    let conn
+    const { postNum } = req.paramBox
+    try{
+        const list = await fetchAnswerList(postNum)
+        res.json({ code: 212, answerlist: list })
+        normalLog(req, controllerName, `에게 질문글 ${postNum}의 답변글 목록 전송완료`)
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message += '-9')
+        res.json({ code: 8335, message: '답변글 목록을 불러오는 도중 오류가 발생하였습니다' })
+    }
 }
 /////////////////////////////////////////////////////////
 
