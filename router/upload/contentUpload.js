@@ -55,7 +55,6 @@ function extractValues(req, res, next){
 }
 
 /**
- * 
  * @param {Error} err 
  * @param {express.Request} req 
  * @param {express.Response} res 

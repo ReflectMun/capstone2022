@@ -27,6 +27,14 @@ fetchPost.get(
     LoadPostListController
 )
 
+fetchPost.get(
+    '/fetch/answer',
+    jwtVerify,
+    extractPostNum,
+    checkExistingPost,
+    fetchAnswerListController
+)
+
 /////////////////////////////////////////////////////////
 // Just Functions
 /**
@@ -48,7 +56,7 @@ function getResponseObject(){
  * @param {string} contentKeyName S3에서 게시글 파일을 찾기 위한 키
  * @returns {object} HTML 컨텐츠
  */
-function getPostHTMLContent(contentKeyName){
+function fetchPostHTMLContent(contentKeyName){
     const content = getObjectFromS3('saviorcontent', contentKeyName)
 
     if(!content){
@@ -64,7 +72,7 @@ function getPostHTMLContent(contentKeyName){
  * @param {string} startNum 게시글의 시작 번호
  * @returns {Array<object>} 게시글 리스트 배열 객체
  */
-async function getPostList(boardURI, startNum){
+async function fetchPostList(boardURI, startNum){
     let connection
     try{
         const queryString = 
@@ -90,6 +98,19 @@ async function getPostList(boardURI, startNum){
     }
     finally{
         if(connection) { connection.release() }
+    }
+}
+
+async function fetchAnswerList(postNum){
+    let conn
+    try{
+        const queryString = `SELECT`
+    }
+    catch(err){
+        console.log(err.message)
+    }
+    finally{
+        if(conn) {}
     }
 }
 /////////////////////////////////////////////////////////
@@ -209,6 +230,11 @@ function extractPageNum(req, res, next){
     }
 }
 
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 async function checkExistingBoard(req, res, next){
     const resObj = getResponseObject()
     const { board } = req.paramBox
@@ -263,6 +289,11 @@ async function checkExistingBoard(req, res, next){
     }
 }
 
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 async function checkExistingPost(req, res, next){
     const resObj = getResponseObject()
     const { board, postNum } = req.paramBox
@@ -328,11 +359,17 @@ async function checkExistingPost(req, res, next){
         if(conn) { conn.release() }
     }
 }
+
 /////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////
 // Controller
-async function ContentViewerController(req, res, next){
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function ContentViewerController(req, res){
     const resObj = getResponseObject()
     const { postNum } = req.paramBox
     let conn
@@ -351,7 +388,7 @@ async function ContentViewerController(req, res, next){
             throw new PostFileNotExist()
         }
 
-        const contentText = getPostHTMLContent(objectFileName)
+        const contentText = fetchPostHTMLContent(objectFileName)
 
         res.json({
             code: 210,
@@ -401,17 +438,30 @@ async function ContentViewerController(req, res, next){
     }
 }
 
-async function LoadPostListController(req, res, next){
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function LoadPostListController(req, res){
     const { pageNum, board } = req.paramBox
     try{
         const startNum = 15 * pageNum
-        const postList = await getPostList(board, startNum)
+        const postList = await fetchPostList(board, startNum)
         res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
     }
     catch(err){
         errorLog(req, controllerName, err.message)
         res.json({ code: 8334, message: '게시글 리스트를 불러오는 도중 오류가 발생하였습니다' })
     }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+async function fetchAnswerListController(req, res, next){
+
 }
 /////////////////////////////////////////////////////////
 
