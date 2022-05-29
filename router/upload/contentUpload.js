@@ -102,7 +102,7 @@ async function putContentController(req, res, next){
         await conn.query(queryString)
         await conn.commit()
 
-        putObjectToS3('saviorcontent', renamedName, req.file.buffer)
+        await putObjectToS3('saviorcontent', renamedName, req.file.buffer)
         
         next()
     }

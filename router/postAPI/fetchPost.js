@@ -23,6 +23,7 @@ fetchPost.get(
     jwtVerify,
     extractBoardName,
     extractPageNum,
+    extractPostType,
     checkExistingBoard,
     LoadPostListController
 )
@@ -54,10 +55,10 @@ function getResponseObject(){
 /**
  * S3로부터 지정된 게시판, 지정된 번호에 해당하는 게시글의 HTML을 꺼내오는 함수
  * @param {string} contentKeyName S3에서 게시글 파일을 찾기 위한 키
- * @returns {object} HTML 컨텐츠
+ * @returns {AWS.S3.GetObjectOutput.Body} HTML 컨텐츠
  */
-function fetchPostHTMLContent(contentKeyName){
-    const content = getObjectFromS3('saviorcontent', contentKeyName)
+async function fetchPostHTMLContent(contentKeyName){
+    const content = await getObjectFromS3('saviorcontent', contentKeyName)
 
     if(!content){
         throw new EmptyContentFetched()
@@ -72,7 +73,7 @@ function fetchPostHTMLContent(contentKeyName){
  * @param {string} startNum 게시글의 시작 번호
  * @returns {Array<object>} 게시글 리스트 배열 객체
  */
-async function fetchPostList(boardURI, startNum){
+async function fetchPostList(boardURI, startNum, Type){
     let connection
     try{
         const queryString = 
@@ -80,7 +81,7 @@ async function fetchPostList(boardURI, startNum){
             FROM(
                 SELECT PostID, Title, Author, Date, Time
                 FROM MainDB.Posts
-                WHERE BoardURI = '${boardURI}' AND isDeleted = 0
+                WHERE BoardURI = '${boardURI}' AND isDeleted = 0 AND Type = ${Type}
                 ORDER BY PostID DESC
             )
             LIMIT ${startNum}, 15`
@@ -91,27 +92,40 @@ async function fetchPostList(boardURI, startNum){
         const [ data, fields ] = await connection.query(queryString)
         await connection.commit()
 
+        connection.release()
         return data
     }
     catch(err){
-        throw new Error('게시글 목록을 불러오는 중 오류가 발생함')
-    }
-    finally{
         if(connection) { connection.release() }
+        throw new Error('게시글 목록을 불러오는 중 오류가 발생함')
     }
 }
 
-async function fetchAnswerList(postNum){
-    let conn
-    try{
-        const queryString = `SELECT `
-    }
-    catch(err){
-        console.log(err.message)
-    }
-    finally{
-        if(conn) {}
-    }
+function fetchAnswerList(postNum){
+    return new Promise(async function(resolve, reject){
+        let conn
+
+        try{
+            const queryString = 'dd'
+
+            conn = await Pool.getConnection()
+
+            await conn.beginTransaction()
+            const [ list, fields ] = await conn.query(queryString)
+            await conn.commit()
+
+            for(row in list){
+
+            }
+
+            conn.release()
+            resolve(true)
+        }
+        catch(err){
+            if(conn) { conn.release() }
+            reject(err)
+        }
+    })
 }
 /////////////////////////////////////////////////////////
 
@@ -193,6 +207,7 @@ function extractPostNum(req, res, next){
         res.json(resObj)
     }
 }
+
 /**
  * @param {express.Request} req 
  * @param {express.Response} res 
@@ -215,6 +230,43 @@ function extractPageNum(req, res, next){
         if(err instanceof PageNumExtractFailed){
             resObj.code = 9973
             resObj.message = '페이지 번호가 없거나 손상되었습니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else{
+            resObj.code = 9999
+            resObj.message = '알 수 없는 오류가 발생하였습니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        res.json(resObj)
+    }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+ function extractPostType(req, res, next){
+    const resObj = getResponseObject()
+    try{
+        const { type } = req.query
+
+        if(typeof type != 'string'){
+            throw new PostTypeExtractFailed()
+        }
+
+        req.paramBox['type'] = type
+        next()
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message)
+        if(err instanceof PostTypeExtractFailed){
+            resObj.code = 9974
+            resObj.message = '게시글 타입이 손상되거나 없습니다'
             if(req.tokenBox['token']){
                 resObj.newToken = req.tokenBox['token']
             }
@@ -388,7 +440,7 @@ async function ContentViewerController(req, res){
             throw new PostFileNotExist()
         }
 
-        const contentText = fetchPostHTMLContent(objectFileName)
+        const contentText = await fetchPostHTMLContent(objectFileName)
 
         res.json({
             code: 210,
@@ -443,10 +495,10 @@ async function ContentViewerController(req, res){
  * @param {express.Response} res 
  */
 async function LoadPostListController(req, res){
-    const { pageNum, board } = req.paramBox
+    const { pageNum, board, type } = req.paramBox
     try{
         const startNum = 15 * pageNum
-        const postList = await fetchPostList(board, startNum)
+        const postList = await fetchPostList(board, startNum, type)
         res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
     }
     catch(err){
@@ -458,10 +510,9 @@ async function LoadPostListController(req, res){
 /**
  * @param {express.Request} req 
  * @param {express.Response} res 
- * @param {express.NextFunction} next 
  */
-async function fetchAnswerListController(req, res, next){
-
+async function fetchAnswerListController(req, res){
+    let conn
 }
 /////////////////////////////////////////////////////////
 
@@ -471,6 +522,7 @@ class EmptyContentFetched extends Error{ constructor() { super('컨텐츠가 존
 class BoardURIExtractFailed extends Error{ constructor() { super('게시판 URI 추출 실패') } }
 class PostNumExtractFailed extends Error{ constructor() { super('게시물 번호 추출 실패') } }
 class PageNumExtractFailed extends Error{ constructor() { super('페이지 번호 추출 실패') } }
+class PostTypeExtractFailed extends Error{ constructor() { super('게시글 타입 추출 실패') } }
 class BoardNotExist extends Error{ constructor() { super('존재하지 않는 게시판') } }
 class UnknownDuplicateOnDataBase extends Error{
     constructor(kindof, item) { super(`원인을 알 수 없는 중복 데이터가 DB에 존재함 : ${kindof} ${item}`) }

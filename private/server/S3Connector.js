@@ -11,19 +11,21 @@ const S3 = new AWS.S3()
  * 
  * @param {string} bucket - 연결할 S3 버킷 이름 
  * @param {string} objectName - 버킷에서 꺼내올 파일의 이름
- * @return {object} S3로부터 fetch한 컨텐츠
+ * @return {Promise<AWS.S3.GetObjectOutput.Body>} S3로부터 fetch한 컨텐츠
  */
 export function getObjectFromS3(bucket, objectName){
-    S3.getObject({
-        Bucket: bucket,
-        Key: objectName
-    }, function(err, data){
-        if(err){
-            throw new ErrorOnS3Fetching(err)
-        }
-        else{
-            return data.Body
-        }
+    return new Promise(function(resolve, reject){
+        S3.getObject({
+            Bucket: bucket,
+            Key: objectName
+        }, function(err, data){
+            if(err){
+                reject(new ErrorOnS3Fetching(err))
+            }
+            else{
+                resolve(data.Body)
+            }
+        })
     })
 }
 
@@ -34,22 +36,25 @@ export function getObjectFromS3(bucket, objectName){
  * @param {string} bucket - 연결할 S3 버킷 이름
  * @param {string} objectName - 버킷에 담길 파일 객체의 이름
  * @param {string} file - 버킷에 담길 파일의 데이터
+ * @return {Promise<AWS.S3.PutObjectOutput>}
  */
 export function putObjectToS3(bucket, objectName, file){
-    S3.putObject({
-        Bucket: bucket,
-        Key: objectName,
-        Body: file,
-        ContentType: 'text/html'
-    }, function(err, data){
-        if(err){
-            err.message += '-S3'
-            throw new ErrorOnS3Inserting(err)
-        }
-        else{
-            return data
-        }
-    })
+    return new Promise(function(resolve, reject){
+        S3.putObject({
+            Bucket: bucket,
+            Key: objectName,
+            Body: file,
+            ContentType: 'text/html'
+        }, function(err, data){
+            if(err){
+                err.message += '-S3'
+                reject(new ErrorOnS3Inserting(err))
+            }
+            else{
+                resolve(data)
+            }
+        })
+    }) 
 }
 
 export class ErrorOnS3Fetching extends Error{ constructor(err){ super(err.message) } }
