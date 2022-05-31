@@ -4,7 +4,7 @@ import styles from "../css/Signup.module.css";
 import logoImage from "../img/logo_savior.png";
 
 const serverURL = "http://www.qnasavior.kro.kr";
-const signin_api = "api/signup";
+const signup_api = "api/signup";
 
 
 

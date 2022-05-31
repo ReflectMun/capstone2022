@@ -102,16 +102,19 @@ function GetPoint() {
     method: "get",
     headers: { authorization: token },
   }).then((result) => {
-    if (result.code === 240) console.log(result.code);
-    //setPoint(result.point);
+    if (result.code === 240) 
+    console.log(result.code);
+    setPoint(result.point);
     // console.log(result)
     // console.log(result.Point)
   });
+  return( 
+    <div>
+      <li id={styled.point}>{point}</li>
+    </div>
+    )
 
-  // console.log(result.point)
-  // <div>
-  // <li id={styled.point}>{point}</li>
-  // </div>
+ 
 }
 function Nav(props) {
   const [selectCollege, setSelectCollge] = useState("공학");
@@ -133,7 +136,6 @@ function Nav(props) {
       setIsLogin(false);
     }
   }, []);
-
   return (
     <nav className={styled.nav}>
       <div className={styled.menuToggle}>
@@ -165,7 +167,6 @@ function Nav(props) {
               {isLogin ? navId : "계정"}
             </Link>
           </li>
-          <li id={styled.point}>POINT</li>
           {/* 로그인 했을 때 포인트 숫자 보이게 아니면 point 글자만 보이게 */}
           {isLogin ? <GetPoint /> : <li id={styled.point}>POINT</li>}
           <li id={styled.message}>쪽지</li>
