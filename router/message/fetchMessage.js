@@ -83,7 +83,7 @@ async function fetchSendedMessageController(req, res){
     const pageNum = req.paramBox['pageNum'] * 15
     try{
         const queryString =
-        `SELECT Author, Recipient, Date, Time, Content
+        `SELECT MessagesID, Author, Recipient, Date, Time, Content
         FROM Messages
         WHERE Author = '${req.paramBox['Author']}' && HiddenForAuthor = 0
         ORDER BY MessagesID DESC
@@ -129,7 +129,7 @@ async function fetchReceivedMessageController(req, res){
     const pageNum = req.paramBox['pageNum'] * 15
     try{
         const queryString =
-        `SELECT Author, Recipient, Date, Time, Content
+        `SELECT MessagesID, Author, Recipient, Date, Time, Content
         FROM Messages
         WHERE Recipient = '${req.paramBox['Recipient']}' && HiddenForRecipient = 0
         ORDER BY MessagesID DESC

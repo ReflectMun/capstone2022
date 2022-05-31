@@ -57,10 +57,13 @@ function extractMessageContent(req, res, next){
     const { Content } = req.body
 
     try{
-        if(!Content){
+        if(typeof Content != 'string'){
+            throw new InvaliedContent()
+        }
+        if(!Content || Content.length == 0){
             throw new EmptyContent()
         }
-        if(typeof Content != 'string'){
+        if(Content.length < 0 || Content.length > 512){
             throw new InvaliedContent()
         }
         

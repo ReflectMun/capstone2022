@@ -11,6 +11,7 @@ import fetchPost from './postAPI/fetchPost.js'
 import issuingJwt from './jwt/issuingJwt.js'
 import messageRouter from './message/messageRouter.js'
 import boardList from './board.js'
+import fetchPoint from './point.js'
 
 import apitest from './test/apitest.js'
 ////////////////////////////////////
@@ -26,6 +27,7 @@ api.use('/post', fetchPost) // 게시글 내용 불러오기 API 컨트롤러
 api.use('/jwtissue', issuingJwt) // 사용자 인증 JWT 발급
 api.use('/message', messageRouter) // 쪽지 수발신 API 컨트롤러
 api.use('/board', boardList) // 게시판 리스트 불러오기 API 컨트롤러
+api.use('/point', fetchPoint) // 사용자 포인트 불러오기 API 컨트롤러
 
 api.use('/test', apitest)
 

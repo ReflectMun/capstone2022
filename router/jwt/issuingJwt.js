@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import express, { Router } from 'express'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
+import { AUTO_CONTENT_TYPE } from 'multer-s3'
 
 const issuingJwt = Router()
 const { sign } = jwt
@@ -39,6 +40,35 @@ async function insertTokenToDB(refreshToken, UID){
     } finally{
         if(conn) { conn.release() }
     }
+}
+
+/**
+ * DB에서 해당 유저의 닉네임을 가져오는 함수
+ * @param {string} UID 
+ * @return {string} 해당 유저의 닉네임
+ */
+async function fetchNickname(UID){
+    let conn, Nickname
+
+    try{
+        const queryString = `SELECT Nickname FROM Users WHERE UID = ${UID}`
+
+        conn = await Pool.getConnection(conn => conn)
+
+        await conn.beginTransaction()
+        const [ data, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        Nickname = data[0]['UID']
+    }
+    catch(err){
+        throw err
+    }
+    finally{
+        if(conn) { conn.release() }
+    }
+
+    return Nickname
 }
 ///////////////////////////////////////////////////////////////
 
@@ -91,14 +121,16 @@ async function issueJwtToken(req, res){
     const { UID, Account } = req.paramBox
     try{
         // 서비스 이용에 쓰이는 액세스 토큰 발급
+        const Nickname = fetchNickname(UID)
+
         const accessToken = sign(
-            { UID: UID, Account: Account },
-            process.env.JWT_SECRET,
-            { issuer: 'SaviorQNA', expiresIn: '20m' }
+            { UID: UID, Account: Account, Nickname: Nickname },
+            process.env.JWT_PRIVATE,
+            { algorithm:'RS512', issuer: 'SaviorQNA', expiresIn: '20m' }
         )
         
         const refreshToken = sign(
-            { UID: UID, Account: Account },
+            { UID: UID, Account: Account, Nickname, Nickname },
             process.env.JWT_SECRET,
             { issuer: 'SaviorQNA', expiresIn: '12h' }
         )

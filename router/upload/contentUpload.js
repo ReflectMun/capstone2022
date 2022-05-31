@@ -5,8 +5,6 @@ import { errorLog, normalLog } from '../../private/apis/logger.js'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
 
-AWS.config.loadFromPath('./private/credential/s3.json')
-
 const contentUpload = Router()
 const controllerName = 'ContentUploader'
 
@@ -49,7 +47,6 @@ function extractValues(req, res, next){
         throw new InvalidValueType('Type')
     }
 
-    req.paramBox = {}
     req.paramBox['BoardURI'] = BoardURI
     req.paramBox['Title'] = Title
     req.paramBox['Type'] = Type
@@ -58,7 +55,6 @@ function extractValues(req, res, next){
 }
 
 /**
- * 
  * @param {Error} err 
  * @param {express.Request} req 
  * @param {express.Response} res 
@@ -106,7 +102,7 @@ async function putContentController(req, res, next){
         await conn.query(queryString)
         await conn.commit()
 
-        putObjectToS3('saviorcontent', renamedName, req.file.buffer)
+        await putObjectToS3('saviorcontent', renamedName, req.file.buffer)
         
         next()
     }

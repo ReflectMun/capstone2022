@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { errorLog, normalLog } from '../private/apis/logger'
-import Pool from '../private/server/DBConnector'
+import { errorLog, normalLog } from '../private/apis/logger.js'
+import Pool from '../private/server/DBConnector.js'
 
 const boardList = Router()
 const controllerName = 'fetchBoardList'
 
-boardList.get('/fetch/list', function(req, res){
+boardList.get('/fetch/list', async function(req, res){
     let conn
 
     try{

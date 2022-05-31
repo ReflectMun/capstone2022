@@ -43,8 +43,8 @@ async function checkVaildRefreshToken(UID){
 function issueNewAccessToken(UID, Account){
     const newToken = sign(
         { UID: UID, Account: Account },
-        process.env.JWT_SECRET,
-        { issuer:'SaiorQNA', expiresIn: '20m'}
+        process.env.JWT_PRIVATE,
+        { algorithm: 'RS512', issuer:'SaiorQNA', expiresIn: '20m'}
     )
 
     return newToken
@@ -66,7 +66,7 @@ export async function jwtVerify(req, res, next){
             throw new TokenDosentContained()
         }
         
-        const verifiedToken = verify(token, process.env.JWT_SECRET)
+        const verifiedToken = verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512' })
 
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
@@ -81,12 +81,12 @@ export async function jwtVerify(req, res, next){
     catch(err){
         if(err.message == 'jwt expired'){
             try{
-                const expToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true }) 
+                const expToken = verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512', ignoreExpiration: true }) 
 
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
                     req.tokenBox['token'] = newAccessToken
-                    normalLog(req, controllerName, `로그인한 사용자 ${verifiedToken['Account']}, 새로운 인증토큰 발급 완료`)
+                    normalLog(req, controllerName, `로그인한 사용자 ${expToken['Account']}, 새로운 인증토큰 발급 완료`)
                     next()
                 }
                 else{
@@ -132,12 +132,12 @@ export async function jwtVerifyForSignin(req, res, next){
     }
 
     try{
-        verify(token, process.env.JWT_SECRET)
+        verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512' })
         res.json({ code: 905, error: '이미 로그인한 사람입니다.' })
     }
     catch(err){
         try{
-            const vaildToken = verify(token, process.env.JWT_SECRET, { ignoreExpiration: true })
+            const vaildToken = verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512', ignoreExpiration: true })
             if(!await checkVaildRefreshToken(vaildToken['UID'])){
                 next()
             }
