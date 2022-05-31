@@ -57,6 +57,7 @@ function Login(props) {
   //버튼클릭, 로그인 이벤트
   const onClickLogin = (event) => {
     event.preventDefault();
+    console.log("로그인버튼");
     if (id === "" || password === "") {
       alert("ID와 비밀번호를 입력해주세요");
       return;
