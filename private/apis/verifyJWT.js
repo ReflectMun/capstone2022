@@ -25,12 +25,12 @@ async function checkVaildRefreshToken(UID){
 
         const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET)
 
+        if(conn) { conn.release() }
         return true
     } catch(err) {
+        if(conn) { conn.release() }
         console.log(err.message)
         throw new RefreshTokenExpired()
-    } finally {
-        if(conn) { conn.release() }
     }
 }
 
@@ -61,7 +61,6 @@ export async function jwtVerify(req, res, next){
     req.tokenBox = {}
 
     const token = req.headers.authorization
-    console.log('체크', token)
     try{
         if(!token){
             throw new TokenDosentContained()
