@@ -36,7 +36,7 @@ function onClickSignupBtn(e) {
       result.code === 204
         ? alert("🎉회원가입 성공🎉")
         : alert("😥" + result.message + "😥");
-    })
+    });
 }
 function Signup() {
   const [pw, setPw] = useState("");
