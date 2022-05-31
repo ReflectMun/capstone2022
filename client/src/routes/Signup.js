@@ -6,6 +6,8 @@ import logoImage from "../img/logo_savior.png";
 const serverURL = "http://www.qnasavior.kro.kr";
 const signin_api = "api/signup";
 
+
+
 function onClickEmailBtn(event) {
   event.preventDefault();
 }
@@ -26,7 +28,7 @@ function onClickSignupBtn(e) {
     EMail: email,
   };
   //회원가입 요청
-  fetch(`${serverURL}/${signin_api}`, {
+  fetch(`${serverURL}/${signup_api}`, {
     method: "post",
     body: JSON.stringify(reqBody),
     headers: { "Content-Type": "application/json" },
