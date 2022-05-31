@@ -1,16 +1,27 @@
 import express, { Router } from 'express'
 import crypto from 'crypto'
+import { createTransport } from 'nodemailer'
+import smtp from 'nodemailer-smtp-transport'
+import { renderFile } from 'ejs'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 
 const signup = Router()
 const controllerName = 'signup'
+const transportter = createTransport(smtp({
+    service: 'Gmail',
+    host: 'smtp.gmail.com',
+    auth: {
+        user: 'qnasavior@gmail.com',
+        pass: 'syluupofbesfopsp'
+    }
+}))
 
 /////////////////////////////////////////////////////////////////////
 // Router
 signup.post(
     '/',
-    extractSigninParameters,
+    extractSignupParameters,
     checkCorrectData,
     checkRegisteredAccountMiddle,
     checkRegisteredNicknameMiddle,
@@ -20,8 +31,13 @@ signup.post(
 
 signup.post(
     '/check_registered',
-    extractSigninParameters,
+    extractSignupParameters,
     checkRegisteredAccount
+)
+
+signup.post(
+    '/check/email',
+    extractEmail
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -46,6 +62,8 @@ signup.post(
 
         result = row[0]['COUNT(UID)']
     } catch(err){
+        err.message += '-101'
+        console.log(err.message)
         throw new ErrorOnRegisterChecking()
     } finally{
         if(conn) { conn.release() }
@@ -72,6 +90,8 @@ signup.post(
 
         result = row[0]['COUNT(UID)']
     } catch(err){
+        err.message += '-102'
+        console.log(err.message)
         throw new ErrorOnRegisterChecking()
     } finally{
         if(conn) { conn.release() }
@@ -98,6 +118,8 @@ signup.post(
 
         result = row[0]['COUNT(UID)']
     } catch(err){
+        err.message += '-103'
+        console.log(err.message)
         throw new ErrorOnRegisterChecking()
     } finally{
         if(conn) { conn.release() }
@@ -115,10 +137,30 @@ function encryptPassword(password){
     return new Promise(function(resolve, reject){
         crypto.scrypt(password, process.env.SALT, 256, (err, key) => {
             if(err){
+                err.message += '-104'
                 reject(err)
             }
             else{
                 resolve(key.toString('base64url'))
+            }
+        })
+    })
+}
+
+/**
+ * 메일 인증 체크용 ejs 파일
+ * @param {string} authCode 
+ * @returns {string} ejs 파일
+ */
+function ejsRender(authCode){
+    return new Promise(function(resolve, reject){
+        renderFile('./public/authPage.ejs', { authCode: authCode }, function(err, string){
+            if(err){
+                err.message += -105
+                reject(err)
+            }
+            else{
+                resolve(string)
             }
         })
     })
@@ -136,7 +178,7 @@ function encryptPassword(password){
  * @param {express.NextFunction} next 
  * @returns {void}
  */
-function extractSigninParameters(req, res, next){
+function extractSignupParameters(req, res, next){
     try{
         const { Account, Password, EMail, Nickname } = req.body
 
@@ -170,7 +212,7 @@ function extractSigninParameters(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-1')
         if(err instanceof ValuesIsMalformed){
             res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
         }
@@ -233,7 +275,7 @@ function checkCorrectData(req, res, next){
 
         next()
     } catch(err) {
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-2')
         res.json({ code: 2130, message: '값을 검증하는 중 오류가 발생하였습니다' })
     }
 }
@@ -259,7 +301,7 @@ async function checkRegisteredAccountMiddle(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-3')
         if(err instanceof RegisterdUser){
             res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
         }
@@ -294,7 +336,7 @@ async function checkRegisteredNicknameMiddle(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-4')
         if(err instanceof RegisterdNickname){
             res.json({ code: 1012, message: '이미 사용중인 닉네임 입니다' })
         }
@@ -329,7 +371,7 @@ async function checkRegisteredEMailMiddle(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-5')
         if(err instanceof RegisterdEMail){
             res.json({ code: 1013, message: '이미 사용중인 이메일 입니다' })
         }
@@ -341,6 +383,45 @@ async function checkRegisteredEMailMiddle(req, res, next){
         }
 
         return
+    }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function extractEmail(req, res, next){
+    const { EMail } = req.body
+
+    try{
+        if(typeof EMail != 'string') { throw new ValuesIsMalformed() }
+
+        if(EMail.length > 45){
+            res.json({ code: 2122, message: '이메일은 45글자 이내여야 합니다' })
+            return
+        }
+
+        const emailRegex = /\w+@(\w+[.]?)+[.]ac[.]kr/g
+        if(emailRegex.test(EMail) == false){
+            res.json({ code: 2126, message: '이메일이 ac.kr로 끝나는 형식의 올바른 이메일이 아닙니다'})
+            return
+        }
+
+        req.paramBox = {
+            EMail: EMail
+        }
+
+        next()
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message + '-6')
+        if(err instanceof ValuesIsMalformed){
+            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
     }
 }
 /////////////////////////////////////////////////////////////////////
@@ -366,7 +447,7 @@ async function checkRegisteredAccount(req, res){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '=1')
         if(err instanceof RegisterdUser){
             res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
         }
@@ -403,7 +484,7 @@ async function processRegister(req, res){
         normalLog(req, controllerName, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '=2')
         res.json({ code: 1021, message: '회원가입 도중 오류가 발생하였습니다' })
     }
     finally{
@@ -411,6 +492,9 @@ async function processRegister(req, res){
     }
 }
 
+async function emailAuthController(req, res){
+    const { EMail } = req.paramBox
+}
 /////////////////////////////////////////////////////////////////////
 
 export default signup

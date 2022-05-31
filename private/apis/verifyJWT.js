@@ -61,6 +61,7 @@ export async function jwtVerify(req, res, next){
     req.tokenBox = {}
 
     const token = req.headers.authorization
+    console.log('체크', token)
     try{
         if(!token){
             throw new TokenDosentContained()
