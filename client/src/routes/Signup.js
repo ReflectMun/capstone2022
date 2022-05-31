@@ -27,8 +27,10 @@ function onClickSignupBtn(e) {
     Nickname: nickname,
     EMail: email,
   };
+
   //회원가입 요청
   fetch(`${serverURL}/${signup_api}`, {
+  // fetch(`/api/signup`, {
     method: "post",
     body: JSON.stringify(reqBody),
     headers: { "Content-Type": "application/json" },
