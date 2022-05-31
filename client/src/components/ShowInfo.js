@@ -7,6 +7,7 @@ import MyContent from "../components/MyContent.js";
 //         <div></div>
 //     );
 // }
+
 function ShowInfo() {
   return (
     <div className={styled.info_container}>

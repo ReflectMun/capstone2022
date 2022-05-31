@@ -8,6 +8,9 @@ import logoImage from "../img/logo_savior.png";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
+const point_api = "api/point";
+
+
 let token = null;
 //쿠키 읽기
 function getCookie(key) {
@@ -82,7 +85,28 @@ function LogoutText() {
     </div>
   );
 }
+//포인트 
+function GetPoint(){
+  const [point,setPoint] = useState(0);
+  fetch(`${API_URL}/${point_api}`,{
+    method :"get",
+    header : { authorization: token },
+  })
+  .then((result) =>{
+    if (result.code === 240)
+      console.log(result.code)
+    //setPoint(result.point); 
+    // console.log(result)
+    // console.log(result.Point)
+  })
 
+
+    // console.log(result.point)
+    // <div>
+    // <li id={styled.point}>{point}</li>
+    // </div>
+  
+}
 function Nav(props) {
   const [selectCollege, setSelectCollge] = useState("공학");
   const onChangeCollge = (event) => {
@@ -128,9 +152,11 @@ function Nav(props) {
               계정
             </Link>
           </li>
+          {/* 로그인 했을 때 포인트 숫자 보이게 아니면 point 글자만 보이게 */}
+          {props.loginValue ? <GetPoint /> : <li id={styled.point}>POINT</li>}
           
-          <li id={styled.point}>POINT</li>
           <li id={styled.message}>쪽지</li>
+          
           {
             //loginValue(로그인상태) 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
             props.loginValue ? <LogoutText /> : <LoginText />
