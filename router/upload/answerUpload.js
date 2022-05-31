@@ -12,7 +12,7 @@ const fileCheck = multer()
 
 answerUploader.put(
     '/',
-    // jwtVerify,
+    jwtVerify,
     fileCheck.fields([
         { name: 'content' },
         { name: 'SourceQuestion' }
@@ -72,7 +72,7 @@ async function answerUploadController(req, res){
 
         await putObjectToS3('saviorcontent', renamedName, req.file.buffer)
 
-        res.json({ code: 231, message: '답변글 작성 완료'})
+        res.json({ code: 231, message: '답변글 작성 완료', newToken: req.tokenBox['token'] })
         normalLog(req, controllerName, `${Author}이(가) 글번호 ${SourceQuestion}에 답변글을 작성함`)
     }
     catch(err){
@@ -90,7 +90,9 @@ async function answerUploadController(req, res){
  * @param {express.NextFunction} next 
  */
 function answerUploadErrorController(err, req, res, next){
-
+    if(err instanceof InvalidValueType){
+        res.json({ code: 5024, message: '해당 답변이 달릴 질문글의 주소가 누락되거나 손상되었습니다', newToken: req.tokenBox['token']})
+    }
 }
 //////////////////////////////////////////////////////////////
 

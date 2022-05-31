@@ -63,16 +63,16 @@ function extractValues(req, res, next){
 function errorHandle(err, req, res, next){
     errorLog(req, controllerName, err.message)
     if(err instanceof InvalidValueType){
-        res.json({ code: 8810, message: '게시판 이름 또는 글 제목이 손상되었습니다' })
+        res.json({ code: 8810, message: '게시판 이름 또는 글 제목이 손상되었습니다', newToken: req.tokenBox['token'] })
     }
     else if(err instanceof FileExtractFailed){
-        res.json({ code: 8812, message: '작성하신 본문이 전송되지 않았거나 손상되었습니다' })
+        res.json({ code: 8812, message: '작성하신 본문이 전송되지 않았거나 손상되었습니다', newToken: req.tokenBox['token'] })
     }
     else if(err.message == 'Unexpected field'){
-        res.json({ code: 8813, message: '잘못된 형식의 데이터가 도착하였습니다' })
+        res.json({ code: 8813, message: '잘못된 형식의 데이터가 도착하였습니다', newToken: req.tokenBox['token'] })
     }
     else{
-        res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     }
 }
 ////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ async function putContentController(req, res, next){
     }
     catch (err) {
         errorLog(req, controllerName, err.message)
-        res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다' })
+        res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     } 
     finally{
         if (conn) { conn.release() }
@@ -117,7 +117,7 @@ async function putContentController(req, res, next){
 
 function okResponserController(req, res){
     const { Account: Author, Title } = req.paramBox
-    res.json({ code: 230, message: '본문 작성 완료' })
+    res.json({ code: 230, message: '본문 작성 완료', newToken: req.tokenBox['token'] })
     normalLog(req, controllerName, `사용자 ${Author}이(가) 게시글 ${Title}을 작성함`)
 }
 ////////////////////////////////////////////////////////////////

@@ -98,7 +98,8 @@ async function fetchSendedMessageController(req, res){
         if(!messages){
             res.json({
                 code: 215,
-                messages: '보낸 메시지가 존재하지 않습니다'
+                messages: '보낸 메시지가 존재하지 않습니다',
+                newToken: req.tokenBox['token']
             })
             normalLog(req, controllerName, '보낸 메시지가 없음')
         }
@@ -144,7 +145,8 @@ async function fetchReceivedMessageController(req, res){
         if(!messages){
             res.json({
                 code: 217,
-                messages: '받은 메시지가 존재하지 않습니다'
+                messages: '받은 메시지가 존재하지 않습니다',
+                newToken: req.tokenBox['token']
             })
             normalLog(req, controllerName, '받은 메시지가 없음')
         }

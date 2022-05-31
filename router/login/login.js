@@ -25,9 +25,9 @@ login.use('/issue', issuingJwt)
  * @param {string} password 
  * @returns {string}
  */
- function encryptPassword(password){
+ async function encryptPassword(password){
     return new Promise(function(resolve, reject){
-        crypto.scrypt(password, process.env.SALT, 256, (err, key) => {
+        crypto.scrypt(password, process.env.SALT, 256, function(err, key){
             if(err){
                 reject(err)
             }
@@ -69,7 +69,7 @@ function getLoginParameter(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message + '-1')
         if(err instanceof InvalidDataType){
             res.json({ code: 151, message: '올바르지 않은 데이터 형식이 전송되었습니다' })
         }
@@ -119,7 +119,7 @@ async function processLogin(req, res){
 
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message + '-2')
         res.json({ code: 150, message: '로그인을 위해 DB 조회중 오류가 발생하였습니다' })
     }
     finally{
