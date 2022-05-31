@@ -56,8 +56,8 @@ function LogoutText() {
       return new Promise((resolve, reject) => {
         fetch(`${API_URL}/${LOGOUT_API}`, {
           method: "GET",
-          header: {
-            Authorization: token,
+          headers: {
+            authorization: token,
           },
         })
           .then((response) => response.json())
@@ -98,7 +98,7 @@ function GetPoint() {
   const [point, setPoint] = useState(0);
   fetch(`${API_URL}/${point_api}`, {
     method: "get",
-    header: { authorization: token },
+    headers: { authorization: token },
   }).then((result) => {
     if (result.code === 240) console.log(result.code);
     //setPoint(result.point);
