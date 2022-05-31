@@ -55,7 +55,7 @@ function App() {
         />
         <Route path="/signup" element={<Signup />} />
         <Route path="/answer" element={<Post />} />
-        <Route path ="/account" element={<Info />} />
+        <Route path="/account" element={<Info />} />
       </Routes>
     </Router>
   );

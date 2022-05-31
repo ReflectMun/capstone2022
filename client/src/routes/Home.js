@@ -8,7 +8,11 @@ function Home(props) {
   }
   return (
     <div>
-      <Nav loginValue={props.loginValue} setLogin={setIsLogin} />
+      <Nav
+        loginValue={props.loginValue}
+        setLogin={setIsLogin}
+        loginId={props.loginId}
+      />
       <Mainarea />
       <Message />
     </div>

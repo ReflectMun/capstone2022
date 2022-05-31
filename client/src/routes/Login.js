@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styles from "../css/Login.module.css";
 import logoImage from "../img/logo_savior.png";
+import { TokenExpiredError } from "jsonwebtoken";
 //쿠키 저장
 //days 는 일자 정수 - 365년 1년 쿠키
 function setCookie(key, value, days) {
@@ -72,13 +73,16 @@ function Login(props) {
           .then((data) => {
             console.log(data);
             //토큰을 cookie 저장
-            setCookie(id, data, 1);
+            console.log(data.token);
+            //setCookie("token", data, 1);
             alert("로그인 완료");
           })
           .catch((error) => {
             console.log(error);
           });
       });
+      //토큰안에 있는 string을 쿠키에 저장하기
+      //{token : aeihfpiaejfsedhifsehfaehlkfhaelkakfljka}
     }
     //해당 아이디로 로그인 했다고 loginId state값 지정
     props.setLoginId(id);

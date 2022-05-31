@@ -5,10 +5,12 @@ import styled from "../css/nav.module.css";
 import Info from "../routes/Info.js";
 import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
+import { decode } from "jsonwebtoken";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 let token = null;
+let myLoginId = null;
 //쿠키 읽기
 function getCookie(key) {
   key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
@@ -59,6 +61,8 @@ function LogoutText() {
         })
           .then((res) => {
             console.log(res);
+            console.log(myLoginId);
+            delCookie(myLoginId);
           })
           .catch((error) => {
             console.log(error);
@@ -90,7 +94,7 @@ function Nav(props) {
   };
   const colleges = ["공학", "인문", "자연", "사회", "의약", "예체능"];
   //로그아웃할때 필요한 token cookie 가져오기
-
+  console.log(props.loginId);
   if (boolCheckCookie(props.loginId)) {
     token = getCookie(props.loginId);
   } else {
@@ -121,14 +125,14 @@ function Nav(props) {
       <div className={styled.info}>
         <ul id={styled.info}>
           <li id={styled.id}>
-            <Link 
-            to ={"/account"}
-            style={{ textDecoration: "none", color: "inherit" }}
+            <Link
+              to={"/account"}
+              style={{ textDecoration: "none", color: "inherit" }}
             >
               계정
             </Link>
           </li>
-          
+
           <li id={styled.point}>POINT</li>
           <li id={styled.message}>쪽지</li>
           {
