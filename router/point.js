@@ -33,7 +33,7 @@ async function FetchUserPointController(req, res){
         const point = data[0]['Point']
 
         res.json({ code: 240, point: point })
-        normalLog(req, controllerName, `${UID}에게 잔여 포인트량을 전송함`)
+        normalLog(req, controllerName, `유저 UID: ${UID} 에게 잔여 포인트량을 전송함`)
     }
     catch(err){
     }
