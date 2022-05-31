@@ -7,6 +7,7 @@ import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
 import jwt_decode from "jwt-decode";
 
+
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 const point_api = "api/point";
@@ -92,6 +93,7 @@ function LogoutText() {
     </div>
   );
 }
+
 //포인트
 function GetPoint() {
   const token = getCookie("token");

@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 import express, { Router } from 'express'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
-import { AUTO_CONTENT_TYPE } from 'multer-s3'
 
 const issuingJwt = Router()
 const { sign } = jwt
@@ -35,10 +34,12 @@ async function insertTokenToDB(refreshToken, UID){
         await conn.beginTransaction()
         await conn.query(queryString)
         await conn.commit()
+
+        conn.release()
     } catch(err) {
-        throw new ErrorOnInsertingRefreshToken(err)
-    } finally{
         if(conn) { conn.release() }
+        err.message += '-101'
+        throw new ErrorOnInsertingRefreshToken(err)
     }
 }
 
@@ -50,25 +51,25 @@ async function insertTokenToDB(refreshToken, UID){
 async function fetchNickname(UID){
     let conn, Nickname
 
-    try{
-        const queryString = `SELECT Nickname FROM Users WHERE UID = ${UID}`
-
-        conn = await Pool.getConnection(conn => conn)
-
-        await conn.beginTransaction()
-        const [ data, fields ] = await conn.query(queryString)
-        await conn.commit()
-
-        Nickname = data[0]['UID']
-    }
-    catch(err){
-        throw err
-    }
-    finally{
-        if(conn) { conn.release() }
-    }
-
-    return Nickname
+    return new Promise(async function(resolve, reject){
+        try{
+            const queryString = `SELECT Nickname FROM Users WHERE UID = ${UID}`
+            conn = await Pool.getConnection(conn => conn)
+            
+            await conn.beginTransaction()
+            const [ data, fields ] = await conn.query(queryString)
+            await conn.commit()
+            
+            Nickname = data[0]['Nickname']
+            resolve(Nickname)
+        }
+        catch(err){
+            if(conn) { conn.release() }
+            err.message += '-102'
+            reject(err)
+        }
+    })
+    
 }
 ///////////////////////////////////////////////////////////////
 
@@ -97,20 +98,18 @@ function extractUserInfo(req, res, next){
             UID: UID,
             Account: Account
         }
+        
+        next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message + '-01')
         if(err instanceof ValueIsUndefined){ // UID, account 값 누락시
             res.json({ code: 351, message: '계정정보가 누락되었습니다' })
         }
         else{ // 정의되지 않은 예외 발생시
             res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
         }
-
-        return
     }
-
-    next()
 }
 
 /**
@@ -121,7 +120,7 @@ async function issueJwtToken(req, res){
     const { UID, Account } = req.paramBox
     try{
         // 서비스 이용에 쓰이는 액세스 토큰 발급
-        const Nickname = fetchNickname(UID)
+        const Nickname = await fetchNickname(UID)
 
         const accessToken = sign(
             { UID: UID, Account: Account, Nickname: Nickname },
@@ -130,7 +129,7 @@ async function issueJwtToken(req, res){
         )
         
         const refreshToken = sign(
-            { UID: UID, Account: Account, Nickname, Nickname },
+            { UID: UID, Account: Account, Nickname: Nickname },
             process.env.JWT_SECRET,
             { issuer: 'SaviorQNA', expiresIn: '12h' }
         )
@@ -141,7 +140,7 @@ async function issueJwtToken(req, res){
         normalLog(req, controllerName, `유저 ${UID} 인증토큰 발급 완료`)
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message + '-02')
         if(err instanceof ErrorOnInsertingRefreshToken){
             res.json({ code: 3802, message: '사용자 인증 토큰 발급을 위해 DB와 통신하던 중 오류가 발생하였습니다' })
         }
