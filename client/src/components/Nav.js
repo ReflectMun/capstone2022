@@ -6,6 +6,7 @@ import Info from "../routes/Info.js";
 import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
 
+
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 const point_api = "api/point";
@@ -87,24 +88,29 @@ function LogoutText() {
 }
 //포인트 
 function GetPoint(){
+  console.log(token)
   const [point,setPoint] = useState(0);
   fetch(`${API_URL}/${point_api}`,{
     method :"get",
+
     header : { authorization: token },
   })
+  .then((response) => response.json())
   .then((result) =>{
     if (result.code === 240)
       console.log(result.code)
-    //setPoint(result.point); 
+    setPoint(result.point); 
     // console.log(result)
     // console.log(result.Point)
   })
-
-
-    // console.log(result.point)
-    // <div>
-    // <li id={styled.point}>{point}</li>
-    // </div>
+  .catch ((error)=>
+    console.log(error)
+  )
+  return ( 
+    <div>
+      <li id={styled.point}>{point}</li>
+    </div>
+  );
   
 }
 function Nav(props) {
