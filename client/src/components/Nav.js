@@ -5,6 +5,7 @@ import styled from "../css/nav.module.css";
 import Info from "../routes/Info.js";
 import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
+import jwt_decode from "jwt-decode";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
@@ -118,8 +119,17 @@ function Nav(props) {
   const colleges = ["공학", "인문", "자연", "사회", "의약", "예체능"];
   //로그아웃할때 필요한 token cookie 가져오기
   const [isLogin, setIsLogin] = useState(false);
+  const [navId, setNavId] = useState("계정");
   useEffect(() => {
-    boolCheckCookie("token") ? setIsLogin(true) : setIsLogin(false);
+    if (boolCheckCookie("token")) {
+      setIsLogin(true);
+      //토큰 가져와서 디코드하고 data 사용
+      const token = getCookie("token");
+      const accountData = jwt_decode(token);
+      setNavId(accountData.Account);
+    } else {
+      setIsLogin(false);
+    }
   }, []);
 
   return (
@@ -150,7 +160,7 @@ function Nav(props) {
               to={"/account"}
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              계정
+              {isLogin ? navId : "계정"}
             </Link>
           </li>
           <li id={styled.point}>POINT</li>
