@@ -51,24 +51,23 @@ function LogoutText() {
       console.log(token);
       console.log("cookie에 token 없음, 로그아웃 상태");
     } else {
-      console.log(token);
       //로그아웃 처리
       return new Promise((resolve, reject) => {
         fetch(`${API_URL}/${LOGOUT_API}`, {
           method: "GET",
-          header: {
-            Authorization: token,
+          headers: {
+            authorization: token,
           },
         })
           .then((response) => response.json())
           .then((result) => {
             console.log(result);
-            // if (result.code === 203) {
-            //   console.log(result);
-            //   alert("로그아웃");
-            //   delCookie("token");
-            //   window.location.replace("/");
-            // }
+            if (result.code === 203) {
+              console.log(result);
+              alert("로그아웃");
+              delCookie("token");
+              window.location.replace("/");
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -98,7 +97,7 @@ function GetPoint() {
   const [point, setPoint] = useState(0);
   fetch(`${API_URL}/${point_api}`, {
     method: "get",
-    header: { authorization: token },
+    headers: { authorization: token },
   }).then((result) => {
     if (result.code === 240) console.log(result.code);
     //setPoint(result.point);

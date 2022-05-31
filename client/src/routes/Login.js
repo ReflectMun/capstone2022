@@ -72,9 +72,7 @@ function Login(props) {
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log(data);
-            //토큰을 cookie 저장
-            console.log(data.token);
+            //토큰 있으면 cookie에 저장
             if (data.token != "") {
               setCookie("token", data.token, 1);
               alert("로그인 완료");
