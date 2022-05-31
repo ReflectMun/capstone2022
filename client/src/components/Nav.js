@@ -98,23 +98,27 @@ function LogoutText() {
 function GetPoint() {
   const token = getCookie("token");
   const [point, setPoint] = useState(0);
-  fetch(`${API_URL}/${point_api}`, {
-    method: "get",
-    headers: { authorization: token },
-  }).then((result) => {
-    if (result.code === 240) 
-    console.log(result.code);
-    setPoint(result.point);
-    // console.log(result)
-    // console.log(result.Point)
-  });
+  new Promise((resolve, reject) => {
+    fetch(`${API_URL}/${point_api}`, {
+      method: "GET",
+      headers: { authorization: token },
+    })
+    .then((result) => {
+      if (result.code === 240){
+        console.log(result.code);
+        setPoint(result.point);
+        console.log(point);
+      }
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
   return( 
     <div>
       <li id={styled.point}>{point}</li>
     </div>
     )
-
- 
+  });
 }
 function Nav(props) {
   const [selectCollege, setSelectCollge] = useState("공학");
