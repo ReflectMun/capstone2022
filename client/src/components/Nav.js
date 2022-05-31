@@ -5,14 +5,10 @@ import styled from "../css/nav.module.css";
 import Info from "../routes/Info.js";
 import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
-import { decode } from "jsonwebtoken";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 const point_api = "api/point";
-
-let token = null;
-let myLoginId = null;
 //쿠키 읽기
 function getCookie(key) {
   key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
@@ -50,28 +46,36 @@ function LoginText() {
 function LogoutText() {
   function onClickLogout(event) {
     event.preventDefault();
-    if (token === null) {
-      console.log("cookie에 token 없음");
+    const token = getCookie("token");
+    if (token === "") {
+      console.log(token);
+      console.log("cookie에 token 없음, 로그아웃 상태");
     } else {
+      console.log(token);
       //로그아웃 처리
       return new Promise((resolve, reject) => {
         fetch(`${API_URL}/${LOGOUT_API}`, {
           method: "GET",
           header: {
-            authorization: token,
+            Authorization: token,
           },
         })
-          .then((res) => {
-            console.log(res);
-            console.log(myLoginId);
-            delCookie(myLoginId);
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result);
+            // if (result.code === 203) {
+            //   console.log(result);
+            //   alert("로그아웃");
+            //   delCookie("token");
+            //   window.location.replace("/");
+            // }
           })
           .catch((error) => {
             console.log(error);
-            // resolve({
-            //   code: 4403,
-            //   message: "로그아웃 중 서버에서 오류가 발생하였습니다",
-            // });
+            resolve({
+              code: 4403,
+              message: "로그아웃 중 서버에서 오류가 발생하였습니다",
+            });
           });
       });
     }
@@ -90,6 +94,7 @@ function LogoutText() {
 }
 //포인트
 function GetPoint() {
+  const token = getCookie("token");
   const [point, setPoint] = useState(0);
   fetch(`${API_URL}/${point_api}`, {
     method: "get",
@@ -113,12 +118,10 @@ function Nav(props) {
   };
   const colleges = ["공학", "인문", "자연", "사회", "의약", "예체능"];
   //로그아웃할때 필요한 token cookie 가져오기
-  console.log(props.loginId);
-  if (boolCheckCookie(props.loginId)) {
-    token = getCookie(props.loginId);
-  } else {
-    token = null;
-  }
+  const [isLogin, setIsLogin] = useState(false);
+  useEffect(() => {
+    boolCheckCookie("token") ? setIsLogin(true) : setIsLogin(false);
+  }, []);
 
   return (
     <nav className={styled.nav}>
@@ -152,14 +155,12 @@ function Nav(props) {
             </Link>
           </li>
           <li id={styled.point}>POINT</li>
-
           {/* 로그인 했을 때 포인트 숫자 보이게 아니면 point 글자만 보이게 */}
-          {props.loginValue ? <GetPoint /> : <li id={styled.point}>POINT</li>}
+          {isLogin ? <GetPoint /> : <li id={styled.point}>POINT</li>}
           <li id={styled.message}>쪽지</li>
-
           {
             //loginValue(로그인상태) 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
-            props.loginValue ? <LogoutText /> : <LoginText />
+            isLogin ? <LogoutText /> : <LoginText />
           }
         </ul>
       </div>

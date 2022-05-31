@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styles from "../css/Login.module.css";
 import logoImage from "../img/logo_savior.png";
-import { TokenExpiredError } from "jsonwebtoken";
+
 //쿠키 저장
 //days 는 일자 정수 - 365년 1년 쿠키
 function setCookie(key, value, days) {
@@ -59,6 +59,7 @@ function Login(props) {
     event.preventDefault();
     if (id === "" || password === "") {
       alert("ID와 비밀번호를 입력해주세요");
+      return;
     } else {
       return new Promise((resolve, reject) => {
         fetch(`${API_URL}/${LOGIN_API}`, {
@@ -74,20 +75,47 @@ function Login(props) {
             console.log(data);
             //토큰을 cookie 저장
             console.log(data.token);
-            //setCookie("token", data, 1);
-            alert("로그인 완료");
+            if (data.token != "") {
+              setCookie("token", data.token, 1);
+              alert("로그인 완료");
+              navigate("/");
+            } else if (data.code == 300) {
+              alert("계정 혹은 비밀번호가 틀렸습니다");
+              resolve({
+                code: 300,
+                message: "계정 혹은 비밀번호가 틀렸습니다",
+              });
+            } else if (data.code == 151) {
+              alert("올바르지 않은 데이터 형식이 전송되었습니다");
+              resolve({
+                code: 151,
+                message: "올바르지 않은 데이터 형식이 전송되었습니다",
+              });
+            } else if (data.code == 150) {
+              alert("로그인을 위해 DB 조회중 오류가 발생하였습니다");
+              resolve({
+                code: 150,
+                message: "로그인을 위해 DB 조회중 오류가 발생하였습니다",
+              });
+            } else if (data.code == 351) {
+              alert("계정정보가 누락되었습니다");
+              resolve({ code: 351, message: "계정정보가 누락되었습니다" });
+            } else if (data.code == 3802) {
+              alert(
+                "사용자 인증 토큰 발급을 위해 DB와 통신하던 중 오류가 발생했습니다"
+              );
+              resolve({
+                code: 3802,
+                message:
+                  "사용자 인증 토큰 발급을 위해 DB와 통신하던 중 오류가 발생했습니다",
+              });
+            }
           })
           .catch((error) => {
             console.log(error);
           });
       });
-      //토큰안에 있는 string을 쿠키에 저장하기
-      //{token : aeihfpiaejfsedhifsehfaehlkfhaelkakfljka}
     }
-    //해당 아이디로 로그인 했다고 loginId state값 지정
-    props.setLoginId(id);
-    alert("로그인되었습니다.");
-    navigate("/");
   };
   return (
     <div className={styles.background}>
@@ -136,14 +164,6 @@ function Login(props) {
           </div>
         </section>
       </div>
-      <button
-        onClick={() => {
-          const cookieData = getCookie(id);
-          console.log(cookieData);
-        }}
-      >
-        쿠키 읽기
-      </button>
     </div>
   );
 }
