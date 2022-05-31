@@ -542,12 +542,12 @@ async function FetchAnswerListController(req, res){
     const { postNum } = req.paramBox
     try{
         const list = await fetchAnswerList(postNum)
-        res.json({ code: 212, answerlist: list })
+        res.json({ code: 212, answerlist: list, newToken: req.tokenBox['token'] })
         normalLog(req, controllerName, `에게 질문글 ${postNum}의 답변글 목록 전송완료`)
     }
     catch(err){
         errorLog(req, controllerName, err.message += '-9')
-        res.json({ code: 8335, message: '답변글 목록을 불러오는 도중 오류가 발생하였습니다' })
+        res.json({ code: 8335, message: '답변글 목록을 불러오는 도중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     }
 }
 /////////////////////////////////////////////////////////
