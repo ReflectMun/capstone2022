@@ -87,6 +87,11 @@ export async function jwtVerify(req, res, next){
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'], expToken['Nickname'])
                     req.tokenBox['token'] = newAccessToken
+
+                    req.paramBox['UID'] = newAccessToken['UID']
+                    req.paramBox['Account'] = newAccessToken['Account']
+                    req.paramBox['Nickname'] = newAccessToken['Nickname']
+
                     normalLog(req, controllerName, `로그인한 사용자 ${expToken['Account']}, 새로운 인증토큰 발급 완료`)
                     next()
                 }
