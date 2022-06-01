@@ -85,7 +85,7 @@ function errorHandle(err, req, res, next){
  * @param {express.NextFunction} next
  */
 async function putContentController(req, res, next){
-    const { Account: Author, UID: AuthorUID, BoardURI, Title, Type } = req.paramBox
+    const { Account: Author, UID: AuthorUID, Nickname: AuthorNickname, BoardURI, Title, Type } = req.paramBox
     const { originalname } = req.file
     let conn
 
@@ -93,8 +93,8 @@ async function putContentController(req, res, next){
 
     try {
         const queryString =
-        `INSERT INTO Posts(BoardURI, Title, AuthorUID, Author, Date, Time, Type, FileName)
-        VALUES('${BoardURI}', '${Title}', '${AuthorUID}', '${Author}', NOW(), NOW(), ${Type}, '${renamedName}')`
+        `INSERT INTO Posts(BoardURI, Title, AuthorUID, Author, AuthorNickname, Date, Time, Type, FileName)
+        VALUES('${BoardURI}', '${Title}', '${AuthorUID}', '${Author}', '${AuthorNickname}', NOW(), NOW(), ${Type}, '${renamedName}')`
 
         conn = await Pool.getConnection(conn => conn)
 
@@ -116,9 +116,9 @@ async function putContentController(req, res, next){
 }
 
 function okResponserController(req, res){
-    const { Account: Author, Title } = req.paramBox
+    const { Nickname: AuthorNickname, Title } = req.paramBox
     res.json({ code: 230, message: '본문 작성 완료', newToken: req.tokenBox['token'] })
-    normalLog(req, controllerName, `사용자 ${Author}이(가) 게시글 ${Title}을 작성함`)
+    normalLog(req, controllerName, `사용자 ${AuthorNickname}이(가) 게시글 ${Title}을 작성함`)
 }
 ////////////////////////////////////////////////////////////////
 
