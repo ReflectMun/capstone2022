@@ -162,8 +162,8 @@ async function sendMessageController(req, res){
 ///////////////////////////////////////////////
 export default sendMessage
 
-class AuthorMustBeString extends Error{ constructor() { super('발신자 정보는 문자여링어야 함') } }
-class RecipientMustBeString extends Error{ constructor() { super('발신자 정보는 문자여링어야 함') } }
+class AuthorMustBeString extends Error{ constructor() { super('발신자 정보는 문자열이어야 함') } }
+class RecipientMustBeString extends Error{ constructor() { super('수신자 정보는 문자열이어야 함') } }
 class EmptyContent extends Error{ constructor() { super('빈 메시지가 전송됨') } }
 class InvaliedContent extends Error{ constructor() { super('올바르지 않은 메시지가 전송됨') } }
 class UserNotFound extends Error{ constructor() { super('유저를 찾을 수 없음') } }

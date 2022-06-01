@@ -22,6 +22,9 @@ const transportter = createTransport(smtp({
 const FileStore = fileSession(session)
 signup.use(session({
     secret: process.env.SESSION,
+    cookie: {
+        maxAge: 60 * 10
+    },
     rolling: false,
     saveUninitialized: false,
     resave: true,
