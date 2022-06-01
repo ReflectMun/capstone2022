@@ -94,6 +94,8 @@ export async function jwtVerify(req, res, next){
 
                     normalLog(req, controllerName, `로그인한 사용자 ${expToken['Account']}, 새로운 인증토큰 발급 완료`)
                     next()
+
+                    return
                 }
                 else{
                     errorLog(req, controllerName, err.message)
