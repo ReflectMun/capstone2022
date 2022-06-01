@@ -26,6 +26,7 @@ function extractAuthorAndRecipient(req, res, next){
     const { Account: Author, Nickname: AuthorNickname } = req.paramBox
     const { Recipient } = req.body
 
+    console.log(req.headers['content-type'])
     console.log('발신자 이름: ', Author)
     console.log('쪽지발신 body 내용물: ', req.body)
     
