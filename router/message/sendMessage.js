@@ -26,6 +26,7 @@ function extractAuthorAndRecipient(req, res, next){
     const { Account: Author, Nickname: AuthorNickname } = req.paramBox
     const { Recipient } = req.body
 
+    console.log(req.headers['content-type'])
     console.log('발신자 이름: ', Author)
     console.log('쪽지발신 body 내용물: ', req.body)
     
@@ -45,7 +46,7 @@ function extractAuthorAndRecipient(req, res, next){
         if(err instanceof AuthorMustBeString){
             res.json({ code: 3901, message: '발신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
-        if(err instanceof AuthorNicknameMustBeString){
+        else if(err instanceof AuthorNicknameMustBeString){
             res.json({ code: 3902, message: '발신자 닉네임이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
         else if(err instanceof RecipientMustBeString){

@@ -508,8 +508,13 @@ async function processRegister(req, res){
     }
 }
 
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
 async function emailAuthController(req, res){
     const { EMail } = req.paramBox
+    req.session['authCode'] = 2022
 }
 /////////////////////////////////////////////////////////////////////
 
