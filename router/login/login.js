@@ -109,7 +109,7 @@ async function processLogin(req, res){
                 UID: row[0]['UID'],
                 Account: paramID
             })
-            normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}, Password = ${Password}`)
+            normalLog(req, controllerName, `로그인 요청 도착함 ID = ${paramID}`)
 
             res.redirect('/api/login/issue?' + UrlQuery)
         }

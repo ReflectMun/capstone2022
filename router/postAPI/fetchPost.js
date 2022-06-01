@@ -78,9 +78,9 @@ async function fetchPostList(boardURI, startNum, Type){
         let connection
         try{
             const queryString = 
-            `SELECT PostID, Title, Author, Date, Time, Type
+            `SELECT PostID, Title, Author, AuthorNickname, Date, Time, Type
             FROM(
-                SELECT PostID, Title, Author, Date, Time, Type
+                SELECT PostID, Title, Author, AuthorNickname, Date, Time, Type
                 FROM MainDB.Posts
                 WHERE BoardURI = '${boardURI}' AND isDeleted = 0 AND Type = ${Type}
                 ORDER BY PostID DESC
@@ -115,7 +115,7 @@ async function fetchAnswerList(postNum){
 
         try{
             const queryString =
-            `SELECT PostID, Author, AuthorUID, Date, Time, FileName
+            `SELECT PostID, Author, AuthorUID, AuthorNickname, Date, Time, FileName
             FROM Posts WHERE isDeleted = 0 AND Type = 3 AND SourceQuestion = ${postNum}`
 
             conn = await Pool.getConnection()
@@ -134,6 +134,7 @@ async function fetchAnswerList(postNum){
                     PostID: row['PostID'],
                     Author: row['Author'],
                     AuthorUID: row['AuthorUID'],
+                    Nickname: row['AuthorNickname'],
                     Date: row['Date'],
                     Time: row['Time'],
                     content: file
@@ -453,7 +454,8 @@ async function ContentViewerController(req, res){
 
     try{
         const queryString =
-        `SELECT PostID, Title, Author, AuthorUID, Date, Time, FileName, Type FROM Posts WHERE PostID = ${postNum} AND isDeleted = 0`
+        `SELECT PostID, Title, Author, AuthorUID, AuthorNickname, Date, Time, FileName, Type
+        FROM Posts WHERE PostID = ${postNum} AND isDeleted = 0`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -473,6 +475,7 @@ async function ContentViewerController(req, res){
             Title: data[0]['Title'],
             Author: data[0]['Author'],
             AuthorUID: data[0]['AuthorUID'],
+            Nickname: data[0]['AuthorNickname'],
             Date: data[0]['Date'],
             Time: data[0]['Time'],
             Type: data[0]['Type'],

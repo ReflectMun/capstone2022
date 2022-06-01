@@ -3,7 +3,7 @@ import multer from 'multer'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
 import Pool from '../../private/server/DBConnector.js'
-import { normalLog } from '../../private/apis/logger.js'
+import { errorLog, normalLog } from '../../private/apis/logger.js'
 
 const answerUploader = Router()
 const controllerName = 'answerUpload'
@@ -54,7 +54,7 @@ function extractValues(req, res, next){
  * @param {express.Response} res 
  */
 async function answerUploadController(req, res){
-    const { Account: Author, UID: AuthorUID, SourceQuestion } = req.paramBox
+    const { Account: Author, UID: AuthorUID, Nickname: AuthorNickname, SourceQuestion } = req.paramBox
     const { originalname } = req.file
     const renamedName = originalname + `_${Author}_${new Date().getMilliseconds()}`
 
@@ -62,8 +62,8 @@ async function answerUploadController(req, res){
 
     try{
         const queryString =
-        `INSERT INTO Posts(Author, AuthorUID, Date, Time, Type, FileName, SourceQuestion)
-        VALUES('${Author}', '${AuthorUID}', NOW(), NOW(), 3, '${renamedName}', ${SourceQuestion})`
+        `INSERT INTO Posts(Author, AuthorUID, AuthorNickname, Date, Time, Type, FileName, SourceQuestion)
+        VALUES('${Author}', '${AuthorUID}', '${AuthorNickname}', NOW(), NOW(), 3, '${renamedName}', ${SourceQuestion})`
         conn = await Pool.getConnection()
 
         await conn.beginTransaction()
@@ -76,10 +76,11 @@ async function answerUploadController(req, res){
         normalLog(req, controllerName, `${Author}이(가) 글번호 ${SourceQuestion}에 답변글을 작성함`)
     }
     catch(err){
-
+        errorLog(req, controllerName, err.message += '=1')
+        res.json({ code: 2023, message: '답변글을 등록하는 중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     }
     finally{
-
+        if(conn) { conn.release() }
     }
 }
 
@@ -90,8 +91,12 @@ async function answerUploadController(req, res){
  * @param {express.NextFunction} next 
  */
 function answerUploadErrorController(err, req, res, next){
+    errorLog(req, controllerName, err.message += 'err1')
     if(err instanceof InvalidValueType){
         res.json({ code: 5024, message: '해당 답변이 달릴 질문글의 주소가 누락되거나 손상되었습니다', newToken: req.tokenBox['token']})
+    }
+    else{
+        res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     }
 }
 //////////////////////////////////////////////////////////////
