@@ -40,9 +40,9 @@ async function checkVaildRefreshToken(UID){
  * @param {string} Account 
  * @returns {string} 새로 발급된 토큰
  */
-function issueNewAccessToken(UID, Account){
+function issueNewAccessToken(UID, Account, Nickname){
     const newToken = sign(
-        { UID: UID, Account: Account },
+        { UID: UID, Account: Account, Nickname: Nickname },
         process.env.JWT_PRIVATE,
         { algorithm: 'RS512', issuer:'SaiorQNA', expiresIn: '20m'}
     )
@@ -71,6 +71,7 @@ export async function jwtVerify(req, res, next){
         if(await checkVaildRefreshToken(verifiedToken['UID'])){
             req.paramBox['UID'] = verifiedToken['UID']
             req.paramBox['Account'] = verifiedToken['Account']
+            req.paramBox['Nickname'] = verifiedToken['Nickname']
             normalLog(req, controllerName, `로그인한 사용자 ${verifiedToken['Account']}`)
             next()
         }
@@ -84,7 +85,7 @@ export async function jwtVerify(req, res, next){
                 const expToken = verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512', ignoreExpiration: true }) 
 
                 if(await checkVaildRefreshToken(expToken['UID'])){
-                    const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'])
+                    const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'], expToken['Nickname'])
                     req.tokenBox['token'] = newAccessToken
                     normalLog(req, controllerName, `로그인한 사용자 ${expToken['Account']}, 새로운 인증토큰 발급 완료`)
                     next()
