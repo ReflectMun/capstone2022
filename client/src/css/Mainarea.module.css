@@ -15,6 +15,12 @@
   cursor: pointer;
 }
 .major {
-  margin-left: "10px";
+  margin-left: 10px;
   width: 87%;
+}
+
+.board_type {
+  margin-left: 18px;
+  width: 150px;
+  height: 23px;
 }

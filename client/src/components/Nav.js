@@ -163,7 +163,6 @@ function Nav(props) {
               {isLogin ? navId : "계정"}
             </Link>
           </li>
-          <li id={styled.point}>POINT</li>
           {/* 로그인 했을 때 포인트 숫자 보이게 아니면 point 글자만 보이게 */}
           {isLogin ? <GetPoint /> : <li id={styled.point}>POINT</li>}
           <li id={styled.message}>쪽지</li>
