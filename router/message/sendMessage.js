@@ -35,7 +35,7 @@ function extractAuthorAndRecipient(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req)
+        errorLog(req, controllerName, err.message += '-1')
         if(err instanceof AuthorMustBeString){
             res.json({ code: 3901, message: '발신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
@@ -72,7 +72,7 @@ function extractMessageContent(req, res, next){
         next()
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-2')
         if(err instanceof EmptyContent){
             res.json({ code: 5901, message: '빈 메시지를 전송할 수 없습니다', newToken: req.tokenBox['token'] })
         }
@@ -114,7 +114,7 @@ async function checkVaildRecipient(req, res, next){
         }
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '-3')
         if(err instanceof UserNotFound){
             res.json({ code: 5911, message: '받는사람을 찾을 수 없습니다', newToken: req.tokenBox['token'] })
         }
@@ -152,7 +152,7 @@ async function sendMessageController(req, res){
         normalLog(req, controllerName, `${Author}이(가) ${Recipient} 에게 쪽지를 전송함`)
     }
     catch(err){
-        errorLog(req, controllerName, err.message)
+        errorLog(req, controllerName, err.message += '=1')
         res.json({ code: 8081, message: '쪽지 전송 중 오류가 발생했습니다', newToken: req.tokenBox['token'] })
     }
     finally{
