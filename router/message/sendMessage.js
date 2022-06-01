@@ -23,7 +23,7 @@ sendMessage.put(
  * @param {express.NextFunction} next 
  */
 function extractAuthorAndRecipient(req, res, next){
-    const { Account: Author } = req.paramBox
+    const { Account: Author, Nickname: AuthorNickname } = req.paramBox
     const { Recipient } = req.body
 
     console.log('발신자 이름: ', Author)
@@ -31,9 +31,11 @@ function extractAuthorAndRecipient(req, res, next){
     
     try{
         if(typeof Author != 'string') { throw new AuthorMustBeString }
+        if(typeof AuthorNickname != 'string') { throw new AuthorNicknameMustBeString }
         if(typeof Recipient != 'string') { throw new RecipientMustBeString }
 
         req.paramBox['Author'] = Author
+        req.paramBox['AuthorNickname'] = AuthorNickname
         req.paramBox['Recipient'] = Recipient
 
         next()
@@ -43,8 +45,11 @@ function extractAuthorAndRecipient(req, res, next){
         if(err instanceof AuthorMustBeString){
             res.json({ code: 3901, message: '발신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
+        if(err instanceof AuthorNicknameMustBeString){
+            res.json({ code: 3902, message: '발신자 닉네임이 잘못되었습니다', newToken: req.tokenBox['token'] })
+        }
         else if(err instanceof RecipientMustBeString){
-            res.json({ code: 3092, message: '수신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
+            res.json({ code: 3093, message: '수신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
         else{
             res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
@@ -99,7 +104,7 @@ async function checkVaildRecipient(req, res, next){
     let conn
 
     try{
-        const query = `SELECT * FROM Users WHERE Account = '${Recipient}' AND isSignedOut = 0`
+        const queryString = `SELECT Account, Nickname FROM Users WHERE Account = '${Recipient}' AND isSignedOut = 0`
 
         conn = await Pool.getConnection()
 
@@ -108,6 +113,7 @@ async function checkVaildRecipient(req, res, next){
         await Pool.commit()
 
         if(row.length == 1){
+            req.paramBox['RecipientNickname'] = row[0]['Nickname']
             next()
         }
         else if(row.length == 0){
@@ -140,11 +146,11 @@ async function checkVaildRecipient(req, res, next){
  */
 async function sendMessageController(req, res){
     let conn = null
-    const { Author, Recipient, Content } = req.paramBox
+    const { Author, AuthorNickname, Recipient, RecipientNickname, Content } = req.paramBox
     try{
         const queryString = 
-        `INSERT INTO Messages(Author, Recipient, Date, Time, Content)
-        VALUES('${Author}', '${Recipient}', NOW(), NOW(), '${Content}')`
+        `INSERT INTO Messages(Author, AuthorNickname, Recipient, RecipientNickname, Date, Time, Content)
+        VALUES('${Author}', '${AuthorNickname}', '${Recipient}', '${RecipientNickname}', NOW(), NOW(), '${Content}')`
 
         conn = await Pool.getConnection()
 
@@ -153,7 +159,7 @@ async function sendMessageController(req, res){
         await conn.commit()
 
         res.send({ code: 220, message: '메시지 송신 완료', newToken: req.tokenBox['token'] })
-        normalLog(req, controllerName, `${Author}이(가) ${Recipient} 에게 쪽지를 전송함`)
+        normalLog(req, controllerName, `${AuthorNickname}이(가) ${RecipientNickname} 에게 쪽지를 전송함`)
     }
     catch(err){
         errorLog(req, controllerName, err.message += '=1')
@@ -167,6 +173,7 @@ async function sendMessageController(req, res){
 export default sendMessage
 
 class AuthorMustBeString extends Error{ constructor() { super('발신자 정보는 문자열이어야 함') } }
+class AuthorNicknameMustBeString extends Error{ constructor() { super('발신자 정보는 문자열이어야 함') } }
 class RecipientMustBeString extends Error{ constructor() { super('수신자 정보는 문자열이어야 함') } }
 class EmptyContent extends Error{ constructor() { super('빈 메시지가 전송됨') } }
 class InvaliedContent extends Error{ constructor() { super('올바르지 않은 메시지가 전송됨') } }

@@ -80,12 +80,13 @@ function extractPageNum(req, res, next){
  */
 async function fetchSendedMessageController(req, res){
     let conn
+    const { Author } = req.paramBox
     const pageNum = req.paramBox['pageNum'] * 15
     try{
         const queryString =
-        `SELECT MessagesID, Author, Recipient, Date, Time, Content
+        `SELECT MessagesID, Recipient, RecipientNickname, Date, Time, Content
         FROM Messages
-        WHERE Author = '${req.paramBox['Author']}' && HiddenForAuthor = 0
+        WHERE Author = '${Author}' && HiddenForAuthor = 0
         ORDER BY MessagesID DESC
         LIMIT ${pageNum}, 15`
 
@@ -95,7 +96,7 @@ async function fetchSendedMessageController(req, res){
         const [ messages, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        if(!messages){
+        if(messages.length < 1){
             res.json({
                 code: 215,
                 messages: '보낸 메시지가 존재하지 않습니다',
@@ -127,12 +128,13 @@ async function fetchSendedMessageController(req, res){
  */
 async function fetchReceivedMessageController(req, res){
     let conn
+    const { Recipient } = req.paramBox
     const pageNum = req.paramBox['pageNum'] * 15
     try{
         const queryString =
-        `SELECT MessagesID, Author, Recipient, Date, Time, Content
+        `SELECT MessagesID, Author, AuthorNickname, Date, Time, Content
         FROM Messages
-        WHERE Recipient = '${req.paramBox['Recipient']}' && HiddenForRecipient = 0
+        WHERE Recipient = '${Recipient}' && HiddenForRecipient = 0
         ORDER BY MessagesID DESC
         LIMIT ${pageNum}, 15`
 
@@ -142,7 +144,7 @@ async function fetchReceivedMessageController(req, res){
         const [ messages, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        if(!messages){
+        if(messages.length < 1){
             res.json({
                 code: 217,
                 messages: '받은 메시지가 존재하지 않습니다',

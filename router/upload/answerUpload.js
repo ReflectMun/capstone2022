@@ -54,7 +54,7 @@ function extractValues(req, res, next){
  * @param {express.Response} res 
  */
 async function answerUploadController(req, res){
-    const { Account: Author, UID: AuthorUID, SourceQuestion } = req.paramBox
+    const { Account: Author, UID: AuthorUID, Nickname: AuthorNickname, SourceQuestion } = req.paramBox
     const { originalname } = req.file
     const renamedName = originalname + `_${Author}_${new Date().getMilliseconds()}`
 
@@ -62,8 +62,8 @@ async function answerUploadController(req, res){
 
     try{
         const queryString =
-        `INSERT INTO Posts(Author, AuthorUID, Date, Time, Type, FileName, SourceQuestion)
-        VALUES('${Author}', '${AuthorUID}', NOW(), NOW(), 3, '${renamedName}', ${SourceQuestion})`
+        `INSERT INTO Posts(Author, AuthorUID, AuthorNickname, Date, Time, Type, FileName, SourceQuestion)
+        VALUES('${Author}', '${AuthorUID}', '${AuthorNickname}', NOW(), NOW(), 3, '${renamedName}', ${SourceQuestion})`
         conn = await Pool.getConnection()
 
         await conn.beginTransaction()
