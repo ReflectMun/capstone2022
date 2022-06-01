@@ -11,9 +11,13 @@ function sendMessage(receiver,content){
     const token = getCookie("token");
     const Receiver = receiver
     const Content = content
-   console.log(token.type)
-   console.log(Receiver.type)
-   console.log(Content.type)
+    console.log(typeof token)
+    console.log(token)
+    console.log(typeof Receiver)
+    console.log(Receiver)
+    console.log(typeof Content)
+    console.log(Content)
+
     const reqBody = {
         Recipient: Receiver,
         Content: Content,
@@ -21,10 +25,11 @@ function sendMessage(receiver,content){
     new Promise((resolve, reject) => {
         fetch(`${API_URL}/${SendMessage_API}`, {
             method: "PUT",
-            body: JSON.stringify(reqBody),
             headers: {
                 authorization: token,
+ 
             },
+            body: JSON.stringify(reqBody)
         })
             .then((response) => response.json())
             .then((res) => {
