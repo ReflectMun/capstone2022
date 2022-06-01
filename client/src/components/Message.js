@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from '../css/message.module.css';
 import { getCookie } from './Nav';
+import PropTypes from "prop-types";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const SendMessage_API = "api/message/send";
@@ -10,9 +11,9 @@ function sendMessage(receiver,content){
     const token = getCookie("token");
     const Receiver = receiver
     const Content = content
-   console.log(token)
-   console.log(Receiver)
-   console.log(Content)
+   console.log(token.type)
+   console.log(Receiver.type)
+   console.log(Content.type)
     const reqBody = {
         Recipient: Receiver,
         Content: Content,
@@ -25,6 +26,7 @@ function sendMessage(receiver,content){
                 authorization: token,
             },
         })
+            .then((response) => response.json())
             .then((res) => {
                 console.log(res);
                 if (res.code === 220){
@@ -40,9 +42,13 @@ function sendMessage(receiver,content){
             });
         })
 }
+sendMessage.propTypes ={
+    token : PropTypes.string,
+    Recipient : PropTypes.string,
+    Content : PropTypes.string,
+}
 
-
-function Message(props) {
+function Message() {
     const [visible, setVisible] = useState(false);
     const [receiver, setReceiver] = useState("");
     const [content, setContent] = useState("");
