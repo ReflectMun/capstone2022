@@ -23,7 +23,7 @@ sendMessage.put(
  * @param {express.NextFunction} next 
  */
 function extractAuthorAndRecipient(req, res, next){
-    const { Account: Author } = req.paramBox['Account']
+    const { Account: Author } = req.paramBox
     const { Recipient } = req.body
     try{
         if(typeof Author != 'string') { throw new AuthorMustBeString }
