@@ -45,7 +45,7 @@ function extractAuthorAndRecipient(req, res, next){
         if(err instanceof AuthorMustBeString){
             res.json({ code: 3901, message: '발신자 이름이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
-        if(err instanceof AuthorNicknameMustBeString){
+        else if(err instanceof AuthorNicknameMustBeString){
             res.json({ code: 3902, message: '발신자 닉네임이 잘못되었습니다', newToken: req.tokenBox['token'] })
         }
         else if(err instanceof RecipientMustBeString){
