@@ -5,6 +5,8 @@ import smtp from 'nodemailer-smtp-transport'
 import { renderFile } from 'ejs'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
+import session from 'express-session'
+import fileSession from 'session-file-store'
 
 const signup = Router()
 const controllerName = 'signup'
@@ -15,6 +17,17 @@ const transportter = createTransport(smtp({
         user: 'qnasavior@gmail.com',
         pass: 'syluupofbesfopsp'
     }
+}))
+
+const FileStore = fileSession(session)
+signup.use(session({
+    secret: process.env.SESSION,
+    rolling: false,
+    saveUninitialized: false,
+    resave: true,
+    store: new FileStore({
+        retries: 1
+    })
 }))
 
 /////////////////////////////////////////////////////////////////////
