@@ -25,6 +25,10 @@ sendMessage.put(
 function extractAuthorAndRecipient(req, res, next){
     const { Account: Author } = req.paramBox
     const { Recipient } = req.body
+
+    console.log('발신자 이름: ', Author)
+    console.log('쪽지발신 body 내용물: ', req.body)
+    
     try{
         if(typeof Author != 'string') { throw new AuthorMustBeString }
         if(typeof Recipient != 'string') { throw new RecipientMustBeString }
