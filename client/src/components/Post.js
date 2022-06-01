@@ -7,7 +7,7 @@ import MyEditor from "./MyEditor";
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
-  const contents = "이 부분은 어떻게 작동하는 건인지요?";
+  const contents = "이 부분은 어떻게 돌아가는 것인지요?";
   return (
     <div className={styles.wrap_question}>
       <div>
@@ -44,10 +44,8 @@ function AnswerBtn(props) {
 function Answer() {
   const answer = (
     <div style={{ marginLeft: "10px" }}>
-      <p>이러이러하고...</p>
-      <p>저러저러하고</p>
-      <p>그러그러하기 때문에</p>
-      <p>이러저러그러한 것 이죠.</p>
+      <p>어떻게 돌아가긴요?</p>
+      <p>잘만 돌아가지요오~</p>
     </div>
   );
 
