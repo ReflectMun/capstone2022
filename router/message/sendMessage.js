@@ -110,7 +110,7 @@ async function checkVaildRecipient(req, res, next){
 
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
-        await Pool.commit()
+        await conn.commit()
 
         if(row.length == 1){
             req.paramBox['RecipientNickname'] = row[0]['Nickname']
