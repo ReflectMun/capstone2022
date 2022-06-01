@@ -11,13 +11,6 @@ function sendMessage(receiver,content){
     const token = getCookie("token");
     const Receiver = receiver
     const Content = content
-    console.log(typeof token)
-    console.log(token)
-    console.log(typeof Receiver)
-    console.log(Receiver)
-    console.log(typeof Content)
-    console.log(Content)
-
     const reqBody = {
         Recipient: Receiver,
         Content: Content,
@@ -27,7 +20,7 @@ function sendMessage(receiver,content){
             method: "PUT",
             headers: {
                 authorization: token,
- 
+                "content-type": "application/json",
             },
             body: JSON.stringify(reqBody)
         })
