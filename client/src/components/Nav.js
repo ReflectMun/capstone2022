@@ -11,8 +11,8 @@ import jwt_decode from "jwt-decode";
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 const point_api = "api/point";
-//쿠키 읽기
-function getCookie(key) {
+//쿠키 읽기 + 이 함수 형제 컴포넌트에서 쓸라면 export 쓰라길래 썼음.
+export function getCookie(key) {
   key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
   return key.test(document.cookie) ? unescape(RegExp.$1) : ""; // 인자로 받은 키에 해당하는 키가 있으면 값을 반환
 }
@@ -97,6 +97,7 @@ function LogoutText() {
 //포인트
 function GetPoint() {
   const token = getCookie("token");
+  console.log(token);
   const [point, setPoint] = useState(0);
   new Promise((resolve, reject) => {
     fetch(`${API_URL}/${point_api}`, {

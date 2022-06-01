@@ -1,41 +1,48 @@
 import React, { useState } from 'react';
 import styled from '../css/message.module.css';
-
+import { getCookie } from './Nav';
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const SendMessage_API = "api/message/send";
 
 //메시지 전송
 function sendMessage(receiver,content){
+    const token = getCookie("token");
     const Receiver = receiver
     const Content = content
-   // console.log(Receiver)
-   // console.log(Content)
+   console.log(token)
+   console.log(Receiver)
+   console.log(Content)
     const reqBody = {
         Recipient: Receiver,
         Content: Content,
       };
-    fetch(`${API_URL}/${SendMessage_API}`, {
-        method: "PUT",
-        body: JSON.stringify(reqBody),
-        header: {
-          //authorization: token,
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          if (res.code == 220){
-            alert(res.message)
-            console.log("성공")
-        }
+    new Promise((resolve, reject) => {
+        fetch(`${API_URL}/${SendMessage_API}`, {
+            method: "PUT",
+            body: JSON.stringify(reqBody),
+            headers: {
+                authorization: token,
+            },
         })
-        .catch((error) => {
-          console.log(error)
-        });
-    }
+            .then((res) => {
+                console.log(res);
+                if (res.code === 220){
+                    alert(res.message)
+                    console.log("성공")
+            }
+                else{
+                    console.log("실패")
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+        })
+}
 
 
-function Message() {
+function Message(props) {
     const [visible, setVisible] = useState(false);
     const [receiver, setReceiver] = useState("");
     const [content, setContent] = useState("");
