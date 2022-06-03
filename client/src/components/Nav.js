@@ -94,35 +94,32 @@ function LogoutText() {
   );
 }
 
-//포인트
-function GetPoint() {
-  const token = getCookie("token");
-  console.log(token);
-  const [point, setPoint] = useState(0);
-  new Promise((resolve, reject) => {
-    fetch(`${API_URL}/${point_api}`, {
-      method: "GET",
-      headers: { authorization: token },
-    })
-    .then((result) => {
-      if (result.code === 240){
-        console.log(result.code);
-        setPoint(result.point);
-        console.log(point);
-      }
-    })
-    .catch((error)=>{
-      console.log(error);
-    })
-  return( 
-    <div>
-      <li id={styled.point}>{point}</li>
-    </div>
-    )
-  });
-}
+// //포인트
+// function GetPoint() {
+//   const token = getCookie("token");
+//   const [point, setPoint] = useState(0);
+//   new Promise((resolve, reject) => {
+//     fetch(`${API_URL}/${point_api}`, {
+//       method: "GET",
+//       headers: { authorization: token },
+//     })
+//     .then((response) => response.json())
+//     .then((result) => {
+//       console.log(result.point)
+//       if (result.code === 240){
+//         console.log(result.code);
+//         setPoint(result.point);
+//       }
+//     })
+//     .catch((error)=>{
+//       console.log(error);
+//     })
+//   });
+// }
+
 function Nav(props) {
   const [selectCollege, setSelectCollge] = useState("공학");
+  const [point, setPoint] = useState(0);
   const onChangeCollge = (event) => {
     setSelectCollge(event.target.innerText);
   };
@@ -130,6 +127,27 @@ function Nav(props) {
   //로그아웃할때 필요한 token cookie 가져오기
   const [isLogin, setIsLogin] = useState(false);
   const [navId, setNavId] = useState("계정");
+  
+  function getPoint() {
+    const token = getCookie("token");
+    new Promise((resolve, reject) => {
+      fetch(`${API_URL}/${point_api}`, {
+        method: "GET",
+        headers: { authorization: token },
+      })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("point:" + result.point);
+        if (result.code === 240){
+          console.log(result.code);
+          setPoint(result.point);
+        }
+      })
+      .catch((error)=>{
+        console.log(error);
+      })
+    });
+  }
   useEffect(() => {
     if (boolCheckCookie("token")) {
       setIsLogin(true);
@@ -137,6 +155,7 @@ function Nav(props) {
       const token = getCookie("token");
       const accountData = jwt_decode(token);
       setNavId(accountData.Account);
+      getPoint();
     } else {
       setIsLogin(false);
     }
@@ -173,7 +192,9 @@ function Nav(props) {
             </Link>
           </li>
           {/* 로그인 했을 때 포인트 숫자 보이게 아니면 point 글자만 보이게 */}
-          {isLogin ? <GetPoint /> : <li id={styled.point}>POINT</li>}
+          {/* {isLogin ? <GetPoint /> : <li id={styled.point}>POINT</li>} */}
+          
+          {isLogin ? <li id={styled.point}>{point}</li> : <li id={styled.point}>POINT</li>}
           <li id={styled.message}>쪽지</li>
           {
             //loginValue(로그인상태) 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
