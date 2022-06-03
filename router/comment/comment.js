@@ -17,7 +17,7 @@ async function getComment(req, res) {
     }
 
     try{
-        const queryString = `SELECT * FROM Comments`  // Comment 테이블의 Idx, Nickname, Comment, CommentTime 을 조회한 뒤, 모든 데이터를 json 으로 리턴함
+        const queryString = `SELECT * FROM Comments`  // Comment 테이블을 조회한 뒤, 모든 데이터를 json 으로 리턴함
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -44,6 +44,8 @@ async function postComment(req, res) {
     let conn = null
     let nickname
     let comment
+    let Date
+    let Time
 
     const response = {
         code: null,
@@ -53,6 +55,9 @@ async function postComment(req, res) {
     try {
         nickname = req.body['nickname']
         comment = req.body['comment']
+        Date = req.body['Date']
+        Time = req.body['Time']
+        
     }
     catch(err){
         console.log(err)
@@ -64,8 +69,8 @@ async function postComment(req, res) {
     }
     
     try{
-        const queryString = `INSERT INTO Comments(Nickname,Comment) VALUES('${nickname}','${comment}')` // Comments 테이블에 Nickname, Comment 를 추가한다.
-                                                                                                        // Idx, CommentTime 컬럼은 mysql 에서 자동으로 추가된다.
+        const queryString = `INSERT INTO Comments(Nickname,Comment,Date,Time) VALUES('${nickname}','${comment}','${Date}','${Time}')` 
+                                                                                                        
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
