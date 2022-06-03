@@ -15,7 +15,7 @@ const transportter = createTransport(smtp({
     host: 'smtp.gmail.com',
     auth: {
         user: 'qnasavior@gmail.com',
-        pass: 'syluupofbesfopsp'
+        pass: process.env.EMAIL_PASS
     }
 }))
 
@@ -52,8 +52,15 @@ signup.post(
 )
 
 signup.post(
-    '/check/email',
-    extractEmail
+    '/auth/email',
+    extractEmail,
+    authCodeSendController
+)
+
+signup.post(
+    '/verify/email',
+    extractAuthCode,
+    verifyEmailController
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -164,6 +171,16 @@ function encryptPassword(password){
 }
 
 /**
+ * 인증코드 랜덤 생성기
+ * @returns {string} 인증코드
+ */
+function getRandomAuthNumber(){
+    const number = Math.floor(Math.random() * 1000000)
+    const code = number.toString().padStart(6, '0')
+    return code
+}
+
+/**
  * 메일 인증 체크용 ejs 파일
  * @param {string} authCode 
  * @returns {string} ejs 파일
@@ -172,7 +189,7 @@ function ejsRender(authCode){
     return new Promise(function(resolve, reject){
         renderFile('./public/authPage.ejs', { authCode: authCode }, function(err, string){
             if(err){
-                err.message += -105
+                err.message += '-105'
                 reject(err)
             }
             else{
@@ -261,11 +278,6 @@ function checkCorrectData(req, res, next){
             return
         }
 
-        if(email.length > 45){
-            res.json({ code: 2122, message: '이메일은 45글자 이내여야 합니다' })
-            return
-        }
-
         if(nickname.length > 20){
             res.json({ code: 2123, message: '닉네임은 20글자 이내여야 합니다' })
             return
@@ -283,10 +295,9 @@ function checkCorrectData(req, res, next){
             return
         }
 
-        const emailRegex = /\w+@(\w+[.]?)+[.]ac[.]kr/g
-        if(emailRegex.test(email) == false){
-            res.json({ code: 2126, message: '이메일이 ac.kr로 끝나는 형식의 올바른 이메일이 아닙니다'})
-            return
+        const { mailAuthed } = req.session
+        if(mailAuthed != true){
+            res.json({ code: 2122, message: '이메일 인증을 먼저 진행해주세요' })
         }
 
         next()
@@ -440,6 +451,45 @@ function extractEmail(req, res, next){
         }
     }
 }
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+ function extractAuthCode(req, res, next){
+    const { AuthCode } = req.body
+
+    try{
+        if(typeof AuthCode != 'string') { throw new ValuesIsMalformed() }
+
+        if(AuthCode.length != 6){
+            res.json({ code: 2152, message: '인증코드는 6자리여야 합니다' })
+            return
+        }
+
+        const numberRegex = /^[0-9]+$/g
+        if(numberRegex.test(AuthCode) == false){
+            res.json({ code: 2126, message: '인증 코드는 숫자로만 구성되어 있습니다' })
+            return
+        }
+
+        req.paramBox = {
+            AuthCode: AuthCode
+        }
+
+        next()
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message + '-6')
+        if(err instanceof ValuesIsMalformed){
+            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+    }
+}
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
@@ -512,9 +562,46 @@ async function processRegister(req, res){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-async function emailAuthController(req, res){
+async function authCodeSendController(req, res){
     const { EMail } = req.paramBox
-    req.session['authCode'] = 2022
+    const authCode = getRandomAuthNumber()
+
+    transportter.sendMail({
+        from: 'qnasavior@gmail.com',
+        to: EMail,
+        subject: 'QNASavior 인증 메일입니다',
+        html: await ejsRender(authCode)
+    }, function(err, info){
+        if(err){
+            errorLog(req, controllerName, err.message += '=3')
+            res.json({ code: 5117, message: '인증메일 전송 중 오류가 발생하였습니다' })
+        }
+        else{
+            req.session['emailWhatTryingAuth'] = EMail
+            req.session['authCode'] = authCode
+            res.json({ code: 250, message: '인증메일 전송 완료' })
+            normalLog(req, controllerName, `메일 ${EMail} 인증을 위한 인증코드 발송`)
+        }
+    })
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function verifyEmailController(req, res){
+    const { AuthCode } = req.body
+    const { authCode: originalAuthCode, emailWhatTryingAuth } = req.session
+
+    if(AuthCode == originalAuthCode){
+        req.session['mailAuthed'] = true
+        res.json({ code: 251, message: '메일 인증에 성공하였습니다' })
+        normalLog(req, controllerName, `이메일 ${emailWhatTryingAuth} 인증완료`)
+    }
+    else{
+        res.json({ code: 5118, message: '인증코드가 일치하지 않습니다' })
+        errorLog(req,controllerName, `이메일 ${emailWhatTryingAuth} 인증코드 불일치`)
+    }
 }
 /////////////////////////////////////////////////////////////////////
 

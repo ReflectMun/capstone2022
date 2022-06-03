@@ -1,5 +1,5 @@
 import express, { Router } from 'express'
-import { normalLog } from '../private/apis/logger.js'
+import { errorLog, normalLog } from '../private/apis/logger.js'
 import { jwtVerify } from '../private/apis/verifyJWT.js'
 import Pool from '../private/server/DBConnector.js'
 
@@ -36,6 +36,19 @@ async function FetchUserPointController(req, res){
         normalLog(req, controllerName, `유저 UID: ${UID} 에게 잔여 포인트량을 전송함`)
     }
     catch(err){
+        errorLog(req, controllerName, err.message += '=1')
+    }
+}
+
+export async function checkCurrentPoint(req, res){
+    const { UID } = req.paramBox
+    let conn
+
+    try{
+        const queryString = ``
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message += '=2')
     }
 }
 /////////////////////////////////////////////////////
