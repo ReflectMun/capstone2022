@@ -6,6 +6,8 @@ import Pool from '../private/server/DBConnector.js'
 const fetchPoint = Router()
 const controllerName = 'fetchPoint'
 
+const pointNeedWhenPost = 10
+
 fetchPoint.get(
     '/',
     jwtVerify,
@@ -40,15 +42,32 @@ async function FetchUserPointController(req, res){
     }
 }
 
-export async function checkCurrentPoint(req, res){
+export async function checkEnoughPoint(req, res){
     const { UID } = req.paramBox
     let conn
 
     try{
-        const queryString = ``
+        const queryString = `SELECT Point FROM Users WHERE UID = ${UID}`
+        conn = await Pool.getConnection()
+
+        await conn.beginTransaction()
+        const [ data, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        const point = data[0]['Point']
+        if(pointNeedWhenPost > point){
+            res.json({ code: 5500, msg: "포인트가 부족합니다"})
+        }else{
+            const queryString2 = `UPDATE Users SET Point=${point - pointNeedWhenPost} WHERE UID = ${UID}`
+            await conn.query(queryString2)
+            await conn.commit()
+            res.json({ code: 240, point: point - pointNeedWhenPost })
+        }
+
+        normalLog(req, controllerName, `${UID}에게 잔여 포인트량을 전송함`)
     }
     catch(err){
-        errorLog(req, controllerName, err.message += '=2')
+        res.json({ code: 500, msg: "database error"})
     }
 }
 /////////////////////////////////////////////////////

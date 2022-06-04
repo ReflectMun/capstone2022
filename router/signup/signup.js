@@ -41,13 +41,13 @@ signup.post(
     checkCorrectData,
     checkRegisteredAccountMiddle,
     checkRegisteredNicknameMiddle,
-    checkRegisteredEMailMiddle,
     processRegister
 )
 
 signup.post(
     '/auth/email',
     extractEmail,
+    checkRegisteredEMailMiddle,
     authCodeSendController
 )
 
@@ -373,10 +373,10 @@ async function checkRegisteredNicknameMiddle(req, res, next){
  * @param {express.NextFunction} next 
  */
 async function checkRegisteredEMailMiddle(req, res, next){
-    const { email } = req.paramBox
+    const { EMail } = req.paramBox
 
     try{
-        const isRegistered = await getRegisteredEMailCheck(email)
+        const isRegistered = await getRegisteredEMailCheck(EMail)
 
         if(isRegistered != 0){
             throw new RegisterdEMail()
@@ -488,7 +488,8 @@ function extractEmail(req, res, next){
  * @param {express.Response} res 
  */
 async function processRegister(req, res){
-    const { paramID: Account, password: Password, email, nickname } = req.paramBox
+    const { paramID: Account, password: Password, nickname } = req.paramBox
+    const { emailWhatTryingVerify: email } = req.session
     const encryptedPassword = await encryptPassword(Password)
 
     let conn
