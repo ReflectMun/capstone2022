@@ -7,7 +7,6 @@ import Major from "./Major.js";
 import logoImage from "../img/logo_savior.png";
 import jwt_decode from "jwt-decode";
 
-
 const API_URL = "http://www.qnasavior.kro.kr";
 const LOGOUT_API = "api/logout";
 const point_api = "api/point";
@@ -50,6 +49,7 @@ function LogoutText() {
     event.preventDefault();
     const token = getCookie("token");
     if (token === "") {
+      //에러 처리
       console.log(token);
       console.log("cookie에 token 없음, 로그아웃 상태");
     } else {
@@ -104,21 +104,21 @@ function GetPoint() {
       method: "GET",
       headers: { authorization: token },
     })
-    .then((result) => {
-      if (result.code === 240){
-        console.log(result.code);
-        setPoint(result.point);
-        console.log(point);
-      }
-    })
-    .catch((error)=>{
-      console.log(error);
-    })
-  return( 
-    <div>
-      <li id={styled.point}>{point}</li>
-    </div>
-    )
+      .then((result) => {
+        if (result.code === 240) {
+          console.log(result.code);
+          setPoint(result.point);
+          console.log(point);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return (
+      <div>
+        <li id={styled.point}>{point}</li>
+      </div>
+    );
   });
 }
 function Nav(props) {
