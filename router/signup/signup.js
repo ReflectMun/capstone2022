@@ -181,7 +181,7 @@ function getRandomAuthNumber(){
  */
 function ejsRender(authCode){
     return new Promise(function(resolve, reject){
-        renderFile('./public/authPage.ejs', { authCode: authCode }, function(err, string){
+        renderFile('public/authPage.ejs', { authCode: authCode }, function(err, string){
             if(err){
                 err.message += '-105'
                 reject(err)
