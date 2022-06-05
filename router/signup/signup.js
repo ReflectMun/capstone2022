@@ -15,7 +15,7 @@ const transportter = createTransport(smtp({
     host: 'smtp.gmail.com',
     auth: {
         user: 'qnasavior@gmail.com',
-        pass: 'syluupofbesfopsp'
+        pass: process.env.EMAIL_PASS
     }
 }))
 
@@ -41,19 +41,20 @@ signup.post(
     checkCorrectData,
     checkRegisteredAccountMiddle,
     checkRegisteredNicknameMiddle,
-    checkRegisteredEMailMiddle,
     processRegister
 )
 
 signup.post(
-    '/check_registered',
-    extractSignupParameters,
-    checkRegisteredAccount
+    '/auth/email',
+    extractEmail,
+    checkRegisteredEMailMiddle,
+    authCodeSendController
 )
 
 signup.post(
-    '/check/email',
-    extractEmail
+    '/verify/email',
+    extractAuthCode,
+    verifyEmailController
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -164,6 +165,16 @@ function encryptPassword(password){
 }
 
 /**
+ * 인증코드 랜덤 생성기
+ * @returns {string} 인증코드
+ */
+function getRandomAuthNumber(){
+    const number = Math.floor(Math.random() * 1000000)
+    const code = number.toString().padStart(6, '0')
+    return code
+}
+
+/**
  * 메일 인증 체크용 ejs 파일
  * @param {string} authCode 
  * @returns {string} ejs 파일
@@ -172,7 +183,7 @@ function ejsRender(authCode){
     return new Promise(function(resolve, reject){
         renderFile('./public/authPage.ejs', { authCode: authCode }, function(err, string){
             if(err){
-                err.message += -105
+                err.message += '-105'
                 reject(err)
             }
             else{
@@ -196,7 +207,7 @@ function ejsRender(authCode){
  */
 function extractSignupParameters(req, res, next){
     try{
-        const { Account, Password, EMail, Nickname } = req.body
+        const { Account, Password, Nickname } = req.body
 
         if(typeof Account != 'string'){
             errorLog(req, controllerName, 'ID must be string')
@@ -208,11 +219,6 @@ function extractSignupParameters(req, res, next){
             throw new ValuesIsMalformed()
         }
 
-        if(typeof EMail != 'string'){
-            errorLog(req, controllerName, 'EMail msust be string')
-            throw new ValuesIsMalformed()
-        }
-
         if(typeof Nickname != 'string'){
             errorLog(req, controllerName, 'Nickname must be string')
             throw new ValuesIsMalformed()
@@ -221,7 +227,6 @@ function extractSignupParameters(req, res, next){
         req.paramBox = {
             paramID: Account,
             password: Password,
-            email: EMail,
             nickname: Nickname
         }
 
@@ -248,7 +253,7 @@ function extractSignupParameters(req, res, next){
  * @param {express.NextFunction} next 
  */
 function checkCorrectData(req, res, next){
-    const { paramID, password, email, nickname } = req.paramBox
+    const { paramID, password, nickname } = req.paramBox
 
     try{
         if(paramID.length > 20){
@@ -258,11 +263,6 @@ function checkCorrectData(req, res, next){
 
         if(password.length > 20){
             res.json({ code: 2121, message: '비밀번호는 20글자 이내여야 합니다' })
-            return
-        }
-
-        if(email.length > 45){
-            res.json({ code: 2122, message: '이메일은 45글자 이내여야 합니다' })
             return
         }
 
@@ -283,10 +283,9 @@ function checkCorrectData(req, res, next){
             return
         }
 
-        const emailRegex = /\w+@(\w+[.]?)+[.]ac[.]kr/g
-        if(emailRegex.test(email) == false){
-            res.json({ code: 2126, message: '이메일이 ac.kr로 끝나는 형식의 올바른 이메일이 아닙니다'})
-            return
+        const { mailAuthed } = req.session
+        if(mailAuthed != true){
+            res.json({ code: 2122, message: '이메일 인증을 먼저 진행해주세요' })
         }
 
         next()
@@ -374,10 +373,10 @@ async function checkRegisteredNicknameMiddle(req, res, next){
  * @param {express.NextFunction} next 
  */
 async function checkRegisteredEMailMiddle(req, res, next){
-    const { email } = req.paramBox
+    const { EMail } = req.paramBox
 
     try{
-        const isRegistered = await getRegisteredEMailCheck(email)
+        const isRegistered = await getRegisteredEMailCheck(EMail)
 
         if(isRegistered != 0){
             throw new RegisterdEMail()
@@ -440,49 +439,57 @@ function extractEmail(req, res, next){
         }
     }
 }
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+ function extractAuthCode(req, res, next){
+    const { VerifyCode } = req.body
+
+    try{
+        if(typeof VerifyCode != 'string') { throw new ValuesIsMalformed() }
+
+        if(VerifyCode.length != 6){
+            res.json({ code: 2152, message: '인증코드는 6자리여야 합니다' })
+            return
+        }
+
+        const numberRegex = /^[0-9]+$/g
+        if(numberRegex.test(VerifyCode) == false){
+            res.json({ code: 2153, message: '인증코드는 숫자로만 구성되어 있습니다' })
+            return
+        }
+
+        req.paramBox = {
+            VerifyCode: VerifyCode
+        }
+
+        next()
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message + '-7')
+        if(err instanceof ValuesIsMalformed){
+            res.json({ code: 1010, message: '올바르지 않은 형태의 데이터가 전송되었습니다' })
+        }
+        else{
+            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다' })
+        }
+    }
+}
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
 // Controller
-/**
- * 별개로 제공하는 ID 중복 체크 API
- * @param {express.Request} req 
- * @param {express.Response} res 
- */
-async function checkRegisteredAccount(req, res){
-    const { paramID } = req.paramBox
-
-    try{
-        const isRegistered = await getRegisteredAccountCheck(paramID)
-
-        if(isRegistered != 0){
-            throw new RegisterdUser()
-        }
-        else{
-            res.json({ code: 202, message: '사용할 수 있는 ID 입니다' })
-        }
-    }
-    catch(err){
-        errorLog(req, controllerName, err.message += '=1')
-        if(err instanceof RegisterdUser){
-            res.json({ code: 1011, message: '이미 사용중인 ID 입니다' })
-        }
-        else if(err instanceof ErrorOnRegisterChecking){
-            res.json({ code: 1019, message: '회원가입 여부 조회중 오류가 발생하였습니다' })
-        }
-        else{
-            res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
-        }
-    }
-}
-
 /**
  * 회원가입을 진행하는 API 컨트롤러
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
 async function processRegister(req, res){
-    const { paramID: Account, password: Password, email, nickname } = req.paramBox
+    const { paramID: Account, password: Password, nickname } = req.paramBox
+    const { emailWhatTryingVerify: email } = req.session
     const encryptedPassword = await encryptPassword(Password)
 
     let conn
@@ -512,9 +519,46 @@ async function processRegister(req, res){
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-async function emailAuthController(req, res){
+async function authCodeSendController(req, res){
     const { EMail } = req.paramBox
-    req.session['authCode'] = 2022
+    const verifyCode = getRandomAuthNumber()
+
+    transportter.sendMail({
+        from: 'qnasavior@gmail.com',
+        to: EMail,
+        subject: 'QNASavior 인증 메일입니다',
+        html: await ejsRender(verifyCode)
+    }, function(err, info){
+        if(err){
+            errorLog(req, controllerName, err.message += '=3')
+            res.json({ code: 5117, message: '인증메일 전송 중 오류가 발생하였습니다' })
+        }
+        else{
+            req.session['emailWhatTryingVerify'] = EMail
+            req.session['verifyCode'] = verifyCode
+            res.json({ code: 250, message: '인증메일 전송 완료' })
+            normalLog(req, controllerName, `메일 ${EMail} 인증을 위한 인증코드 발송`)
+        }
+    })
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function verifyEmailController(req, res){
+    const { VerifyCode } = req.body
+    const { verifyCode: originalVerifyCode, emailWhatTryingVerify } = req.session
+
+    if(VerifyCode == originalVerifyCode){
+        req.session['mailAuthed'] = true
+        res.json({ code: 251, message: '메일 인증에 성공하였습니다' })
+        normalLog(req, controllerName, `이메일 ${emailWhatTryingVerify} 인증완료`)
+    }
+    else{
+        res.json({ code: 5118, message: '인증코드가 일치하지 않습니다' })
+        errorLog(req,controllerName, `이메일 ${emailWhatTryingVerify} 인증코드 불일치`)
+    }
 }
 /////////////////////////////////////////////////////////////////////
 
