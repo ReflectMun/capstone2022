@@ -23,14 +23,12 @@ const FileStore = fileSession(session)
 signup.use(session({
     secret: process.env.SESSION,
     cookie: {
-        maxAge: 60 * 10
+        sameSite: true,
+        maxAge: 1000 * 60 * 10
     },
     rolling: false,
-    saveUninitialized: false,
-    resave: true,
-    store: new FileStore({
-        retries: 1
-    })
+    saveUninitialized: true,
+    resave: false,
 }))
 
 /////////////////////////////////////////////////////////////////////
@@ -522,6 +520,7 @@ async function processRegister(req, res){
 async function authCodeSendController(req, res){
     const { EMail } = req.paramBox
     const verifyCode = getRandomAuthNumber()
+    console.log(`'${verifyCode} '`)
 
     transportter.sendMail({
         from: 'qnasavior@gmail.com',

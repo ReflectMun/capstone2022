@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            window.onload = () => {
+                const button = document.getElementById('test')
+                button.onclick = () => {
+                    fetch('http://localhost:14450/api/signup/verify/email',
+                {
+                    method: 'post',
+                    body: JSON.stringify({ VerifyCode: '111111' }),
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(alert('통신완료'))
+                } 
+            }
+        </script>
+    </head>
+    <body>
+        <h1>세션ID 테스트용</h1>
+        <button id="test" >버튼</button>
+    </body>
+</html>
