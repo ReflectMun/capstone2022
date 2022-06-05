@@ -1,23 +1,54 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
 import Pool from '../../private/server/DBConnector.js'
+import { normalLog, errorLog } from '../../private/apis/logger.js'
 
 const Comment = Router()
+const controllerName = 'Comment'
 
-Comment
-    .get('/', getComment)   // /api/comment 에 GET 요청 시
-    .post('/', postComment) // /api/comment 에 POST 요청 시
+Comment.get(
+    '/fetch',
+    extractPostNum,
+    getComment
+)
 
-async function getComment(req, res) {
-    let conn = null
+Comment.put(
+    '/put', 
+    postComment
+)
 
-    const response = {
-        code: null,
-        body: null,
-        err: null
-    }
+////////////////////////////////////////////////////////////
+// Middle Ware
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function extractPostNum(req, res, next){
+    const { PostNum } = req.query
 
     try{
-        const queryString = `SELECT * FROM Comments`  // Comment 테이블의 Idx, Nickname, Comment, CommentTime 을 조회한 뒤, 모든 데이터를 json 으로 리턴함
+        if(typeof PostNum != 'string') { throw new Error('게시글 값이 전송되지 않음') }
+    }
+    catch(err){
+        errorLog(req, controllerName, err.message += '-1')
+        res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다' })
+    }
+}
+////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////
+// Controller
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ */
+async function getComment(req, res) {
+    const { SourcePost } = req.paramBox
+    let conn = null
+
+    try{
+        const queryString =
+        `SELECT CommentID, Author, Nickname, Comment, Date, Time FROM Comments  WHERE SourcePost = ${SourcePost}`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -28,44 +59,19 @@ async function getComment(req, res) {
         response.body = row
     }
     catch(err){
-        console.log(err)
-        response.code = 404
-        response.err = {message:'댓글 테이블 조회중 에러 발생'}
     }
     finally{
         if(conn) { conn.release() }
-
-        res.json(response)
     }
 
 }
 
 async function postComment(req, res) {
-    let conn = null
-    let nickname
-    let comment
+    let conn
 
-    const response = {
-        code: null,
-        body: null,
-        err: null
-    }
-    try {
-        nickname = req.body['nickname']
-        comment = req.body['comment']
-    }
-    catch(err){
-        console.log(err)
-
-        response.code = 404
-        response.err = { message: '올바르지 않은 데이터 형식' }
-
-        return res.json(response)
-    }
-    
     try{
-        const queryString = `INSERT INTO Comments(Nickname,Comment) VALUES('${nickname}','${comment}')` // Comments 테이블에 Nickname, Comment 를 추가한다.
-                                                                                                        // Idx, CommentTime 컬럼은 mysql 에서 자동으로 추가된다.
+        const queryString = `INSERT INTO Comments(Nickname,Comment,Date,Time) VALUES('${nickname}','${comment}','${Date}','${Time}')` 
+                                                                                                        
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -88,4 +94,6 @@ async function postComment(req, res) {
     }
 
 }
+////////////////////////////////////////////////////////////
+
 export default Comment
