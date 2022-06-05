@@ -1,19 +1,14 @@
 import Message from "../components/Message";
 import Nav from "../components/Nav";
 import Mainarea from "../components/Mainarea";
-
+import { useState } from "react";
 function Home(props) {
-  function setIsLogin(loginValue) {
-    props.setIsLogin(loginValue);
-  }
+  const [selectedMajor, setSelectedMajor] = useState("");
+
   return (
     <div>
-      <Nav
-        loginValue={props.loginValue}
-        setLogin={setIsLogin}
-        loginId={props.loginId}
-      />
-      <Mainarea />
+      <Nav setSelectedMajor={setSelectedMajor} />
+      <Mainarea selectedMajor={selectedMajor} />
       <Message />
     </div>
   );

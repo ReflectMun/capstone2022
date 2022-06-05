@@ -180,7 +180,10 @@ function Nav(props) {
               </li>
             ))}
           </ul>
-          <Major college={selectCollege} />
+          <Major
+            college={selectCollege}
+            setSelectedMajor={props.setSelectedMajor}
+          />
         </ul>
       </div>
       <div className={styled.logoContainer}>
@@ -206,7 +209,7 @@ function Nav(props) {
           )}
           <li id={styled.message}>쪽지</li>
           {
-            //loginValue(로그인상태) 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
+            //로그인상태 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
             isLogin ? <LogoutText /> : <LoginText />
           }
         </ul>

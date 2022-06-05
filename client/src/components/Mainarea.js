@@ -1,12 +1,19 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../css/Mainarea.module.css";
 import Board from "./Board";
 import Writer from "./Writer";
 
-function Mainarea() {
+function Mainarea(props) {
   const [write, setWrite] = useState(false);
-  const major = "컴퓨터 공학";
+  const [major, setMajor] = useState("");
+  const [boardType, setBoardType] = useState("질문");
+  function changeBoardType(event) {
+    setBoardType(event.target.value);
+  }
+  useEffect(() => {
+    setMajor(props.selectedMajor);
+  }, [props.selectedMajor]);
   const boards = [
     {
       title: "이것은 무엇을 의미하는 건지요?",
@@ -70,7 +77,7 @@ function Mainarea() {
             글쓰기
           </button>
         </div>
-        <select className={styles.board_type}>
+        <select className={styles.board_type} onChange={changeBoardType}>
           <option value="질문">질문</option>
           <option value="솔루션">솔루션</option>
         </select>
