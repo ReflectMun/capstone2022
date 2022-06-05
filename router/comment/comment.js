@@ -17,7 +17,7 @@ async function getComment(req, res) {
     }
 
     try{
-        const queryString = `SELECT * FROM Comments`  // Comment 테이블을 조회한 뒤, 모든 데이터를 json 으로 리턴함
+        const queryString = `SELECT Nickname,Comment,Date,Time FROM Comments WHERE SourcePost = ${sourcepost} `  // Comment 테이블을 조회한 뒤, 모든 데이터를 json 으로 리턴함
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
@@ -42,6 +42,8 @@ async function getComment(req, res) {
 
 async function postComment(req, res) {
     let conn = null
+    let sourcepost
+    let author
     let nickname
     let comment
     let Date
@@ -53,6 +55,8 @@ async function postComment(req, res) {
         err: null
     }
     try {
+        sourcepost = req.body['sourcepost']
+        author = req.body['author']
         nickname = req.body['nickname']
         comment = req.body['comment']
         Date = req.body['Date']
@@ -69,7 +73,7 @@ async function postComment(req, res) {
     }
     
     try{
-        const queryString = `INSERT INTO Comments(Nickname,Comment,Date,Time) VALUES('${nickname}','${comment}','${Date}','${Time}')` 
+        const queryString = `INSERT INTO Comments(SourcePost,Author,Nickname,Comment,Date,Time) VALUES('${sourcepost}','${author}','${nickname}','${comment}',NOW(), NOW())` 
                                                                                                         
         conn = await Pool.getConnection(conn => conn)
 
