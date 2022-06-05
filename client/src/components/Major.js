@@ -2,18 +2,31 @@ import PropTypes from "prop-types";
 import styled from "../css/nav.module.css";
 
 function Major(props) {
-  const enrs = ["건축", "기계", "전자,전기", "컴퓨터", "토목", "화학"];
+  const enrs = [
+    "컴퓨터공학",
+    "전기전자공학",
+    "기계공학",
+    "건축공학",
+    "토목공학",
+    "화학공학",
+  ];
   const hmns = ["국어국문", "영어영문", "철학", "사학"];
-  const natures = ["수학", "물리", "화학", "생명"];
+  const natures = ["수학", "물리", "화학", "생물"];
   const socials = ["행정", "법학", "사회복지"];
   const meds = ["의학", "약학", "간호학"];
   const arts = ["음악", "미술", "체육", "무용"];
+  function onClickMajor(event) {
+    event.preventDefault();
+    props.setSelectedMajor(event.target.innerText);
+  }
   // console.log(props);
   if (props.college === "공학")
     return (
       <ul id={styled.majors}>
         {enrs.map((enr) => (
-          <li key={enr}>{enr}</li>
+          <li key={enr} onClick={onClickMajor}>
+            {enr}
+          </li>
         ))}
       </ul>
     );
@@ -21,7 +34,9 @@ function Major(props) {
     return (
       <ul id={styled.majors}>
         {hmns.map((hmn) => (
-          <li key={hmn}>{hmn}</li>
+          <li key={hmn} onClick={onClickMajor}>
+            {hmn}
+          </li>
         ))}
       </ul>
     );
@@ -29,7 +44,9 @@ function Major(props) {
     return (
       <ul id={styled.majors}>
         {natures.map((nature) => (
-          <li key={nature}>{nature}</li>
+          <li key={nature} onClick={onClickMajor}>
+            {nature}
+          </li>
         ))}
       </ul>
     );
@@ -37,7 +54,9 @@ function Major(props) {
     return (
       <ul id={styled.majors}>
         {socials.map((social) => (
-          <li key={social}>{social}</li>
+          <li key={social} onClick={onClickMajor}>
+            {social}
+          </li>
         ))}
       </ul>
     );
@@ -45,7 +64,9 @@ function Major(props) {
     return (
       <ul id={styled.majors}>
         {meds.map((med) => (
-          <li key={med}>{med}</li>
+          <li key={med} onClick={onClickMajor}>
+            {med}
+          </li>
         ))}
       </ul>
     );
@@ -53,7 +74,9 @@ function Major(props) {
     return (
       <ul id={styled.majors}>
         {arts.map((art) => (
-          <li key={art}>{art}</li>
+          <li key={art} onClick={onClickMajor}>
+            {art}
+          </li>
         ))}
       </ul>
     );

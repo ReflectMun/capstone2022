@@ -33,16 +33,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Home
-              loginValue={isLogin}
-              setIsLogin={setIsLogin}
-              loginId={loginId}
-            />
-          }
-        />
+        <Route path="/" element={<Home loginValue={isLogin} />} />
         <Route
           path="/login"
           element={
