@@ -5,20 +5,65 @@ import logoImage from "../img/logo_savior.png";
 
 const serverURL = "http://www.qnasavior.kro.kr";
 const signup_api = "api/signup";
+const email_api = "api/signup/auth/email";
+const check_email_api = "api/signup/verify/email";
 
-
-
-function onClickEmailBtn(event) {
-  event.preventDefault();
+//이메일 인증 번호 전송
+function onClickEmailBtn(e) {
+  e.preventDefault();
+  //회원가입 텍스트 박스
+  const formElement = document.SignUpForm;
+  const email = formElement.email.value;
+  const reqBody = {
+    EMail: email,
+  }; 
+  //console.log(email);
+  fetch(`${serverURL}/${email_api}`, {
+    method: "post",
+    body: JSON.stringify(reqBody),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if(result.code === 250){
+        alert(result.message);
+      }
+    });
 }
-
-function onClickSignupBtn(e) {
+//이메일 인증 번호 확인
+function onClickCheckEmailBtn(e)
+{
+  e.preventDefault();
+  //회원가입 텍스트 박스
+  const formElement = document.SignUpForm;
+  const check_email = formElement.check_email.value;
+  const reqBody = {
+    VerifyCode: check_email,
+  }; 
+  console.log(check_email);
+  console.log(check_email.length);
+  fetch(`${serverURL}/${check_email_api}`, {
+    method: "post",
+    body: JSON.stringify(reqBody),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if(result.code === 251){
+        alert(result.message);
+      }
+      else{
+        alert(result.message);
+      }
+    });
+}
+//회원가입
+  function onClickSignupBtn(e) {
   e.preventDefault();
   //회원가입 텍스트 박스
   const formElement = document.SignUpForm;
   const id = formElement.id.value;
   const password = formElement.password.value;
-  const passwordCheck = formElement.passwordCheck.value;
   const nickname = formElement.nickname.value;
   const email = formElement.email.value;
   const reqBody = {
@@ -26,11 +71,9 @@ function onClickSignupBtn(e) {
     Password: password,
     Nickname: nickname,
     EMail: email,
-  };
-
+  }; 
   //회원가입 요청
   fetch(`${serverURL}/${signup_api}`, {
-  // fetch(`/api/signup`, {
     method: "post",
     body: JSON.stringify(reqBody),
     headers: { "Content-Type": "application/json" },
@@ -61,7 +104,6 @@ function Signup() {
       setPasswordConfirmMessage("비밀번호가 일치하지 않습니다🙅‍♂️");
       setIsPasswordConfirm(false);
     }
-    //[pw]
   };
   return (
     <div className={styles.background}>
@@ -117,7 +159,7 @@ function Signup() {
           </div>
           <h4>이메일 인증</h4>
           <div className={styles.wrap_email} id={styles.wrap_email}>
-            <div className={styles.signup_input}>
+            <div className={styles.signup_input} id ={styles.email}>
               <input
                 name="email"
                 type="text"
@@ -127,7 +169,23 @@ function Signup() {
             </div>
             <div className={styles.mail_btn_wrap}>
               <button className={styles.mail_btn} onClick={onClickEmailBtn}>
-                인증
+                인증하기
+              </button>
+            </div>
+          </div>
+          <h4>인증번호</h4>
+          <div className={styles.wrap_check_email} id={styles.wrap_check_email}>
+            <div className={styles.signup_input} id ={styles.check_email}>
+              <input
+                name="check_email"
+                type="text"
+                placeholder="메일로 전송된 인증번호를 입력해주세요."
+                className={styles.signup_info}
+              />
+            </div>
+            <div className={styles.check_email_btn_wrap}>
+              <button className={styles.check_email_btn} onClick={onClickCheckEmailBtn}>
+                인증완료
               </button>
             </div>
           </div>
