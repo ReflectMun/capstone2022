@@ -30,7 +30,7 @@ function Mainarea() {
     },
     {
       title: "크러스컬 알고리즘",
-      contents: "크러스컬 알고리즘 코트 확인 좀...",
+      contents: "크러스컬 알고리즘 코드 확인 좀...",
       image: "https://i.imgur.com/4wIFiNX.png",
       nickName: "Han",
     },
