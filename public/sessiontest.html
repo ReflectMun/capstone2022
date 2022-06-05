@@ -5,7 +5,7 @@
             window.onload = () => {
                 const button = document.getElementById('test')
                 button.onclick = () => {
-                    fetch('http://localhost:14450/api/signup/verify/email',
+                    fetch('http://www.qnasavior.kro.kr/api/signup/verify/email',
                 {
                     method: 'post',
                     body: JSON.stringify({ VerifyCode: '111111' }),
