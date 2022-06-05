@@ -4,6 +4,11 @@ import Message from "../components/Message";
 import Nav from "../components/Nav";
 import { useState } from "react";
 import MyEditor from "./MyEditor";
+import { getCookie } from './Nav';
+
+const token = getCookie("token");
+const serverURL = "http://www.qnasavior.kro.kr";
+const comment_api = "api/upload/putText";
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
@@ -22,9 +27,11 @@ function Question() {
           alt="load error"
         />
       </div>
+      <Comment />
     </div>
   );
 }
+
 function AnswerBtn(props) {
   return (
     <div className={styles.wrap_ans_btn}>
@@ -82,14 +89,77 @@ function AnswerBox(props) {
     </div>
   );
 }
+/////////////////////////////////////////////댓글////////////////////////////////////////////
+function Comment(){
+  const[comment,setComment] =useState("");
+  const [visibleComment,setVisibleComment]=useState(false);
+  const clickCommentBtn =()=>{
+    setVisibleComment(!visibleComment);
+  }
+  const changeText=(e)=>{
+    setComment(e.target.value);
+  }
+  const upLoadComment=()=>{
+    var data = new FormData();
+    data.append("content",comment);
+    data.append("boarduri","ComputerScience");
+    data.append("title","hi~~");
+    data.append("author","test1");
+    console.log(data.values());
+      fetch(`${serverURL}/${comment_api}`, {
+        method: "post",
+        body:data,
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          authorization: token },
+      })
+        .then((result) => {
+          if (result.code === 200) {
+            console.log(result.code);
+          }
+          else if (result.code === 500){
+            alert("다시 시도해주세요.");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+  }
+  return(
+    visibleComment ? (
+    <div className={styles.comment}>
+      <textarea
+        id={styles.comment_text} 
+        onChange={changeText}></textarea>
+      <button 
+        id ={styles.comment_btn}
+        onClick={()=>{
+          upLoadComment();
+          clickCommentBtn();
+          }}
+     >댓글달기</button>
+    </div>
+    ) : (
+      <div>
+        <button 
+         id ={styles.comment_btn}
+         onClick={clickCommentBtn}
+         >comment</button>
+      </div>
+    )
+
+  )
+}
 function Post() {
   const [answer, setAnswer] = useState(false);
+
   return (
     <center>
       <Nav />
       <Message />
       <div className={styles.wrap_post}>
         <Question />
+
         <AnswerBtn
           onChangeMode={() => {
             if (answer === false) {
@@ -105,4 +175,5 @@ function Post() {
     </center>
   );
 }
+
 export default Post;
