@@ -520,7 +520,6 @@ async function processRegister(req, res){
 async function authCodeSendController(req, res){
     const { EMail } = req.paramBox
     const verifyCode = getRandomAuthNumber()
-    console.log(`'${verifyCode} '`)
 
     transportter.sendMail({
         from: 'qnasavior@gmail.com',
