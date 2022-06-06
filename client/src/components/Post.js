@@ -8,7 +8,7 @@ import { getCookie } from './Nav';
 
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
-const comment_api = "api/upload/putText";
+const comment_api = "api/comment";
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
