@@ -22,7 +22,7 @@ const controllerName = 'issuingJwt'
  * @param {string} refreshToken
  * @param {string} UID 
  */
-async function insertTokenToDB(refreshToken, UID){
+async function insertTokenToDB(refreshToken, UID, req){
     let conn = null
 
     try{
@@ -39,7 +39,7 @@ async function insertTokenToDB(refreshToken, UID){
     } catch(err) {
         if(conn) { conn.release() }
         err.message += '-101'
-        errorLog(null, controllerName, err.message)
+        errorLog(req, controllerName, err.message)
         throw new ErrorOnInsertingRefreshToken()
     }
 }
