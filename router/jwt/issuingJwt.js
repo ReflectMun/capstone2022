@@ -39,7 +39,8 @@ async function insertTokenToDB(refreshToken, UID){
     } catch(err) {
         if(conn) { conn.release() }
         err.message += '-101'
-        throw new ErrorOnInsertingRefreshToken(err)
+        errorLog(null, controllerName, err.message)
+        throw new ErrorOnInsertingRefreshToken()
     }
 }
 
