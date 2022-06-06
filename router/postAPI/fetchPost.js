@@ -20,6 +20,7 @@ fetchPost.get(
 
 fetchPost.get(
     '/fetch/postlist',
+    proprocess,
     extractBoardName,
     extractPageNum,
     extractPostType,
@@ -156,6 +157,18 @@ async function fetchAnswerList(postNum){
 
 /////////////////////////////////////////////////////////
 // Middle ware
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function proprocess(req, res, next){
+    req.paramBox = {}
+    req.tokenBox = {}
+
+    next()
+}
 
 /**
  * @param {express.Request} req 
