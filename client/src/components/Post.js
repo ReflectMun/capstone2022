@@ -10,6 +10,17 @@ const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment";
 
+///////////////////////////////////////날짜////////////////////////////
+let day = new Date();
+let year = day.getFullYear(); // 년도
+let month = day.getMonth() + 1;  // 월
+let date = day.getDate();  //일
+let hours = day.getHours(); // 시
+let minutes = day.getMinutes();  // 분
+let seconds = day.getSeconds();  //초
+let today = year + month + date
+let time = hours + minutes + seconds
+
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
   const contents = "이 부분은 어떻게 돌아가는 것인지요?";
@@ -101,11 +112,15 @@ function Comment(){
   }
   const upLoadComment=()=>{
     var data = new FormData();
-    data.append("content",comment);
-    data.append("boarduri","ComputerScience");
-    data.append("title","hi~~");
-    data.append("author","test1");
+    data.append("SourcePost",1);
+    data.append("Author","ComputerScience");
+    data.append("nickname","hi~~");
+    data.append("comment",comment);
+    data.append("date",comment);
+    data.append("time",comment);
+
     console.log(data.values());
+    console.log(date);
       fetch(`${serverURL}/${comment_api}`, {
         method: "post",
         body:data,
