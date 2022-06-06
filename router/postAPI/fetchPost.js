@@ -279,7 +279,7 @@ function extractPageNum(req, res, next){
  function extractPostType(req, res, next){
     const resObj = getResponseObject()
     try{
-        const { type } = req.query
+        const { Type } = req.query
 
         if(typeof type != 'string'){
             throw new PostTypeExtractFailed()
