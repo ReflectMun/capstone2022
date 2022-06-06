@@ -5,7 +5,13 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 const API_URL = "http://www.qnasavior.kro.kr";
 const UPLOAD_ENDPOINT = "api/upload/image";
 
+function getCookie(key) {
+  key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
+  return key.test(document.cookie) ? unescape(RegExp.$1) : ""; // 인자로 받은 키에 해당하는 키가 있으면 값을 반환
+}
+
 function MyEditor({ handleChange, ...props }) {
+  const token = getCookie("token");
   function uploadAdapter(loader) {
     return {
       upload: () => {
@@ -17,6 +23,9 @@ function MyEditor({ handleChange, ...props }) {
             // headers.append("Origin", "http://localhost:3000");
             fetch(`${API_URL}/${UPLOAD_ENDPOINT}`, {
               method: "PUT",
+              headers: {
+                authorization: token,
+              },
               body: body,
               // mode: "no-cors"
             })
