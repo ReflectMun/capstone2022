@@ -20,7 +20,6 @@ fetchPost.get(
 
 fetchPost.get(
     '/fetch/postlist',
-    jwtVerify,
     extractBoardName,
     extractPageNum,
     extractPostType,
