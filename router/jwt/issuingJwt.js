@@ -135,7 +135,7 @@ async function issueJwtToken(req, res){
             { issuer: 'SaviorQNA', expiresIn: '12h' }
         )
 
-        await insertTokenToDB(refreshToken, UID)
+        await insertTokenToDB(refreshToken, UID, req)
         res.json({ token: accessToken })
 
         normalLog(req, controllerName, `유저 ${UID} 인증토큰 발급 완료`)
