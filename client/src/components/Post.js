@@ -10,7 +10,7 @@ const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment";
 
-///////////////////////////////////////날짜////////////////////////////
+///////////////////////////////////////날짜랑 시간////////////////////////////////
 let day = new Date();
 let year = day.getFullYear(); // 년도
 let month = day.getMonth() + 1;  // 월
@@ -18,8 +18,8 @@ let date = day.getDate();  //일
 let hours = day.getHours(); // 시
 let minutes = day.getMinutes();  // 분
 let seconds = day.getSeconds();  //초
-let today = year + month + date
-let time = hours + minutes + seconds
+let today =`${year}/${month}/${date}`;
+let time = `${hours}/${minutes}/${seconds}`;
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
@@ -38,7 +38,7 @@ function Question() {
           alt="load error"
         />
       </div>
-      <Comment />
+      <UploadComment />
     </div>
   );
 }
@@ -101,7 +101,8 @@ function AnswerBox(props) {
   );
 }
 /////////////////////////////////////////////댓글////////////////////////////////////////////
-function Comment(){
+function UploadComment(){
+  //comment 누르면 댓글 쓰는 거 보이게
   const[comment,setComment] =useState("");
   const [visibleComment,setVisibleComment]=useState(false);
   const clickCommentBtn =()=>{
@@ -113,14 +114,13 @@ function Comment(){
   const upLoadComment=()=>{
     var data = new FormData();
     data.append("SourcePost",1);
-    data.append("Author","ComputerScience");
-    data.append("nickname","hi~~");
+    data.append("Author","hyozeong");
+    data.append("nickname","test1");
     data.append("comment",comment);
-    data.append("date",comment);
-    data.append("time",comment);
+    data.append("date",today);
+    data.append("time",time);
 
-    console.log(data.values());
-    console.log(date);
+    console.log(today);
       fetch(`${serverURL}/${comment_api}`, {
         method: "post",
         body:data,
@@ -140,31 +140,61 @@ function Comment(){
           console.log(error);
         })
   }
+  // 원래 있던 댓글 불러오기
+  const [comments,getComment] = useState(true);
+  fetch(`${serverURL}/${comment_api}`, {
+    method: "get",
+    // body:JSON.stringify(reqBody),
+    headers: { 
+      "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.code === 200) {
+        console.log(result);
+        getComment(!comments);
+      }
+      else if (result.code === 500){
+        alert("댓글을 조회할 수 없습니다.");
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    })
   return(
-    visibleComment ? (
-    <div className={styles.comment}>
-      <textarea
-        id={styles.comment_text} 
-        onChange={changeText}></textarea>
-      <button 
-        id ={styles.comment_btn}
-        onClick={()=>{
-          upLoadComment();
-          clickCommentBtn();
-          }}
-     >댓글달기</button>
-    </div>
-    ) : (
+    <div>
       <div>
-        <button 
-         id ={styles.comment_btn}
-         onClick={clickCommentBtn}
-         >comment</button>
+      {comments ? (
+      <div className={styles.comment}>
+        <div>댓글쓴</div>
       </div>
-    )
-
+      ) : (null)}
+    </div>
+      {visibleComment ? (
+      <div className={styles.comment}>
+        <textarea
+          id={styles.comment_text} 
+          onChange={changeText}></textarea>
+        <button 
+          id ={styles.comment_btn}
+          onClick={()=>{
+            upLoadComment();
+            clickCommentBtn();
+            }}
+      >댓글달기</button>
+      </div>
+      ) : (
+        <div>
+          <button 
+          id ={styles.comment_btn}
+          onClick={clickCommentBtn}
+          >comment</button>
+        </div>
+      )}
+    </div>
   )
 }
+
 function Post() {
   const [answer, setAnswer] = useState(false);
 
