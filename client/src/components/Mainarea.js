@@ -7,7 +7,7 @@ import Writer from "./Writer";
 function Mainarea(props) {
   const [write, setWrite] = useState(false);
   const [major, setMajor] = useState("");
-  const [boardType, setBoardType] = useState("질문");
+  const [boardType, setBoardType] = useState("1");
   function changeBoardType(event) {
     setBoardType(event.target.value);
   }
@@ -78,10 +78,12 @@ function Mainarea(props) {
           </button>
         </div>
         <select className={styles.board_type} onChange={changeBoardType}>
-          <option value="질문">질문</option>
-          <option value="솔루션">솔루션</option>
+          <option value="1">질문</option>
+          <option value="2">솔루션</option>
         </select>
-        <center>{write ? <Writer /> : null}</center>
+        <center>
+          {write ? <Writer major={major} boardType={boardType} /> : null}
+        </center>
         <ul style={{ margin: "0px", padding: "0px" }}>{boardsList}</ul>
       </div>
     </center>

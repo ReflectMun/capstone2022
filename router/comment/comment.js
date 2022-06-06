@@ -70,7 +70,7 @@ async function postComment(req, res) {
     let conn
 
     try{
-        const queryString = `INSERT INTO Comments(Nickname,Comment,Date,Time) VALUES('${nickname}','${comment}','${Date}','${Time}')` 
+        const queryString = `INSERT INTO Comments(Nickname,Comment,Date,Time) VALUES('${nickname}','${comment}',NOW(),NOW())` 
                                                                                                         
         conn = await Pool.getConnection(conn => conn)
 

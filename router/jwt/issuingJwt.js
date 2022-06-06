@@ -22,7 +22,7 @@ const controllerName = 'issuingJwt'
  * @param {string} refreshToken
  * @param {string} UID 
  */
-async function insertTokenToDB(refreshToken, UID){
+async function insertTokenToDB(refreshToken, UID, req){
     let conn = null
 
     try{
@@ -39,7 +39,8 @@ async function insertTokenToDB(refreshToken, UID){
     } catch(err) {
         if(conn) { conn.release() }
         err.message += '-101'
-        throw new ErrorOnInsertingRefreshToken(err)
+        errorLog(req, controllerName, err.message)
+        throw new ErrorOnInsertingRefreshToken()
     }
 }
 
@@ -134,7 +135,7 @@ async function issueJwtToken(req, res){
             { issuer: 'SaviorQNA', expiresIn: '12h' }
         )
 
-        await insertTokenToDB(refreshToken, UID)
+        await insertTokenToDB(refreshToken, UID, req)
         res.json({ token: accessToken })
 
         normalLog(req, controllerName, `유저 ${UID} 인증토큰 발급 완료`)
