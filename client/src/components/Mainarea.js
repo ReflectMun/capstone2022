@@ -4,6 +4,16 @@ import styles from "../css/Mainarea.module.css";
 import Board from "./Board";
 import Writer from "./Writer";
 
+const API_URL = "http://www.qnasavior.kro.kr";
+const POSTLIST_API = "api/post/fetch/postlist";
+let BoardURI = "ComputerScience";
+let pageNum = 0;
+
+function getCookie(key) {
+  key = new RegExp(key + "=([^;]*)"); // 쿠키들을 세미콘론으로 구분하는 정규표현식 정의
+  return key.test(document.cookie) ? unescape(RegExp.$1) : ""; // 인자로 받은 키에 해당하는 키가 있으면 값을 반환
+}
+
 function Mainarea(props) {
   const [write, setWrite] = useState(false);
   const [major, setMajor] = useState("");
@@ -11,9 +21,25 @@ function Mainarea(props) {
   function changeBoardType(event) {
     setBoardType(event.target.value);
   }
-  useEffect(() => {
-    setMajor(props.selectedMajor);
-  }, [props.selectedMajor]);
+  function loadPosts() {
+    console.log("loadPost: ", BoardURI);
+    console.log("boardtyle: ", boardType);
+    console.log("boardType의 type: ", typeof boardType);
+    new Promise((resolve, reject) => {
+      const pageNumString = pageNum.toString();
+      fetch(
+        `${API_URL}/${POSTLIST_API}?boardURI=${BoardURI}&pageNum=${pageNumString}&Type=${boardType}`,
+        {
+          method: "GET",
+          headers: { authorization: null },
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+        });
+    });
+  }
   const boards = [
     {
       title: "이것은 무엇을 의미하는 건지요?",
@@ -49,6 +75,82 @@ function Mainarea(props) {
       nickName: "lee",
     },
   ];
+  //게시물 리스트 가져오기
+  switch (major) {
+    case "컴퓨터공학":
+      BoardURI = "ComputerScience";
+      break;
+    case "전기전자공학":
+      BoardURI = "ElectricalAndElectronic";
+      break;
+    case "기계공학":
+      BoardURI = "Mechanical";
+      break;
+    case "건축공학":
+      BoardURI = "Architecture";
+      break;
+    case "토목공학":
+      BoardURI = "Civil";
+      break;
+    case "화학공학":
+      BoardURI = "Chemical";
+      break;
+    case "국어국문":
+      BoardURI = "Korean";
+      break;
+    case "영어영문":
+      BoardURI = "English";
+      break;
+    case "철학":
+      BoardURI = "Philosophy";
+      break;
+    case "사학":
+      BoardURI = "History";
+      break;
+    case "수학":
+      BoardURI = "Math";
+      break;
+    case "물리":
+      BoardURI = "Physics";
+      break;
+    case "화학":
+      BoardURI = "Chemistry";
+      break;
+    case "생물":
+      BoardURI = "Biology";
+      break;
+    case "행정":
+      BoardURI = "Administration";
+      break;
+    case "법학":
+      BoardURI = "Law";
+      break;
+    case "사회복지":
+      BoardURI = "SocialWelfare";
+      break;
+    case "의학":
+      BoardURI = "Medical";
+      break;
+    case "약학":
+      BoardURI = "Pharmacy";
+      break;
+    case "간호학":
+      BoardURI = "Nursing";
+      break;
+    case "음악":
+      BoardURI = "Music";
+      break;
+    case "미술":
+      BoardURI = "Art";
+      break;
+    case "체육":
+      BoardURI = "Athletic";
+      break;
+    case "무용":
+      BoardURI = "Dance";
+      break;
+  }
+
   const boardsList = boards.map((item) => (
     <li style={{ listStyle: "none" }}>
       <Link to={"/answer"} style={{ textDecoration: "none", color: "inherit" }}>
@@ -56,6 +158,10 @@ function Mainarea(props) {
       </Link>
     </li>
   ));
+  useEffect(() => {
+    setMajor(props.selectedMajor);
+    loadPosts();
+  }, [props.selectedMajor]);
   return (
     <center>
       <div className={styles.main_area}>
@@ -82,7 +188,9 @@ function Mainarea(props) {
           <option value="2">솔루션</option>
         </select>
         <center>
-          {write ? <Writer major={major} boardType={boardType} /> : null}
+          {write ? (
+            <Writer major={major} boardType={boardType} setWrite={setWrite} />
+          ) : null}
         </center>
         <ul style={{ margin: "0px", padding: "0px" }}>{boardsList}</ul>
       </div>

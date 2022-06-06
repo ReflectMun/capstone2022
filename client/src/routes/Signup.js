@@ -16,7 +16,7 @@ function onClickEmailBtn(e) {
   const email = formElement.email.value;
   const reqBody = {
     EMail: email,
-  }; 
+  };
   //console.log(email);
   fetch(`${serverURL}/${email_api}`, {
     method: "post",
@@ -25,21 +25,20 @@ function onClickEmailBtn(e) {
   })
     .then((response) => response.json())
     .then((result) => {
-      if(result.code === 250){
+      if (result.code === 250) {
         alert(result.message);
       }
     });
 }
 //이메일 인증 번호 확인
-function onClickCheckEmailBtn(e)
-{
+function onClickCheckEmailBtn(e) {
   e.preventDefault();
   //회원가입 텍스트 박스
   const formElement = document.SignUpForm;
   const check_email = formElement.check_email.value;
   const reqBody = {
     VerifyCode: check_email,
-  }; 
+  };
   console.log(check_email);
   console.log(check_email.length);
   fetch(`${serverURL}/${check_email_api}`, {
@@ -49,16 +48,15 @@ function onClickCheckEmailBtn(e)
   })
     .then((response) => response.json())
     .then((result) => {
-      if(result.code === 251){
+      if (result.code === 251) {
         alert(result.message);
-      }
-      else{
+      } else {
         alert(result.message);
       }
     });
 }
 //회원가입
-  function onClickSignupBtn(e) {
+function onClickSignupBtn(e) {
   e.preventDefault();
   //회원가입 텍스트 박스
   const formElement = document.SignUpForm;
@@ -71,7 +69,7 @@ function onClickCheckEmailBtn(e)
     Password: password,
     Nickname: nickname,
     EMail: email,
-  }; 
+  };
   //회원가입 요청
   fetch(`${serverURL}/${signup_api}`, {
     method: "post",
@@ -159,7 +157,7 @@ function Signup() {
           </div>
           <h4>이메일 인증</h4>
           <div className={styles.wrap_email} id={styles.wrap_email}>
-            <div className={styles.signup_input} id ={styles.email}>
+            <div className={styles.signup_input} id={styles.email}>
               <input
                 name="email"
                 type="text"
@@ -175,7 +173,7 @@ function Signup() {
           </div>
           <h4>인증번호</h4>
           <div className={styles.wrap_check_email} id={styles.wrap_check_email}>
-            <div className={styles.signup_input} id ={styles.check_email}>
+            <div className={styles.signup_input} id={styles.check_email}>
               <input
                 name="check_email"
                 type="text"
@@ -184,7 +182,10 @@ function Signup() {
               />
             </div>
             <div className={styles.check_email_btn_wrap}>
-              <button className={styles.check_email_btn} onClick={onClickCheckEmailBtn}>
+              <button
+                className={styles.check_email_btn}
+                onClick={onClickCheckEmailBtn}
+              >
                 인증완료
               </button>
             </div>
