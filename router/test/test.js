@@ -6,7 +6,12 @@ import multer from 'multer'
 const test = Router()
 const formData = multer()
 
-// test.get('/', testS3Image)
+test.get('/', function(req, res){
+    readFile('public/sessiontest.html', { encoding: 'utf-8' }, (err, dat) => {
+        if(err) { res.send('err') }
+        else{ res.send(dat) }
+    })
+})
 test.put('/', formData.single('content'), (req, res) => {
     console.log(req.body)
     console.log(req.file.originalname)

@@ -6,8 +6,6 @@ import Pool from '../private/server/DBConnector.js'
 const fetchPoint = Router()
 const controllerName = 'fetchPoint'
 
-const pointNeedWhenPost = 10
-
 fetchPoint.get(
     '/',
     jwtVerify,
@@ -44,6 +42,7 @@ async function FetchUserPointController(req, res){
 
 export async function checkEnoughPoint(req, res){
     const { UID } = req.paramBox
+    const pointNeedWhenPost = 10
     let conn
 
     try{

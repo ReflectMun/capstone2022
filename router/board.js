@@ -9,7 +9,7 @@ boardList.get('/fetch/list', async function(req, res){
     let conn
 
     try{
-        const queryString = `SELECT BoardName, BoardURI, Group FROM BoardLists`
+        const queryString = `SELECT BoardName, BoardURI, GroupIN FROM BoardLists`
 
         conn = await Pool.getConnection(conn => conn)
 
