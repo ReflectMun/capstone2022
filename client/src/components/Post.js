@@ -41,7 +41,7 @@ function AnswerBtn(props) {
   );
 }
 
-function Answer() {
+function Answer(props) {
   const answer = (
     <div style={{ marginLeft: "10px" }}>
       <p>어떻게 돌아가긴요?</p>

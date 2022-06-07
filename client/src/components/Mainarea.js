@@ -6,7 +6,7 @@ import Writer from "./Writer";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const POSTLIST_API = "api/post/fetch/postlist";
-let BoardURI = "ComputerScience";
+let BoardURI = "";
 let pageNum = 0;
 
 function getCookie(key) {
@@ -16,15 +16,18 @@ function getCookie(key) {
 
 function Mainarea(props) {
   const [write, setWrite] = useState(false);
-  const [major, setMajor] = useState("");
   const [boardType, setBoardType] = useState("1");
+  const [boardLists, setBoardLists] = useState([]);
   function changeBoardType(event) {
     setBoardType(event.target.value);
   }
+  function onClickMore(event) {
+    event.preventDefault();
+    pageNum++;
+    loadPosts();
+  }
   function loadPosts() {
-    console.log("loadPost: ", BoardURI);
-    console.log("boardtyle: ", boardType);
-    console.log("boardType의 type: ", typeof boardType);
+    console.log(BoardURI);
     new Promise((resolve, reject) => {
       const pageNumString = pageNum.toString();
       fetch(
@@ -36,7 +39,20 @@ function Mainarea(props) {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          if (data.code === 210) {
+            if (data.postlist.length === 0) {
+              alert("마지막 페이지입니다");
+            } else {
+              //console.log(data.postlist);
+              setBoardLists([...boardLists, ...data.postlist]);
+            }
+          } else {
+            alert("load error");
+            return;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
         });
     });
   }
@@ -76,7 +92,7 @@ function Mainarea(props) {
     },
   ];
   //게시물 리스트 가져오기
-  switch (major) {
+  switch (props.selectedMajor) {
     case "컴퓨터공학":
       BoardURI = "ComputerScience";
       break;
@@ -151,16 +167,24 @@ function Mainarea(props) {
       break;
   }
 
-  const boardsList = boards.map((item) => (
-    <li style={{ listStyle: "none" }}>
+  const boardsList = boardLists.map((item) => (
+    <li key={item.PostID} style={{ listStyle: "none" }}>
       <Link to={"/answer"} style={{ textDecoration: "none", color: "inherit" }}>
         <Board item={item} />
       </Link>
     </li>
   ));
   useEffect(() => {
-    setMajor(props.selectedMajor);
-    loadPosts();
+    console.log(boardLists);
+  }, [boardLists]);
+
+  useEffect(() => {
+    console.log(props.selectedMajor);
+    setBoardLists([]);
+    if (props.selectedMajor !== "") {
+      console.log("loadPost함");
+      loadPosts();
+    }
   }, [props.selectedMajor]);
   return (
     <center>
@@ -168,7 +192,7 @@ function Mainarea(props) {
         <div
           style={{ display: "flex", marginLeft: "30px", marginRight: "30px" }}
         >
-          <h2 className={styles.major}>{major}</h2>
+          <h2 className={styles.major}>{props.selectedMajor}</h2>
           <button
             className={styles.write_btn}
             onClick={(event) => {
@@ -189,10 +213,15 @@ function Mainarea(props) {
         </select>
         <center>
           {write ? (
-            <Writer major={major} boardType={boardType} setWrite={setWrite} />
+            <Writer
+              major={props.selectedMajor}
+              boardType={boardType}
+              setWrite={setWrite}
+            />
           ) : null}
         </center>
         <ul style={{ margin: "0px", padding: "0px" }}>{boardsList}</ul>
+        <button onClick={onClickMore}>더보기</button>
       </div>
     </center>
   );
