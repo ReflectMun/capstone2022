@@ -5,54 +5,49 @@ import { useState } from "react";
 
 const token = getCookie("token");
 
-function getMyQuestion() {
-  console.log("질문");
-  return <MyContent />
-}
-function getMyAnswer() {
-  console.log("답");
-  return <MyContent />
-}
-function getMyMessage() {
-  console.log("쪽지");
-  return <MyContent />
-}
-function getMySolution() {
-  console.log("솔루션");
-  return <MyContent />
-}
+// function getContent(e) {
+//   console.log(e.target.innerText);
+//   <MyContent />
+// }
 
 function ShowInfo() {
+  const [contents,setContent]=useState(null);
+  const clickContent =(e) => {
+    setContent(e.target.innerText);
+  }
   return (
     <div className={styled.info_container}>
       <ul className={styled.info_ul}>
         <li className={styled.info_li}>id</li>
         <li 
           className={styled.info_li} 
-          onClick={getMyQuestion}
+          onClick={clickContent}
           value ="question">
           my question
         </li>
         <li className={styled.info_li}>닉네임</li>
         <li 
           className={styled.info_li} 
-          onClick={getMyAnswer}
+          onClick={clickContent}
           value ="answer">
           my answer
         </li>
         <li 
           className={styled.info_li} 
-          onClick={getMyMessage}
+          onClick={clickContent}
           value="message">
           쪽지
         </li>
         <li 
           className={styled.info_li} 
-          onClick={getMySolution}
+          onClick={clickContent}
           value="solution">
           my solution
         </li>
       </ul>
+      <MyContent
+        content = {contents}
+        /> 
     </div>
   );
 }

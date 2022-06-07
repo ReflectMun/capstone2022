@@ -20,7 +20,7 @@ fetchPost.get(
 
 fetchPost.get(
     '/fetch/postlist',
-    jwtVerify,
+    proprocess,
     extractBoardName,
     extractPageNum,
     extractPostType,
@@ -163,6 +163,18 @@ async function fetchAnswerList(postNum){
  * @param {express.Response} res 
  * @param {express.NextFunction} next 
  */
+function proprocess(req, res, next){
+    req.paramBox = {}
+    req.tokenBox = {}
+
+    next()
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
 function extractBoardName(req, res, next){
     const resObj = getResponseObject()
     try{
@@ -279,13 +291,13 @@ function extractPageNum(req, res, next){
  function extractPostType(req, res, next){
     const resObj = getResponseObject()
     try{
-        const { type } = req.query
+        const { Type } = req.query
 
-        if(typeof type != 'string'){
+        if(typeof Type != 'string'){
             throw new PostTypeExtractFailed()
         }
 
-        req.paramBox['type'] = type
+        req.paramBox['type'] = Type
         next()
     }
     catch(err){

@@ -4,6 +4,22 @@ import Message from "../components/Message";
 import Nav from "../components/Nav";
 import { useState } from "react";
 import MyEditor from "./MyEditor";
+import { getCookie } from './Nav';
+
+const token = getCookie("token");
+const serverURL = "http://www.qnasavior.kro.kr";
+const comment_api = "api/comment";
+
+///////////////////////////////////////날짜////////////////////////////
+let day = new Date();
+let year = day.getFullYear(); // 년도
+let month = day.getMonth() + 1;  // 월
+let date = day.getDate();  //일
+let hours = day.getHours(); // 시
+let minutes = day.getMinutes();  // 분
+let seconds = day.getSeconds();  //초
+let today = year + month + date
+let time = hours + minutes + seconds
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
@@ -22,9 +38,11 @@ function Question() {
           alt="load error"
         />
       </div>
+      <Comment />
     </div>
   );
 }
+
 function AnswerBtn(props) {
   return (
     <div className={styles.wrap_ans_btn}>
@@ -82,14 +100,81 @@ function AnswerBox(props) {
     </div>
   );
 }
+/////////////////////////////////////////////댓글////////////////////////////////////////////
+function Comment(){
+  const[comment,setComment] =useState("");
+  const [visibleComment,setVisibleComment]=useState(false);
+  const clickCommentBtn =()=>{
+    setVisibleComment(!visibleComment);
+  }
+  const changeText=(e)=>{
+    setComment(e.target.value);
+  }
+  const upLoadComment=()=>{
+    var data = new FormData();
+    data.append("SourcePost",1);
+    data.append("Author","ComputerScience");
+    data.append("nickname","hi~~");
+    data.append("comment",comment);
+    data.append("date",comment);
+    data.append("time",comment);
+
+    console.log(data.values());
+    console.log(date);
+      fetch(`${serverURL}/${comment_api}`, {
+        method: "post",
+        body:data,
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          authorization: token },
+      })
+        .then((result) => {
+          if (result.code === 200) {
+            console.log(result.code);
+          }
+          else if (result.code === 500){
+            alert("다시 시도해주세요.");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+  }
+  return(
+    visibleComment ? (
+    <div className={styles.comment}>
+      <textarea
+        id={styles.comment_text} 
+        onChange={changeText}></textarea>
+      <button 
+        id ={styles.comment_btn}
+        onClick={()=>{
+          upLoadComment();
+          clickCommentBtn();
+          }}
+     >댓글달기</button>
+    </div>
+    ) : (
+      <div>
+        <button 
+         id ={styles.comment_btn}
+         onClick={clickCommentBtn}
+         >comment</button>
+      </div>
+    )
+
+  )
+}
 function Post() {
   const [answer, setAnswer] = useState(false);
+
   return (
     <center>
       <Nav />
       <Message />
       <div className={styles.wrap_post}>
         <Question />
+
         <AnswerBtn
           onChangeMode={() => {
             if (answer === false) {
@@ -105,4 +190,5 @@ function Post() {
     </center>
   );
 }
+
 export default Post;

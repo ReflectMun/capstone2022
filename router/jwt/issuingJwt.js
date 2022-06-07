@@ -40,7 +40,12 @@ async function insertTokenToDB(refreshToken, UID, req){
         if(conn) { conn.release() }
         err.message += '-101'
         errorLog(req, controllerName, err.message)
-        throw new ErrorOnInsertingRefreshToken()
+        if((err.message.indexOf('Duplicate entry', 0) != -1) && (err.message.indexOf('for key', 0) != -1)){
+            throw new LoggedInUser()
+        }
+        else{
+            throw new ErrorOnInsertingRefreshToken()
+        }
     }
 }
 
@@ -145,6 +150,9 @@ async function issueJwtToken(req, res){
         if(err instanceof ErrorOnInsertingRefreshToken){
             res.json({ code: 3802, message: '사용자 인증 토큰 발급을 위해 DB와 통신하던 중 오류가 발생하였습니다' })
         }
+        else if(err instanceof LoggedInUser){
+            res.json({ code: 3803, message: '이미 다른 곳에서 로그인한 유저입니다' })
+        }
         else{
             res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다'})
         }
@@ -156,3 +164,4 @@ export default issuingJwt
 ////////// Error Type Class Define ////////// 
 class ValueIsUndefined extends Error{ constructor(){ super('UID 또는 계정정보가 누락됨') } }
 class ErrorOnInsertingRefreshToken extends Error{ constructor(){ super('토큰 보관을 위해 DB와 통신하는 중 에러가 발생함') } }
+class LoggedInUser extends Error{ constructor(){ super('이미 다른 곳에서 로그인한 유저입니다') } }

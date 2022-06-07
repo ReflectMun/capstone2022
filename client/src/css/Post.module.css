@@ -1,9 +1,12 @@
-.wrap_post {
+.wrap_post{
   width: 700px;
   margin: 65px 200px;
   text-align: left;
 }
-.wrap_question {
+.comment_container{
+  margin-top:5px;
+}
+.wrap_question, .comment_container  {
   border: solid 1.5px rgb(196, 191, 191);
   border-radius: 5px;
 }
@@ -48,3 +51,23 @@
 .box_sample {
   border: solid 1.5px rgb(196, 191, 191);
 }
+.comment{
+  display: flex;
+  align-items: flex-end;
+}
+#comment_text{
+  margin: 5px;
+  height: 22px;
+  flex-basis : 85%;
+}
+#comment_btn{
+  margin: 5px;
+  flex-basis : 15%;
+  border: none;
+  color: white;
+  background-color: #9f81f7;
+  width: 100px;
+  height: 30px;
+  cursor: pointer;
+}
+
