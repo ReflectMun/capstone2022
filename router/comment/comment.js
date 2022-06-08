@@ -30,7 +30,7 @@ function extractPostNum(req, res, next){
     const { postNum } = req.query
 
     try{
-        if(typeof postNum != 'string') { throw new Error('게시글 값이 전송되지 않음') }
+        if(!postNum) { throw new EmptyPostNum('게시글 값이 전송되지 않음') }
 
         req.paramBox = {
             sourcePost: postNum
@@ -53,7 +53,8 @@ function extractValue(req, res, next){
     const { postNum, text } = req.body
 
     try{
-        if(typeof text != 'string') { throw new Error('댓글내용이 비어있음') }
+        if(typeof postNum != 'string') { throw new EmptyPostNum('게시글 값이 전송되지 않음') }
+        if(typeof text != 'string') { throw new EmptyComment('댓글내용이 비어있음') }
 
         req.paramBox['text'] = text
         req.paramBox['postNum'] = postNum
@@ -61,7 +62,12 @@ function extractValue(req, res, next){
     }
     catch(err){
         errorLog(req, controllerName, err.message += '-2')
-        res.json({ code: 4303, message: '댓글내용이 비어있습니다' })
+        if(err instanceof EmptyPostNum){
+            res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다' })
+        }
+        else if(err instanceof EmptyComment){
+            res.json({ code: 4303, message: '빈 댓글은 등록할 수 없습니다' })
+        }
     }
 }
 ////////////////////////////////////////////////////////////
@@ -128,3 +134,6 @@ async function postComment(req, res) {
 ////////////////////////////////////////////////////////////
 
 export default Comment
+
+class EmptyPostNum extends Error{ constructor(){ super('게시글 정보가 손상되거나 전송되지 않음') } }
+class EmptyComment extends Error{ constructor(){ super('댓글 정보가 손상되거나 전송되지 않음') } }
