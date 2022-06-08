@@ -13,6 +13,7 @@ Comment.get(
 
 Comment.put(
     '/put', 
+    extractData,
     postComment
 )
 
@@ -24,14 +25,29 @@ Comment.put(
  * @param {express.NextFunction} next 
  */
 function extractPostNum(req, res, next){
-    const { PostNum } = req.query
+    const { sourcePost } = req.query
 
     try{
-        if(typeof PostNum != 'string') { throw new Error('게시글 값이 전송되지 않음') }
+        if(typeof sourcePost != 'string') { throw new Error('게시글 값이 전송되지 않음') }
+
+        req.paramBox['sourcePost'] = sourcePost
     }
     catch(err){
         errorLog(req, controllerName, err.message += '-1')
         res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다' })
+    }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+function extractData(req, res, next){
+    const { postNum, test } = req.body
+
+    try{
+
     }
 }
 ////////////////////////////////////////////////////////////
@@ -43,25 +59,28 @@ function extractPostNum(req, res, next){
  * @param {express.Response} res 
  */
 async function getComment(req, res) {
-    const { SourcePost } = req.paramBox
+    const { sourcePost } = req.paramBox
     let conn = null
 
     try{
         const queryString =
-        `SELECT CommentID, Author, Nickname, Comment, Date, Time FROM Comments  WHERE SourcePost = ${SourcePost}`
+        `SELECT CommentID, Author, Nickname, Comment, Date, Time FROM Comments  WHERE SourcePost = ${sourcePost}`
         conn = await Pool.getConnection(conn => conn)
 
         await conn.beginTransaction()
-        const [row] = await conn.query(queryString)
+        const [ row, fields ] = await conn.query(queryString)
         await conn.commit()
 
-        response.code = 200
-        response.body = row
+        res.json({ code: 270, comments: row})
+        normalLog(req, controllerName, `게시글 ${sourcePost}의 댓글 전송완료`)
     }
     catch(err){
     }
     finally{
-        if(conn) { conn.release() }
+        if(conn) {
+            conn.commit()
+            conn.release()
+        }
     }
 
 }
@@ -77,20 +96,12 @@ async function postComment(req, res) {
         await conn.beginTransaction()
         await conn.query(queryString)
         await conn.commit()
-
-
-        response.code = 200
-        response.body = "success"
     }
     catch(err){
         console.log(err)
-        response.code = 404
-        response.err = {message:'댓글 테이블 데이터 삽입중 에러 발생'}
     }
     finally{
         if(conn) { conn.release() }
-
-        res.json(response)
     }
 
 }
