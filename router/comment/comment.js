@@ -32,7 +32,9 @@ function extractPostNum(req, res, next){
     try{
         if(typeof postNum != 'string') { throw new Error('게시글 값이 전송되지 않음') }
 
-        req.paramBox['sourcePost'] = postNum
+        req.paramBox = {
+            sourcePost: postNum
+        }
         next()
     }
     catch(err){
