@@ -32,7 +32,6 @@ fetchPost.get(
     '/fetch/answer',
     jwtVerify,
     extractPostNum,
-    checkExistingPost,
     FetchAnswerListController
 )
 
