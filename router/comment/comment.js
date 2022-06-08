@@ -27,12 +27,12 @@ Comment.put(
  * @param {express.NextFunction} next 
  */
 function extractPostNum(req, res, next){
-    const { sourcePost } = req.query
+    const { postNum } = req.query
 
     try{
-        if(typeof sourcePost != 'string') { throw new Error('게시글 값이 전송되지 않음') }
+        if(typeof postNum != 'string') { throw new Error('게시글 값이 전송되지 않음') }
 
-        req.paramBox['sourcePost'] = sourcePost
+        req.paramBox['sourcePost'] = postNum
         next()
     }
     catch(err){
