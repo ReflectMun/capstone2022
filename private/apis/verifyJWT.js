@@ -21,14 +21,17 @@ async function checkVaildRefreshToken(UID){
 
         await conn.beginTransaction()
         const [ row, fields ] = await conn.query(queryString)
+        const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET)
         await conn.commit()
 
-        const verifiedToken = verify(row[0]['Token'], process.env.JWT_SECRET)
+        conn.release()
 
-        if(conn) { conn.release() }
         return true
     } catch(err) {
-        if(conn) { conn.release() }
+        if(conn) {
+            conn.commit()
+            conn.release()
+        }
         console.log(err.message)
         throw new RefreshTokenExpired()
     }

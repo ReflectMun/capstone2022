@@ -37,7 +37,11 @@ async function insertTokenToDB(refreshToken, UID, req){
 
         conn.release()
     } catch(err) {
-        if(conn) { conn.release() }
+        if(conn) {
+            conn.rollback()
+            conn.release()
+        }
+
         err.message += '-101'
         errorLog(req, controllerName, err.message)
         if((err.message.indexOf('Duplicate entry', 0) != -1) && (err.message.indexOf('for key', 0) != -1)){
