@@ -96,7 +96,7 @@ async function getComment(req, res) {
 }
 
 async function postComment(req, res) {
-    const { Account: Author, Nickname, sourcePost, text } = req.paramBox
+    const { Account: Author, Nickname, postNum: sourcePost, text } = req.paramBox
     let conn
 
     try{
