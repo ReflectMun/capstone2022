@@ -37,7 +37,10 @@ async function processLogout(req, res){
         res.json({ code: 4403, message: '로그아웃 중 서버에서 오류가 발생하였습니다' })
     }
     finally{
-        if(conn) { conn.release() }
+        if(conn) {
+            conn.rollback()
+            conn.release()
+        }
     }
 }
 

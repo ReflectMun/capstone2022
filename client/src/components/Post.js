@@ -51,6 +51,7 @@ function AnswerBtn(props) {
   );
 }
 
+
 function Answer() {
   // const answer = (
   //   <div style={{ marginLeft: "10px" }}>
@@ -58,6 +59,7 @@ function Answer() {
   //     <p>잘만 돌아가지요오~</p>
   //   </div>
   // );
+
 
   // const ansWriter = "asdf1234";
   // const postNum ="1";

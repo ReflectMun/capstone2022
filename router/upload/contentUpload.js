@@ -106,16 +106,19 @@ async function putContentController(req, res, next){
         await conn.commit()
 
         await putObjectToS3('saviorcontent', renamedName, req.file.buffer)
-        
+
+        conn.release()
         next()
     }
     catch (err) {
+        if(conn){
+            conn.rollback()
+            conn.release()
+        }
+
         errorLog(req, controllerName, err.message += '=1')
         res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     } 
-    finally{
-        if (conn) { conn.release() }
-    }
 }
 
 function okResponserController(req, res){

@@ -121,15 +121,16 @@ function Writer(props) {
       fetch(`${API_URL}/${UPLOAD_API}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "multipart/form-data",
           authorization: token,
         },
         body: data,
       })
         .then((res) => res.json())
         .then((data) => {
+          console.log(data);
           if (data.code === 230) {
             alert("작성 완료");
+            props.setWrite(false);
           }
         })
         .catch((error) => {
