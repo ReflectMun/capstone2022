@@ -52,7 +52,8 @@ function extractValue(req, res, next){
     try{
         if(typeof text != 'string') { throw new Error('댓글내용이 비어있음') }
 
-        req.paramBox['text'] = req.text
+        req.paramBox['text'] = text
+        req.paramBox['postNum'] = postNum
         next()
     }
     catch(err){
