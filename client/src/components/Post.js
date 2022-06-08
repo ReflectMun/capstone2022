@@ -62,28 +62,31 @@ function Answer() {
 
 
   // const ansWriter = "asdf1234";
-  // const postNum ="1";
-  // function getAnswer(){
-    // fetch(
-    //   `${serverURL}/${answer_api}?postNum=${postNum}`, 
-    //   {
-    //     method: "get",
-    //     headers: { 
-    //       "Content-Type": "application/json",
-    //       authorization: token 
-    //     }
-    // })
-    //   .then((result) => {
-    //     if (result.code === 212) {         
-    //     }
-    //     else {
-    //       console.log(result);
-    //     }
-    //   })
-  // }
-  // useEffect(()=>{
-  //   getAnswer();
-  // })
+  const postNum ="1";
+  function getAnswer(){
+    fetch(
+      `${serverURL}/${answer_api}?postNum=${postNum}`, 
+      {
+        method: "get",
+        headers: { 
+          //"Content-Type": "application/json",
+          authorization: token 
+        }
+    })
+    .then((response)=>response.json())
+      .then((result) => {
+        console.log(result);
+        if (result.code === 212) { 
+          console.log(result);        
+        }
+        else {
+          // console.log(result);
+        }
+      })
+  }
+  useEffect(()=>{
+    getAnswer();
+  })
   return (
     <div className={styles.wrap_answer}>
       {/* <div className={styles.wrap_ans_name}>
