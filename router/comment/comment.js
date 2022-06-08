@@ -40,6 +40,7 @@ function extractPostNum(req, res, next){
         res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다' })
     }
 }
+ //
 
 /**
  * @param {express.Request} req 
