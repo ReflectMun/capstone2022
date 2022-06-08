@@ -144,7 +144,7 @@ function Nav(props) {
         .then((result) => {
           console.log("point:" + result.point);
           if (result.code === 240) {
-            console.log(result.code);
+            // console.log(result.code);
             setPoint(result.point);
           }
         })

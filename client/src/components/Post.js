@@ -2,43 +2,35 @@ import question_sample from "./q_sample.png";
 import styles from "../css/Post.module.css";
 import Message from "../components/Message";
 import Nav from "../components/Nav";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MyEditor from "./MyEditor";
 import { getCookie } from './Nav';
 
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
-const comment_api = "api/comment";
+const comment_api = "api/comment/fetch";
+const answer_api = "api/post/fetch/answer";
+const uploadComment_api="api/comment/put";
 
-///////////////////////////////////////날짜랑 시간////////////////////////////////
-let day = new Date();
-let year = day.getFullYear(); // 년도
-let month = day.getMonth() + 1;  // 월
-let date = day.getDate();  //일
-let hours = day.getHours(); // 시
-let minutes = day.getMinutes();  // 분
-let seconds = day.getSeconds();  //초
-let today =`${year}/${month}/${date}`;
-let time = `${hours}/${minutes}/${seconds}`;
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
   const contents = "이 부분은 어떻게 돌아가는 것인지요?";
   return (
-    <div className={styles.wrap_question}>
-      <div>
-        <span className={styles.q_icon}>Q</span>
-        <span className={styles.question_title}>{title}</span>
-      </div>
-      <div>
-        <p style={{ marginLeft: "10px" }}>{contents}</p>
-        <img
-          src={question_sample}
-          style={{ margin: "5px", width: "80%" }}
-          alt="load error"
-        />
-      </div>
-      <UploadComment />
+      <div className={styles.wrap_question}>
+        <div>
+          <span className={styles.q_icon}>Q</span>
+          <span className={styles.question_title}>{title}</span>
+        </div>
+        <div>
+          <p>{contents}</p>
+          <img
+            src={question_sample}
+            style={{ margin: "5px", width: "80%" }}
+            alt="load error"
+          />
+        </div>
+        <UploadComment />
     </div>
   );
 }
@@ -60,21 +52,44 @@ function AnswerBtn(props) {
 }
 
 function Answer() {
-  const answer = (
-    <div style={{ marginLeft: "10px" }}>
-      <p>어떻게 돌아가긴요?</p>
-      <p>잘만 돌아가지요오~</p>
-    </div>
-  );
+  // const answer = (
+  //   <div style={{ marginLeft: "10px" }}>
+  //     <p>어떻게 돌아가긴요?</p>
+  //     <p>잘만 돌아가지요오~</p>
+  //   </div>
+  // );
 
-  const ansWriter = "asdf1234";
+  // const ansWriter = "asdf1234";
+  // const postNum ="1";
+  // function getAnswer(){
+    // fetch(
+    //   `${serverURL}/${answer_api}?postNum=${postNum}`, 
+    //   {
+    //     method: "get",
+    //     headers: { 
+    //       "Content-Type": "application/json",
+    //       authorization: token 
+    //     }
+    // })
+    //   .then((result) => {
+    //     if (result.code === 212) {         
+    //     }
+    //     else {
+    //       console.log(result);
+    //     }
+    //   })
+  // }
+  // useEffect(()=>{
+  //   getAnswer();
+  // })
   return (
     <div className={styles.wrap_answer}>
-      <div className={styles.wrap_ans_name}>
+      {/* <div className={styles.wrap_ans_name}>
         <span className={styles.a_icon}>A</span>
         <span>{ansWriter}</span>
       </div>
-      {answer}
+      {answer} */}
+      ㅁㅁㅁㅁ
     </div>
   );
 }
@@ -100,9 +115,8 @@ function AnswerBox(props) {
     </div>
   );
 }
-/////////////////////////////////////////////댓글////////////////////////////////////////////
+/////////////////////////////////////////////댓글등록////////////////////////////////////////////
 function UploadComment(){
-  //comment 누르면 댓글 쓰는 거 보이게
   const[comment,setComment] =useState("");
   const [visibleComment,setVisibleComment]=useState(false);
   const clickCommentBtn =()=>{
@@ -111,65 +125,33 @@ function UploadComment(){
   const changeText=(e)=>{
     setComment(e.target.value);
   }
-  const upLoadComment=()=>{
-    var data = new FormData();
-    data.append("SourcePost",1);
-    data.append("Author","hyozeong");
-    data.append("nickname","test1");
-    data.append("comment",comment);
-    data.append("date",today);
-    data.append("time",time);
 
-    console.log(today);
-      fetch(`${serverURL}/${comment_api}`, {
-        method: "post",
-        body:data,
+  const postNum="37";
+  const upLoadComment=()=>{
+   const reqBody = {
+    postNum: postNum,
+    text: comment,
+  };
+      fetch(`${serverURL}/${uploadComment_api}`, {
+        method: "put",
+        body: JSON.stringify(reqBody),
         headers: { 
-          "Content-Type": "multipart/form-data",
-          authorization: token },
+          "content-type": "application/json",
+          authorization: token 
+        },
       })
+        .then((response) => response.json())
         .then((result) => {
-          if (result.code === 200) {
-            console.log(result.code);
-          }
-          else if (result.code === 500){
-            alert("다시 시도해주세요.");
+          if (result.code === 271) {
+            alert(result.message);
           }
         })
         .catch((error) => {
           console.log(error);
         })
   }
-  // 원래 있던 댓글 불러오기
-  const [comments,getComment] = useState(true);
-  fetch(`${serverURL}/${comment_api}`, {
-    method: "get",
-    // body:JSON.stringify(reqBody),
-    headers: { 
-      "Content-Type": "application/json" },
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      if (result.code === 200) {
-        console.log(result);
-        getComment(!comments);
-      }
-      else if (result.code === 500){
-        alert("댓글을 조회할 수 없습니다.");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    })
   return(
     <div>
-      <div>
-      {comments ? (
-      <div className={styles.comment}>
-        <div>댓글쓴</div>
-      </div>
-      ) : (null)}
-    </div>
       {visibleComment ? (
       <div className={styles.comment}>
         <textarea
@@ -197,7 +179,32 @@ function UploadComment(){
 
 function Post() {
   const [answer, setAnswer] = useState(false);
-
+  
+  //원래 있던 댓글 가져오기
+  const postNum = "37";
+  function getComment(){
+    fetch(
+      `${serverURL}/${comment_api}?postNum=${postNum}`, 
+      {
+        method: "get",
+        headers: { 
+          "Content-Type": "application/json",
+          authorization: null
+        }
+    })
+    .then((response)=>response.json())
+      .then((result) => {
+          console.log(result);
+        if (result.code === 270) {         
+        }
+        else {
+          //console.log(result.code);
+        }
+      })
+      }
+      useEffect(()=>{
+        getComment();
+      })
   return (
     <center>
       <Nav />
@@ -220,5 +227,6 @@ function Post() {
     </center>
   );
 }
+
 
 export default Post;
