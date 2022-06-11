@@ -114,7 +114,7 @@ async function putContentController(req, res, next){
     }
     catch (err) {
         if(conn){
-            conn.rollback()
+            await conn.rollback()
             conn.release()
         }
 

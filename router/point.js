@@ -78,7 +78,7 @@ export async function checkEnoughPoint(req, res, next){
     }
     catch(err){
         if(conn){
-            conn.rollback()
+            await conn.rollback()
             conn.release()
         }
         errorLog(req, controllerName, err.message += '=2')
