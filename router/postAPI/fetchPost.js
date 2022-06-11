@@ -98,7 +98,7 @@ async function fetchPostList(boardURI, startNum, Type){
         }
         catch(err){
             if(connection) {
-                connection.commit()
+                await connection.commit()
                 connection.release()
             }
             err.message += '-101'
@@ -151,7 +151,7 @@ async function fetchAnswerList(postNum){
         }
         catch(err){
             if(conn) {
-                conn.commit()
+                await conn.commit()
                 conn.release()
             }
             err.message += '-102'
@@ -359,7 +359,7 @@ async function checkExistingBoard(req, res, next){
     }
     catch(err){
         if(conn){
-            conn.commit()
+            await conn.commit()
             conn.release()
         }
         errorLog(req, controllerName, err.message += '-5')
@@ -425,7 +425,7 @@ async function checkExistingPost(req, res, next){
     }
     catch(err){
         if(conn){
-            conn.commit()
+            await conn.commit()
             conn.release()
         }
         errorLog(req, controllerName, err.message += '-6')
@@ -498,7 +498,7 @@ async function checkExistingPost(req, res, next){
     }
     catch(err){
         if(conn){
-            conn.commit()
+            await conn.commit()
             conn.release()
         }
         errorLog(req, controllerName, err.message += '-7')
@@ -584,7 +584,7 @@ async function ContentViewerController(req, res){
     }
     catch(err){
         if(conn){
-            conn.commit()
+            await conn.commit()
             conn.release()
         }
         errorLog(req, controllerName, err.message += '-7')

@@ -35,6 +35,7 @@ function extractPostNum(req, res, next){
         req.paramBox = {
             sourcePost: postNum
         }
+
         next()
     }
     catch(err){
@@ -95,7 +96,7 @@ async function getComment(req, res) {
         normalLog(req, controllerName, `게시글 ${sourcePost}의 댓글 전송완료`)
     }
     catch(err){
-        if(conn) { conn.commit() }
+        if(conn) { await conn.commit() }
         res.json({ code: 9102, message: '댓글을 불러오는 도중 오류가 발생했습니다' })
     }
     finally{
@@ -123,7 +124,7 @@ async function postComment(req, res) {
         normalLog(req, controllerName, `${Author}가 ${sourcePost}게시물에 댓글 작성 완료`)
     }
     catch(err){
-        if(conn) { conn.rollback() }
+        if(conn) { await conn.rollback() }
         res.json({ code: 9102, message: '댓글을 작성하는 도중 오류가 발생했습니다' })
     }
     finally{

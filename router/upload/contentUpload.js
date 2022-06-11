@@ -4,6 +4,7 @@ import multer from 'multer'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
+import { checkEnoughPoint } from '../point.js'
 
 const contentUpload = Router()
 const controllerName = 'ContentUploader'
@@ -13,6 +14,7 @@ const fileChecker = multer()
 contentUpload.put(
     '/',
     jwtVerify,
+    checkEnoughPoint,
     fileChecker.fields([
         { name: 'content' },
         { name: 'BoardURI' },
@@ -112,7 +114,7 @@ async function putContentController(req, res, next){
     }
     catch (err) {
         if(conn){
-            conn.rollback()
+            await conn.rollback()
             conn.release()
         }
 
