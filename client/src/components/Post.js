@@ -11,7 +11,7 @@ const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment/fetch";
 const answer_api = "api/post/fetch/answer";
 const uploadComment_api="api/comment/put";
-
+const postNum ="1";
 
 function Question() {
   const title = "이것은 무엇을 의미하는 건지요?";
@@ -62,7 +62,6 @@ function Answer() {
 
 
   // const ansWriter = "asdf1234";
-  const postNum ="1";
   function getAnswer(){
     fetch(
       `${serverURL}/${answer_api}?postNum=${postNum}`, 
@@ -130,8 +129,6 @@ function UploadComment(){
   const changeText=(e)=>{
     setComment(e.target.value);
   }
-
-  const postNum="37";
   const upLoadComment=()=>{
    const reqBody = {
     postNum: postNum,
@@ -186,7 +183,6 @@ function Post() {
   const [answer, setAnswer] = useState(false);
   
   //원래 있던 댓글 가져오기
-  const postNum = "37";
   function getComment(){
     fetch(
       `${serverURL}/${comment_api}?postNum=${postNum}`, 
@@ -199,8 +195,8 @@ function Post() {
     })
     .then((response)=>response.json())
       .then((result) => {
-          console.log(result);
-        if (result.code === 270) {         
+        if (result.code === 270) {       
+          console.log(result.comments);  
         }
         else {
           //console.log(result.code);
