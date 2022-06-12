@@ -76,15 +76,19 @@ signup.post(
         await conn.commit()
 
         result = row[0]['COUNT(UID)']
+        
+        conn.release()
+        return result
     } catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
+
         err.message += '-101'
         console.log(err.message)
         throw new ErrorOnRegisterChecking()
-    } finally{
-        if(conn) { conn.release() }
     }
-    
-    return result
 }
 
 /**
@@ -104,15 +108,20 @@ signup.post(
         await conn.commit()
 
         result = row[0]['COUNT(UID)']
-    } catch(err){
+
+        conn.release()
+        return result
+    }
+    catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
+
         err.message += '-102'
         console.log(err.message)
         throw new ErrorOnRegisterChecking()
-    } finally{
-        if(conn) { conn.release() }
     }
-    
-    return result
 }
 
 /**
@@ -132,15 +141,20 @@ signup.post(
         await conn.commit()
 
         result = row[0]['COUNT(UID)']
-    } catch(err){
+
+        conn.release()
+        return result
+    }
+    catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
+
         err.message += '-103'
         console.log(err.message)
         throw new ErrorOnRegisterChecking()
-    } finally{
-        if(conn) { conn.release() }
     }
-    
-    return result
 }
 
 /**
@@ -505,6 +519,7 @@ async function processRegister(req, res){
         normalLog(req, controllerName, `사용자 ${Account} 회원가입 성공`)
     }
     catch(err){
+        if(conn) { await conn.rollback() }
         errorLog(req, controllerName, err.message += '=2')
         res.json({ code: 1021, message: '회원가입 도중 오류가 발생하였습니다' })
     }

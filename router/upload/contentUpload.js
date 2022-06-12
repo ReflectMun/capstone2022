@@ -4,6 +4,7 @@ import multer from 'multer'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
+import { checkEnoughPoint } from '../point.js'
 
 const contentUpload = Router()
 const controllerName = 'ContentUploader'
@@ -13,6 +14,7 @@ const fileChecker = multer()
 contentUpload.put(
     '/',
     jwtVerify,
+    checkEnoughPoint,
     fileChecker.fields([
         { name: 'content' },
         { name: 'BoardURI' },
@@ -106,16 +108,19 @@ async function putContentController(req, res, next){
         await conn.commit()
 
         await putObjectToS3('saviorcontent', renamedName, req.file.buffer)
-        
+
+        conn.release()
         next()
     }
     catch (err) {
+        if(conn){
+            await conn.rollback()
+            conn.release()
+        }
+
         errorLog(req, controllerName, err.message += '=1')
         res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
     } 
-    finally{
-        if (conn) { conn.release() }
-    }
 }
 
 function okResponserController(req, res){

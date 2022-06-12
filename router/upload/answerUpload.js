@@ -4,6 +4,7 @@ import { jwtVerify } from '../../private/apis/verifyJWT.js'
 import { putObjectToS3 } from '../../private/server/S3Connector.js'
 import Pool from '../../private/server/DBConnector.js'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
+import { increaseUserPoint } from '../point.js'
 
 const answerUploader = Router()
 const controllerName = 'answerUpload'
@@ -18,6 +19,7 @@ answerUploader.put(
         { name: 'SourceQuestion' }
     ]),
     extractValues,
+    increaseUserPoint,
     answerUploadController,
     answerUploadErrorController
 )

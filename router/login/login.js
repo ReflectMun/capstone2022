@@ -119,11 +119,12 @@ async function processLogin(req, res){
 
     }
     catch(err){
+        if(conn){
+            conn.commit()
+            conn.release()
+        }
         errorLog(req, controllerName, err.message + '-2')
         res.json({ code: 150, message: '로그인을 위해 DB 조회중 오류가 발생하였습니다' })
-    }
-    finally{
-        if(conn) { conn.release() } // 할당된 연결이 있다면 연결을 삭제
     }
 }
 /////////////////////////////////////////////////////////////////////

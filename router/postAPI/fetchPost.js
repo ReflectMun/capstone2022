@@ -10,7 +10,7 @@ const NoFileErrorMessage = 'NoFile'
 
 fetchPost.get(
     '/fetch/content',
-    jwtVerify,
+    // jwtVerify,
     extractBoardName,
     extractPostNum,
     checkExistingBoard,
@@ -32,7 +32,7 @@ fetchPost.get(
     '/fetch/answer',
     jwtVerify,
     extractPostNum,
-    checkExistingPost,
+    checkExistingPostForAnswer,
     FetchAnswerListController
 )
 
@@ -97,8 +97,11 @@ async function fetchPostList(boardURI, startNum, Type){
             resolve(data)
         }
         catch(err){
+            if(connection) {
+                await connection.commit()
+                connection.release()
+            }
             err.message += '-101'
-            if(connection) { connection.release() }
             reject(err)
         }
     }) 
@@ -147,8 +150,11 @@ async function fetchAnswerList(postNum){
             resolve(list)
         }
         catch(err){
+            if(conn) {
+                await conn.commit()
+                conn.release()
+            }
             err.message += '-102'
-            if(conn) { conn.release() }
             reject(err)
         }
     })
@@ -177,6 +183,10 @@ function proprocess(req, res, next){
  */
 function extractBoardName(req, res, next){
     const resObj = getResponseObject()
+
+    req.paramBox = {}
+    req.tokenBox = {}
+
     try{
         const { boardURI } = req.query
 
@@ -215,6 +225,7 @@ function extractBoardName(req, res, next){
  */
 function extractPostNum(req, res, next){
     const resObj = getResponseObject()
+
     try{
         const { postNum } = req.query
 
@@ -339,6 +350,8 @@ async function checkExistingBoard(req, res, next){
         await conn.commit()
 
         const duplicate = row[0]['COUNT(BoardsID)']
+
+        conn.release()
         if(duplicate == 0){
             throw new BoardNotExist()
         }
@@ -350,6 +363,10 @@ async function checkExistingBoard(req, res, next){
         }
     }
     catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
         errorLog(req, controllerName, err.message += '-5')
         if(err instanceof BoardNotExist){
             resObj.code = 3304
@@ -373,9 +390,6 @@ async function checkExistingBoard(req, res, next){
             }
         }
         res.json(resObj)
-    }
-    finally{
-        if(conn) { conn.release() }
     }
 }
 
@@ -405,6 +419,8 @@ async function checkExistingPost(req, res, next){
         }
 
         const isDeleted = row[0]['isDeleted']
+
+        conn.release()
         if(isDeleted){
             throw new DeletedPost()
         }
@@ -413,6 +429,10 @@ async function checkExistingPost(req, res, next){
         }
     }
     catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
         errorLog(req, controllerName, err.message += '-6')
         if(err instanceof PostNotExist){
             resObj.code = 3305
@@ -445,8 +465,78 @@ async function checkExistingPost(req, res, next){
         
         res.json(resObj)
     }
-    finally{
-        if(conn) { conn.release() }
+}
+
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} res 
+ * @param {express.NextFunction} next 
+ */
+ async function checkExistingPostForAnswer(req, res, next){
+    const resObj = getResponseObject()
+    const { postNum } = req.paramBox
+    let conn
+
+    try{
+        const queryString = `SELECT isDeleted FROM Posts WHERE PostID = ${postNum}`
+        conn = await Pool.getConnection(conn => conn)
+        
+        await conn.beginTransaction()
+        const [ row, fields ] = await conn.query(queryString)
+        await conn.commit()
+
+        if(row.length == 0){
+            throw new PostNotExist()
+        }
+        else if(row.length > 1){
+            throw new UnknownDuplicateOnDataBase('post', req.paramBox['postNum'])
+        }
+
+        const isDeleted = row[0]['isDeleted']
+        conn.release()
+        if(isDeleted){
+            throw new DeletedPost()
+        }
+        else{
+            next()
+        }
+    }
+    catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
+        errorLog(req, controllerName, err.message += '-7')
+        if(err instanceof PostNotExist){
+            resObj.code = 3305
+            resObj.message = '존재하지 않는 게시물 입니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else if(err instanceof DeletedPost){
+            resObj.code = 3306
+            resObj.message = '삭제된 게시물 입니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else if(err instanceof UnknownDuplicateOnDataBase){
+            resObj.code = 3307
+            resObj.message = '원인 미상의 오류가 DB에서 발생하였습니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        else{
+            resObj.code = 9999
+            resObj.message = '원인을 알 수 없는 오류가 발생하였습니다'
+            if(req.tokenBox['token']){
+                resObj.newToken = req.tokenBox['token']
+            }
+        }
+        
+        res.json(resObj)
     }
 }
 
@@ -494,9 +584,14 @@ async function ContentViewerController(req, res){
             content: contentText,
             newToken: req.tokenBox['totken']
         })
+        conn.release()
         normalLog(req, controllerName, `${req.paramBox['Account']}에게 게시글 ${req.paramBox['postNum']} 전송 완료`)
     }
     catch(err){
+        if(conn){
+            await conn.commit()
+            conn.release()
+        }
         errorLog(req, controllerName, err.message += '-7')
         if(err instanceof PostFileNotExist){
             resObj.code = 4470
