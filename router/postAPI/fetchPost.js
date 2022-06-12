@@ -60,7 +60,7 @@ function getResponseObject(){
 async function fetchPostHTMLContent(contentKeyName){
     const content = await getObjectFromS3('saviorcontent', contentKeyName)
 
-    if(!source){
+    if(!content){
         throw new EmptyContentFetched()
     }
 
