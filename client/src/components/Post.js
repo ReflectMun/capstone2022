@@ -4,7 +4,8 @@ import Message from "../components/Message";
 import Nav from "../components/Nav";
 import { useEffect, useState } from "react";
 import MyEditor from "./MyEditor";
-import { getCookie } from './Nav';
+import { getCookie } from "./Nav";
+import { useParams } from "react-router-dom";
 
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
@@ -13,9 +14,35 @@ const answer_api = "api/post/fetch/answer";
 const uploadComment_api="api/comment/put";
 const postNum ="1";
 
-function Question() {
-  const title = "이것은 무엇을 의미하는 건지요?";
-  const contents = "이 부분은 어떻게 돌아가는 것인지요?";
+
+const API_URL = "http://www.qnasavior.kro.kr";
+const CONTENT_API = "api/post/fetch/content";
+const ANSWER_API = "api/upload/answer";
+function Question(props) {
+  const { boardURI, id } = useParams();
+  const [title, setTitle] = useState("");
+  let contents = "이 부분은 어떻게 돌아가는 것인지요?";
+  let content = null;
+  new Promise((resolve, reject) => {
+    fetch(`${API_URL}/${CONTENT_API}?boardURI=${boardURI}&postNum=${id}`, {
+      method: "GET",
+      headers: { authorization: token },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if ((data.code = 210)) {
+          console.log(data);
+          setTitle(data.Title);
+          // const fs = require("fs");
+          // const myData = fs.readFileSync(data.content, {
+          //   encoding: "utf8",
+          //   flag: "r",
+          // });
+          //내용 출력이랑 작성자 닉네임 출력 필요
+          //const t = data.content.toString("utf-8");
+        }
+      });
+  });
   return (
       <div className={styles.wrap_question}>
         <div>
@@ -31,6 +58,28 @@ function Question() {
           />
         </div>
         <UploadComment />
+    </div>
+  );
+}
+
+function Solution() {
+  const title = "이것은 답입니다";
+  const contents = "참고하세요";
+  return (
+    <div className={styles.wrap_question}>
+      <div>
+        <span className={styles.q_icon}>S</span>
+        <span className={styles.question_title}>{title}</span>
+      </div>
+      <div>
+        <p style={{ marginLeft: "10px" }}>{contents}</p>
+        <img
+          src={question_sample}
+          style={{ margin: "5px", width: "80%" }}
+          alt="load error"
+        />
+      </div>
+      <Comment />
     </div>
   );
 }
@@ -100,6 +149,44 @@ function Answer() {
 //ckeditor 사용
 function AnswerBox(props) {
   const [editor, setEditor] = useState(null);
+  const { id } = useParams();
+  function onClickAnswer(event) {
+    event.preventDefault();
+    console.log(editor);
+    console.log("답변의 id: " + id);
+    if (editor === null || editor === "") {
+      alert("내용을 입력해주세요");
+      return;
+    }
+    const blobFile = new Blob([editor], {
+      type: "text/html",
+    });
+    const file = new File([blobFile], "newAnswer.html");
+    const data = new FormData();
+    data.append("content", file);
+    data.append("SourceQuestion", id);
+    return new Promise((resolve, reject) => {
+      fetch(`${API_URL}/${ANSWER_API}`, {
+        method: "PUT",
+        headers: {
+          authorization: token,
+        },
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          if (data.code === 231) {
+            alert("답변 작성 완료");
+            props.setAnswer(false);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("답변 업로드 실패");
+        });
+    });
+  }
   return (
     <div className={styles.box_sample}>
       <MyEditor
@@ -109,25 +196,22 @@ function AnswerBox(props) {
         data={editor}
         {...props}
       />
-      <input
-        type="submit"
-        onClick={(event) => {
-          event.preventDefault();
-          console.log(editor);
-        }}
-      />
+      <input type="submit" value="작성" onClick={onClickAnswer} />
     </div>
   );
 }
+
 /////////////////////////////////////////////댓글등록////////////////////////////////////////////
 function UploadComment(){
   const[comment,setComment] =useState("");
   const [visibleComment,setVisibleComment]=useState(false);
   const clickCommentBtn =()=>{
+
     setVisibleComment(!visibleComment);
-  }
-  const changeText=(e)=>{
+  };
+  const changeText = (e) => {
     setComment(e.target.value);
+
   }
   const upLoadComment=()=>{
    const reqBody = {
@@ -179,7 +263,7 @@ function UploadComment(){
   )
 }
 
-function Post() {
+function Post(props) {
   const [answer, setAnswer] = useState(false);
   
   //원래 있던 댓글 가져오기
@@ -211,7 +295,7 @@ function Post() {
       <Nav />
       <Message />
       <div className={styles.wrap_post}>
-        <Question />
+        <Question boardURI={props.boardURI} />
 
         <AnswerBtn
           onChangeMode={() => {
@@ -222,7 +306,7 @@ function Post() {
             }
           }}
         />
-        {answer ? <AnswerBox /> : null}
+        {answer ? <AnswerBox setAnswer={setAnswer} /> : null}
         <Answer />
       </div>
     </center>
