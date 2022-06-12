@@ -58,11 +58,13 @@ function getResponseObject(){
  * @returns {AWS.S3.GetObjectOutput.Body} HTML 컨텐츠
  */
 async function fetchPostHTMLContent(contentKeyName){
-    const content = await getObjectFromS3('saviorcontent', contentKeyName)
+    const source = await getObjectFromS3('saviorcontent', contentKeyName)
 
-    if(!content){
+    if(!source){
         throw new EmptyContentFetched()
     }
+
+    const content = Buffer.from(source).toString('utf-8')
 
     return content
 }
@@ -183,6 +185,7 @@ function proprocess(req, res, next){
  */
 function extractBoardName(req, res, next){
     const resObj = getResponseObject()
+
     try{
         const { boardURI } = req.query
 
