@@ -268,7 +268,7 @@ function Post(props) {
     getAnswerList();
   }, []);
   const pageAnswerList = answerList.map((item) => (
-    <li>
+    <li key={item.AuthorUID}>
       <Answer item={item} />
     </li>
   ));
