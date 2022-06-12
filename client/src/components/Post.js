@@ -9,23 +9,16 @@ import { useParams } from "react-router-dom";
 
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
-const comment_api = "api/comment";
-
-///////////////////////////////////////날짜////////////////////////////
-let day = new Date();
-let year = day.getFullYear(); // 년도
-let month = day.getMonth() + 1; // 월
-let date = day.getDate(); //일
-let hours = day.getHours(); // 시
-let minutes = day.getMinutes(); // 분
-let seconds = day.getSeconds(); //초
-let today = year + month + date;
-let time = hours + minutes + seconds;
+const comment_api = "api/comment/fetch";
+const answer_api = "api/post/fetch/answer";
+const uploadComment_api = "api/comment/put";
+const postNum = "1";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
 const ANSWER_API = "api/upload/answer";
 const ANSWER_LIST_API = "api/post/fetch/answer";
+
 function Question(props) {
   const { boardURI, id } = useParams();
   const [title, setTitle] = useState("");
@@ -58,7 +51,7 @@ function Question(props) {
         <span className={styles.question_title}>{title}</span>
       </div>
       <div>
-        <p style={{ marginLeft: "10px" }}>{contents}</p>
+        <p>{contents}</p>
         <img
           src={question_sample}
           style={{ margin: "5px", width: "80%" }}
@@ -117,6 +110,7 @@ function Answer(props) {
   );
   const answerContent = props.item.content;
   const ansWriter = props.item.Nickname;
+  // const answerList = answerLists.map(())
   return (
     <div className={styles.wrap_answer}>
       <div className={styles.wrap_ans_name}>
@@ -129,6 +123,7 @@ function Answer(props) {
 }
 //ckeditor 사용
 function AnswerBox(props) {
+  const token1 = getCookie("token");
   const [editor, setEditor] = useState(null);
   const { id } = useParams();
   function onClickAnswer(event) {
@@ -146,11 +141,12 @@ function AnswerBox(props) {
     const data = new FormData();
     data.append("content", file);
     data.append("SourceQuestion", id);
+    console.log(token1);
     return new Promise((resolve, reject) => {
       fetch(`${API_URL}/${ANSWER_API}`, {
         method: "PUT",
         headers: {
-          authorization: token,
+          authorization: token1,
         },
         body: data,
       })
@@ -181,64 +177,65 @@ function AnswerBox(props) {
     </div>
   );
 }
+
 /////////////////////////////////////////////댓글////////////////////////////////////////////
 function Comment() {
   const [comment, setComment] = useState("");
   const [visibleComment, setVisibleComment] = useState(false);
+
   const clickCommentBtn = () => {
     setVisibleComment(!visibleComment);
   };
+
   const changeText = (e) => {
     setComment(e.target.value);
   };
   const upLoadComment = () => {
-    var data = new FormData();
-    data.append("SourcePost", 1);
-    data.append("Author", "ComputerScience");
-    data.append("nickname", "hi~~");
-    data.append("comment", comment);
-    data.append("date", comment);
-    data.append("time", comment);
-
-    console.log(data.values());
-    console.log(date);
-    fetch(`${serverURL}/${comment_api}`, {
-      method: "post",
-      body: data,
+    const reqBody = {
+      postNum: postNum,
+      text: comment,
+    };
+    fetch(`${serverURL}/${uploadComment_api}`, {
+      method: "put",
+      body: JSON.stringify(reqBody),
       headers: {
-        "Content-Type": "multipart/form-data",
+        "content-type": "application/json",
         authorization: token,
       },
     })
+      .then((response) => response.json())
       .then((result) => {
-        if (result.code === 200) {
-          console.log(result.code);
-        } else if (result.code === 500) {
-          alert("다시 시도해주세요.");
+        if (result.code === 271) {
+          alert(result.message);
         }
       })
       .catch((error) => {
         console.log(error);
       });
   };
-  return visibleComment ? (
-    <div className={styles.comment}>
-      <textarea id={styles.comment_text} onChange={changeText}></textarea>
-      <button
-        id={styles.comment_btn}
-        onClick={() => {
-          upLoadComment();
-          clickCommentBtn();
-        }}
-      >
-        댓글달기
-      </button>
-    </div>
-  ) : (
+
+  return (
     <div>
-      <button id={styles.comment_btn} onClick={clickCommentBtn}>
-        comment
-      </button>
+      {visibleComment ? (
+        <div className={styles.comment}>
+          <textarea id={styles.comment_text} onChange={changeText}></textarea>
+          <button
+            id={styles.comment_btn}
+            onClick={() => {
+              upLoadComment();
+              clickCommentBtn();
+            }}
+          >
+            댓글달기
+          </button>
+        </div>
+      ) : (
+        <div>
+          <button id={styles.comment_btn} onClick={clickCommentBtn}>
+            comment
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -247,6 +244,28 @@ function Post(props) {
   const [answer, setAnswer] = useState(false);
   const { id } = useParams();
   const [answerList, setAnswerList] = useState([]);
+  //원래 있던 댓글 가져오기
+  function getComment() {
+    fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: null,
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.code === 270) {
+          console.log(result.comments);
+        } else {
+          //console.log(result.code);
+        }
+      });
+  }
+  useEffect(() => {
+    getComment();
+  });
+
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
@@ -267,11 +286,13 @@ function Post(props) {
   useEffect(() => {
     getAnswerList();
   }, []);
+
   const pageAnswerList = answerList.map((item) => (
-    <li>
+    <li key={item.AuthorUID}>
       <Answer item={item} />
     </li>
   ));
+
   return (
     <center>
       <Nav />
