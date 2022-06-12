@@ -221,6 +221,7 @@ function extractBoardName(req, res, next){
  */
 function extractPostNum(req, res, next){
     const resObj = getResponseObject()
+
     try{
         const { postNum } = req.query
 
@@ -470,7 +471,6 @@ async function checkExistingPost(req, res, next){
  async function checkExistingPostForAnswer(req, res, next){
     const resObj = getResponseObject()
     const { postNum } = req.paramBox
-    console.log('postNum', postNum)
     let conn
 
     try{
