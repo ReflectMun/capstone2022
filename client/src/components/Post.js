@@ -110,7 +110,6 @@ function Answer(props) {
   );
   const answerContent = props.item.content;
   const ansWriter = props.item.Nickname;
-
   return (
     <div className={styles.wrap_answer}>
       <div className={styles.wrap_ans_name}>
@@ -286,6 +285,7 @@ function Post(props) {
   useEffect(() => {
     getAnswerList();
   }, []);
+
   const pageAnswerList = answerList.map((item) => (
     <li key={item.AuthorUID}>
       <Answer item={item} />
