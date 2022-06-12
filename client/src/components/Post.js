@@ -102,7 +102,6 @@ function AnswerBtn(props) {
 }
 
 function Answer(props) {
-  const [answerLists, setAnswerList] = useState([]);
   const answer = (
     <div style={{ marginLeft: "10px" }}>
       <p>어떻게 돌아가긴요?</p>
@@ -111,30 +110,7 @@ function Answer(props) {
   );
   const answerContent = props.item.content;
   const ansWriter = props.item.Nickname;
-  function getAnswer() {
-    fetch(`${serverURL}/${answer_api}?postNum=${postNum}`, {
-      method: "get",
-      headers: {
-        //"Content-Type": "application/json",
-        authorization: token,
-      },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        //console.log(result);
-        if (result.code === 212) {
-          console.log(result.answerlist);
-          setAnswerList([result.answerlist]);
-        } else {
-          // console.log(result);
-        }
-      });
-  }
-  useEffect(() => {
-    getAnswer();
-    console.log(answerLists);
-  });
-  // const answerList = answerLists.map(())
+
   return (
     <div className={styles.wrap_answer}>
       <div className={styles.wrap_ans_name}>
@@ -288,7 +264,7 @@ function Post(props) {
   }
   useEffect(() => {
     getComment();
-  });
+  },[]);
 
   //답변글 목록 가져오기
   function getAnswerList() {
