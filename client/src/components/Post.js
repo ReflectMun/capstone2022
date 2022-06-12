@@ -11,8 +11,8 @@ const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment/fetch";
 const answer_api = "api/post/fetch/answer";
-const uploadComment_api="api/comment/put";
-const postNum ="1";
+const uploadComment_api = "api/comment/put";
+const postNum = "1";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
@@ -45,20 +45,20 @@ function Question(props) {
       });
   });
   return (
-      <div className={styles.wrap_question}>
-        <div>
-          <span className={styles.q_icon}>Q</span>
-          <span className={styles.question_title}>{title}</span>
-        </div>
-        <div>
-          <p>{contents}</p>
-          <img
-            src={question_sample}
-            style={{ margin: "5px", width: "80%" }}
-            alt="load error"
-          />
-        </div>
-        <UploadComment />
+    <div className={styles.wrap_question}>
+      <div>
+        <span className={styles.q_icon}>Q</span>
+        <span className={styles.question_title}>{title}</span>
+      </div>
+      <div>
+        <p>{contents}</p>
+        <img
+          src={question_sample}
+          style={{ margin: "5px", width: "80%" }}
+          alt="load error"
+        />
+      </div>
+      <Comment />
     </div>
   );
 }
@@ -103,38 +103,45 @@ function AnswerBtn(props) {
 
 function Answer(props) {
   const [answerLists, setAnswerList] = useState([]);
+  const answer = (
+    <div style={{ marginLeft: "10px" }}>
+      <p>어떻게 돌아가긴요?</p>
+      <p>잘만 돌아가지요오~</p>
+    </div>
+  );
   const answerContent = props.item.content;
   const ansWriter = props.item.Nickname;
-  function getAnswer(){
-    fetch(
-      `${serverURL}/${answer_api}?postNum=${postNum}`, 
-      {
-        method: "get",
-        headers: { 
-          //"Content-Type": "application/json",
-          authorization: token 
-        }
+  function getAnswer() {
+    fetch(`${serverURL}/${answer_api}?postNum=${postNum}`, {
+      method: "get",
+      headers: {
+        //"Content-Type": "application/json",
+        authorization: token,
+      },
     })
-    .then((response)=>response.json())
+      .then((response) => response.json())
       .then((result) => {
         //console.log(result);
-        if (result.code === 212) { 
-          console.log(result.answerlist);    
+        if (result.code === 212) {
+          console.log(result.answerlist);
           setAnswerList([result.answerlist]);
-        }
-        else {
+        } else {
           // console.log(result);
         }
-      })
+      });
   }
-  useEffect(()=>{
+  useEffect(() => {
     getAnswer();
     console.log(answerLists);
-  })
+  });
   // const answerList = answerLists.map(())
   return (
     <div className={styles.wrap_answer}>
-      ㅁㅁㅁㅁ
+      <div className={styles.wrap_ans_name}>
+        <span className={styles.a_icon}>A</span>
+        <span>{ansWriter}</span>
+      </div>
+      {answer}
     </div>
   );
 }
@@ -195,110 +202,94 @@ function AnswerBox(props) {
   );
 }
 
-
-/////////////////////////////////////////////댓글등록////////////////////////////////////////////
-function UploadComment(){
-  const[comment,setComment] =useState("");
-  const [visibleComment,setVisibleComment]=useState(false);
-  const clickCommentBtn =()=>{
-
-    setVisibleComment(!visibleComment);
-  };
-}
 /////////////////////////////////////////////댓글////////////////////////////////////////////
 function Comment() {
   const [comment, setComment] = useState("");
   const [visibleComment, setVisibleComment] = useState(false);
-  
+
   const clickCommentBtn = () => {
     setVisibleComment(!visibleComment);
-  }
+  };
 
   const changeText = (e) => {
     setComment(e.target.value);
-
-  }
-  const upLoadComment=()=>{
-   const reqBody = {
-    postNum: postNum,
-    text: comment,
   };
-      fetch(`${serverURL}/${uploadComment_api}`, {
-        method: "put",
-        body: JSON.stringify(reqBody),
-        headers: { 
-          "content-type": "application/json",
-          authorization: token 
-        },
+  const upLoadComment = () => {
+    const reqBody = {
+      postNum: postNum,
+      text: comment,
+    };
+    fetch(`${serverURL}/${uploadComment_api}`, {
+      method: "put",
+      body: JSON.stringify(reqBody),
+      headers: {
+        "content-type": "application/json",
+        authorization: token,
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.code === 271) {
+          alert(result.message);
+        }
       })
-        .then((response) => response.json())
-        .then((result) => {
-          if (result.code === 271) {
-            alert(result.message);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-      }
-  
-  return(
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  return (
     <div>
       {visibleComment ? (
-      <div className={styles.comment}>
-        <textarea
-          id={styles.comment_text} 
-          onChange={changeText}></textarea>
-        <button 
-          id ={styles.comment_btn}
-          onClick={()=>{
-            upLoadComment();
-            clickCommentBtn();
+        <div className={styles.comment}>
+          <textarea id={styles.comment_text} onChange={changeText}></textarea>
+          <button
+            id={styles.comment_btn}
+            onClick={() => {
+              upLoadComment();
+              clickCommentBtn();
             }}
-      >댓글달기</button>
-      </div>
+          >
+            댓글달기
+          </button>
+        </div>
       ) : (
         <div>
-          <button 
-          id ={styles.comment_btn}
-          onClick={clickCommentBtn}
-          >comment</button>
+          <button id={styles.comment_btn} onClick={clickCommentBtn}>
+            comment
+          </button>
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function Post(props) {
   const [answer, setAnswer] = useState(false);
-
-  //원래 있던 댓글 가져오기
-  function getComment(){
-    fetch(
-      `${serverURL}/${comment_api}?postNum=${postNum}`, 
-      {
-        method: "get",
-        headers: { 
-          "Content-Type": "application/json",
-          authorization: null
-        }
-    })
-    .then((response)=>response.json())
-      .then((result) => {
-        if (result.code === 270) {       
-          console.log(result.comments);  
-        }
-        else {
-          //console.log(result.code);
-        }
-      })
-      }
-      useEffect(()=>{
-        getComment();
-      })
-
   const { id } = useParams();
   const [answerList, setAnswerList] = useState([]);
+  //원래 있던 댓글 가져오기
+  function getComment() {
+    fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: null,
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.code === 270) {
+          console.log(result.comments);
+        } else {
+          //console.log(result.code);
+        }
+      });
+  }
+  useEffect(() => {
+    getComment();
+  });
+
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
@@ -346,6 +337,5 @@ function Post(props) {
     </center>
   );
 }
-
 
 export default Post;
