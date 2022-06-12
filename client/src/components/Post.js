@@ -14,11 +14,11 @@ const answer_api = "api/post/fetch/answer";
 const uploadComment_api="api/comment/put";
 const postNum ="1";
 
-
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
 const ANSWER_API = "api/upload/answer";
 const ANSWER_LIST_API = "api/post/fetch/answer";
+
 function Question(props) {
   const { boardURI, id } = useParams();
   const [title, setTitle] = useState("");
@@ -140,6 +140,7 @@ function Answer(props) {
 }
 //ckeditor 사용
 function AnswerBox(props) {
+  const token1 = getCookie("token");
   const [editor, setEditor] = useState(null);
   const { id } = useParams();
   function onClickAnswer(event) {
@@ -157,11 +158,12 @@ function AnswerBox(props) {
     const data = new FormData();
     data.append("content", file);
     data.append("SourceQuestion", id);
+    console.log(token1);
     return new Promise((resolve, reject) => {
       fetch(`${API_URL}/${ANSWER_API}`, {
         method: "PUT",
         headers: {
-          authorization: token,
+          authorization: token1,
         },
         body: data,
       })
