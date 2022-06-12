@@ -5,7 +5,7 @@ const test = Router()
 
 test.get(
     '/',
-    sendPenguin
+    sendCat
 )
 
 /**
