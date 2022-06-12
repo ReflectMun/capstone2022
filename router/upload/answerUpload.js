@@ -54,8 +54,9 @@ function extractValues(req, res, next){
 /**
  * @param {express.Request} req 
  * @param {express.Response} res 
+ * @param {express.NextFunction} next
  */
-async function answerUploadController(req, res){
+async function answerUploadController(req, res, next){
     const { Account: Author, UID: AuthorUID, Nickname: AuthorNickname, SourceQuestion } = req.paramBox
     const { originalname } = req.file
     const renamedName = originalname + `_${Author}_${new Date().getMilliseconds()}`
