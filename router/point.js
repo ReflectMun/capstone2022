@@ -69,6 +69,7 @@ export async function checkEnoughPoint(req, res, next){
             res.json({ code: 5500, msg: "포인트가 부족합니다"})
         }else{
             const queryString2 = `UPDATE Users SET Point=${point - pointNeedWhenPost} WHERE UID = ${UID}`
+            await conn.beginTransaction()
             await conn.query(queryString2)
             await conn.commit()
 
@@ -105,16 +106,14 @@ export async function checkEnoughPoint(req, res, next){
         await conn.commit()
 
         const point = data[0]['Point']
-        if(pointAdd > point){
-            res.json({ code: 5500, msg: "포인트가 부족합니다"})
-        }else{
-            const queryString2 = `UPDATE Users SET Point=${point + pointAdd} WHERE UID = ${UID}`
-            await conn.query(queryString2)
-            await conn.commit()
 
-            conn.release()
-            next()
-        }
+        const queryString2 = `UPDATE Users SET Point=${point + pointAdd} WHERE UID = ${UID}`
+        await conn.beginTransaction()
+        await conn.query(queryString2)
+        await conn.commit()
+
+        conn.release()
+        next()
     }
     catch(err){
         if(conn){
