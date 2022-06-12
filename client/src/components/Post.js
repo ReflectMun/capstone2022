@@ -102,15 +102,7 @@ function AnswerBtn(props) {
 
 
 function Answer() {
-  // const answer = (
-  //   <div style={{ marginLeft: "10px" }}>
-  //     <p>어떻게 돌아가긴요?</p>
-  //     <p>잘만 돌아가지요오~</p>
-  //   </div>
-  // );
-
-
-  // const ansWriter = "asdf1234";
+  const [answerLists, setAnswerList] = useState([]);
   function getAnswer(){
     fetch(
       `${serverURL}/${answer_api}?postNum=${postNum}`, 
@@ -123,9 +115,10 @@ function Answer() {
     })
     .then((response)=>response.json())
       .then((result) => {
-        console.log(result);
+        //console.log(result);
         if (result.code === 212) { 
-          console.log(result);        
+          console.log(result.answerlist);    
+          setAnswerList([result.answerlist]);
         }
         else {
           // console.log(result);
@@ -134,14 +127,11 @@ function Answer() {
   }
   useEffect(()=>{
     getAnswer();
+    console.log(answerLists);
   })
+  // const answerList = answerLists.map(())
   return (
     <div className={styles.wrap_answer}>
-      {/* <div className={styles.wrap_ans_name}>
-        <span className={styles.a_icon}>A</span>
-        <span>{ansWriter}</span>
-      </div>
-      {answer} */}
       ㅁㅁㅁㅁ
     </div>
   );
@@ -201,6 +191,7 @@ function AnswerBox(props) {
   );
 }
 
+
 /////////////////////////////////////////////댓글등록////////////////////////////////////////////
 function UploadComment(){
   const[comment,setComment] =useState("");
@@ -209,6 +200,16 @@ function UploadComment(){
 
     setVisibleComment(!visibleComment);
   };
+}
+/////////////////////////////////////////////댓글////////////////////////////////////////////
+function Comment() {
+  const [comment, setComment] = useState("");
+  const [visibleComment, setVisibleComment] = useState(false);
+  
+  const clickCommentBtn = () => {
+    setVisibleComment(!visibleComment);
+  }
+
   const changeText = (e) => {
     setComment(e.target.value);
 
@@ -235,7 +236,8 @@ function UploadComment(){
         .catch((error) => {
           console.log(error);
         })
-  }
+      }
+  
   return(
     <div>
       {visibleComment ? (
