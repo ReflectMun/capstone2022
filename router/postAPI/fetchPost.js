@@ -469,7 +469,8 @@ async function checkExistingPost(req, res, next){
  */
  async function checkExistingPostForAnswer(req, res, next){
     const resObj = getResponseObject()
-    const { board, postNum } = req.paramBox
+    const { postNum } = req.paramBox
+    console.log(postNum)
     let conn
 
     try{
