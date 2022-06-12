@@ -105,6 +105,8 @@ export async function checkEnoughPoint(req, res, next){
         const [ data, fields ] = await conn.query(queryString)
         await conn.commit()
 
+        const point = data[0]['Point']
+
         const queryString2 = `UPDATE Users SET Point=${point + pointAdd} WHERE UID = ${UID}`
         await conn.beginTransaction()
         await conn.query(queryString2)
