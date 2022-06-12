@@ -2,7 +2,7 @@ import question_sample from "./q_sample.png";
 import styles from "../css/Post.module.css";
 import Message from "../components/Message";
 import Nav from "../components/Nav";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MyEditor from "./MyEditor";
 import { getCookie } from "./Nav";
 import { useParams } from "react-router-dom";
@@ -25,6 +25,7 @@ let time = hours + minutes + seconds;
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
 const ANSWER_API = "api/upload/answer";
+const ANSWER_LIST_API = "api/post/fetch/answer";
 function Question(props) {
   const { boardURI, id } = useParams();
   const [title, setTitle] = useState("");
@@ -114,8 +115,8 @@ function Answer(props) {
       <p>잘만 돌아가지요오~</p>
     </div>
   );
-
-  const ansWriter = "asdf1234";
+  const answerContent = props.item.content;
+  const ansWriter = props.item.Nickname;
   return (
     <div className={styles.wrap_answer}>
       <div className={styles.wrap_ans_name}>
@@ -241,16 +242,42 @@ function Comment() {
     </div>
   );
 }
+
 function Post(props) {
   const [answer, setAnswer] = useState(false);
-
+  const { id } = useParams();
+  const [answerList, setAnswerList] = useState([]);
+  //답변글 목록 가져오기
+  function getAnswerList() {
+    new Promise((resolve, reject) => {
+      fetch(`${API_URL}/${ANSWER_LIST_API}?postNum=${id}`, {
+        method: "GET",
+        headers: { authorization: token },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code === 212) {
+            console.log("답변글 리스트");
+            console.log(data.answerlist);
+            setAnswerList(data.answerlist);
+          }
+        });
+    });
+  }
+  useEffect(() => {
+    getAnswerList();
+  }, []);
+  const pageAnswerList = answerList.map((item) => (
+    <li>
+      <Answer item={item} />
+    </li>
+  ));
   return (
     <center>
       <Nav />
       <Message />
       <div className={styles.wrap_post}>
         <Question boardURI={props.boardURI} />
-
         <AnswerBtn
           onChangeMode={() => {
             if (answer === false) {
@@ -261,7 +288,7 @@ function Post(props) {
           }}
         />
         {answer ? <AnswerBox setAnswer={setAnswer} /> : null}
-        <Answer />
+        <ul style={{ listStyle: "none", padding: "0px" }}>{pageAnswerList}</ul>
       </div>
     </center>
   );
