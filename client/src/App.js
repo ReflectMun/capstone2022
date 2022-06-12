@@ -20,6 +20,7 @@ function boolCheckCookie(key) {
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [loginId, setLoginId] = useState("");
+  const [boardURI, setBoardURI] = useState("");
   //로그인 아이디로 쿠키 읽어와서, 쿠키 만료안되고 있으면 로그인상태 true
   useEffect(() => {
     if (boolCheckCookie(loginId)) {
@@ -33,7 +34,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home loginValue={isLogin} />} />
+        <Route
+          path="/"
+          element={<Home loginValue={isLogin} setBoardURI={setBoardURI} />}
+        />
         <Route
           path="/login"
           element={
@@ -45,7 +49,7 @@ function App() {
           }
         />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/answer" element={<Post />} />
+        <Route path="/:boardURI/:id" element={<Post />} />
         <Route path="/account" element={<Info />} />
       </Routes>
     </Router>
