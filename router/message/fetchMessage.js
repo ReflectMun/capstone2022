@@ -43,6 +43,7 @@ function extractSender(req, res, next){
  * @param {express.NextFunction} next 
  */
 function extractRecipient(req, res, next){
+    console.log(req.paramBox)
     const { Recipient } = req.paramBox['Account']
     console.log(`Recipient: '${Recipient}'`)
     req.paramBox['Recipient'] = Recipient
