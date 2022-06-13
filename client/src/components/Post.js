@@ -225,55 +225,59 @@ function Comment() {
     getCommentList();
   }, []);
   const upLoadComment = () => {
-    const reqBody = {
-      postNum: id,
-      text: comment,
-    };
-    fetch(`${serverURL}/${uploadComment_api}`, {
-      method: "put",
-      body: JSON.stringify(reqBody),
-      headers: {
-        "content-type": "application/json",
-        authorization: token,
-      },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.code === 271) {
-          alert(result.message);
-        }
+    if(comment === "")
+    alert("등록할 댓글 내용을 입력해주세요.");
+    else{
+      const reqBody = {
+        postNum: id,
+        text: comment,
+      };
+      fetch(`${serverURL}/${uploadComment_api}`, {
+        method: "put",
+        body: JSON.stringify(reqBody),
+        headers: {
+          "content-type": "application/json",
+          authorization: token,
+        },
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.code === 271) {
+            alert(result.message);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
     <div>
       <div>
-        <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
-      </div>
-      <div>
-        {visibleComment ? (
-          <div className={styles.comment}>
-            <textarea id={styles.comment_text} onChange={changeText}></textarea>
-            <button
-              id={styles.comment_btn}
-              onClick={() => {
-                upLoadComment();
-                clickCommentBtn();
-              }}
-            >
-              댓글달기
-            </button>
-          </div>
-        ) : (
+      {visibleComment ? (
+        <div className={styles.comment}>
+          <textarea id={styles.comment_text} onChange={changeText}></textarea>
+          <button
+            id={styles.comment_btn}
+            onClick={() => {
+              upLoadComment();
+              clickCommentBtn();
+            }}
+          >
+            댓글달기
+          </button>
+        </div>
+      ) : (
+        <div>
+          <button id={styles.comment_btn} onClick={clickCommentBtn}>
+            comment
+          </button>
           <div>
-            <button id={styles.comment_btn} onClick={clickCommentBtn}>
-              comment
-            </button>
+            <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
           </div>
-        )}
+        </div>
+      )}
       </div>
     </div>
   );
