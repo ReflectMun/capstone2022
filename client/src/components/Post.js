@@ -269,15 +269,22 @@ function Comment() {
           </button>
         </div>
       ) : (
-        <div>
+        <div className={styles.falseComment}>
           <hr id ={styles.comment_hr}/>
           <button id={styles.comment_btn} onClick={clickCommentBtn}>
-            comment
+            댓글달기
           </button>
         </div>
       )}
       <div className={styles.commentContainer}>
-            <ul style={{ listStyle: "none", padding: "0px", margin:"0px" }}>{pageCommentList}</ul>
+            <ul style={{ listStyle: "none", padding: "0px", margin:"0px" }}>
+              <li className={styles.commentListFormat} >
+                <span id ={styles.FormatAuthor}>작성자</span>
+                <span  id ={styles.FormatContent}>내용</span>
+                <span id={styles.FormatDate}>작성일</span>
+              </li>
+              {pageCommentList}
+              </ul>
           </div>
       </div>
     </div>

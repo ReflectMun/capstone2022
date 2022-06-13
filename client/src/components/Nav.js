@@ -193,6 +193,7 @@ function Nav(props) {
         <ul id={styled.info}>
           <li id={styled.id}>
             <Link
+              id ={navId}
               to={"/account"}
               style={{ textDecoration: "none", color: "inherit" }}
             >

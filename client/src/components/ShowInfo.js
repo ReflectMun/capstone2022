@@ -1,5 +1,5 @@
 import styled from "../css/ShowInfo.module.css";
-import MyContent from "../components/MyContent.js";
+import MyContent from "./MyContent.js";
 import { getCookie } from './Nav';
 import { useState } from "react";
 
@@ -10,15 +10,16 @@ const token = getCookie("token");
 //   <MyContent />
 // }
 
-function ShowInfo() {
+function ShowInfo(props) {
   const [contents,setContent]=useState(null);
   const clickContent =(e) => {
     setContent(e.target.innerText);
   }
+  console.log(props.id);
   return (
     <div className={styled.info_container}>
       <ul className={styled.info_ul}>
-        <li className={styled.info_li}>id</li>
+        <li className={styled.info_li}>{props.id}</li>
         <li 
           className={styled.info_li} 
           onClick={clickContent}
