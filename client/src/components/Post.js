@@ -178,7 +178,7 @@ function AnswerBox(props) {
 }
 
 /////////////////////////////////////////////댓글////////////////////////////////////////////
-function Comment() {
+function Comment(props) {
   const [comment, setComment] = useState("");
   const [visibleComment, setVisibleComment] = useState(false);
 
@@ -189,6 +189,10 @@ function Comment() {
   const changeText = (e) => {
     setComment(e.target.value);
   };
+  // const commentContent = props.item.Comment;
+  // const commentAuthor = props.item.Author;
+  // const commentDate = props.item.Date;
+
   const upLoadComment = () => {
     const reqBody = {
       postNum: postNum,
@@ -215,6 +219,12 @@ function Comment() {
 
   return (
     <div>
+      <div>
+      <div>
+        {/* <span>{commentAuthor}</span> */}
+      </div>
+     {/* {commentContent} */}
+    </div>
       {visibleComment ? (
         <div className={styles.comment}>
           <textarea id={styles.comment_text} onChange={changeText}></textarea>
@@ -241,10 +251,12 @@ function Comment() {
 
 function Post(props) {
   const [answer, setAnswer] = useState(false);
+  const [comment, setComment] = useState(false);
   const { id } = useParams();
   const [answerList, setAnswerList] = useState([]);
+  const [commentList, setCommentList] = useState([]);
   //원래 있던 댓글 가져오기
-  function getComment() {
+  function getCommentList() {
     fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
       method: "get",
       headers: {
@@ -255,16 +267,15 @@ function Post(props) {
       .then((response) => response.json())
       .then((result) => {
         if (result.code === 270) {
-          console.log(result.comments);
-        } else {
-          //console.log(result.code);
+          setCommentList(result.comments);
+          // console.log("a");
+          // console.log(result.comments);
+          // console.log(result.comments[0].Comment);
+          console.log("Comment List:");
+          console.log(commentList);
         }
       });
   }
-  useEffect(() => {
-    getComment();
-  },[]);
-
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
@@ -285,8 +296,13 @@ function Post(props) {
   }
   useEffect(() => {
     getAnswerList();
+    getCommentList();
   }, []);
-
+  const pageCommentList = commentList.map((item) => (
+    <li key ={item.Author}>
+      <Comment item ={item} />
+    </li>
+  ));
   const pageAnswerList = answerList.map((item) => (
     <li key={item.AuthorUID}>
       <Answer item={item} />
