@@ -86,7 +86,6 @@ export async function jwtVerify(req, res, next){
         if(err.message == 'jwt expired'){
             try{
                 const expToken = verify(token, process.env.JWT_PUBLIC, { algorithms: 'RS512', ignoreExpiration: true }) 
-                console.log(expToken)
 
                 if(await checkVaildRefreshToken(expToken['UID'])){
                     const newAccessToken = issueNewAccessToken(expToken['UID'], expToken['Account'], expToken['Nickname'])
