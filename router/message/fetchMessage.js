@@ -44,6 +44,7 @@ function extractSender(req, res, next){
  */
 function extractRecipient(req, res, next){
     const { Recipient } = req.paramBox['Account']
+    console.log(`Recipient: '${Recipient}'`)
     req.paramBox['Recipient'] = Recipient
     next()
 }
