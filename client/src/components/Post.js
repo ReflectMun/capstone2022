@@ -285,7 +285,7 @@ function Post(props) {
   const [answerList, setAnswerList] = useState([]);
   //원래 있던 댓글 가져오기
   function getComment() {
-    fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
+    fetch(`${serverURL}/${comment_api}?postNum=${id}`, {
       method: "get",
       headers: {
         "Content-Type": "application/json",
