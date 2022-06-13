@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import MyEditor from "./MyEditor";
 import { getCookie } from "./Nav";
 import { useParams } from "react-router-dom";
+import parse from "html-react-parser";
 
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
@@ -22,42 +23,41 @@ const ANSWER_LIST_API = "api/post/fetch/answer";
 function Question(props) {
   const { boardURI, id } = useParams();
   const [title, setTitle] = useState("");
-  let contents = "이 부분은 어떻게 돌아가는 것인지요?";
-  let content = null;
-  new Promise((resolve, reject) => {
-    fetch(`${API_URL}/${CONTENT_API}?boardURI=${boardURI}&postNum=${id}`, {
-      method: "GET",
-      headers: { authorization: token },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if ((data.code = 210)) {
-          console.log(data);
-          setTitle(data.Title);
-          //내용 출력이랑 작성자 닉네임 출력 필요
-          console.log("test");
-          //console.log(...data.content.data);
-          const decoder = new TextDecoder("utf-8");
-          const buf = new Uint8Array(data.content.data);
-          const string = decoder.decode(buf);
-          console.log(string);
-        }
-      });
-  });
+  const [contents, setContents] = useState(null);
+  function getContents() {
+    new Promise((resolve, reject) => {
+      fetch(`${API_URL}/${CONTENT_API}?boardURI=${boardURI}&postNum=${id}`, {
+        method: "GET",
+        headers: { authorization: token },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if ((data.code = 210)) {
+            console.log(data);
+            setTitle(data.Title);
+            //내용 출력이랑 작성자 닉네임 출력 필요
+            console.log("test");
+            //console.log(...data.content.data);
+            const decoder = new TextDecoder("utf-8");
+            const buf = new Uint8Array(data.content.data);
+            const contentString = decoder.decode(buf);
+            console.log(contentString);
+            const contentHtml = parse(contentString);
+            setContents(contentHtml);
+          }
+        });
+    });
+  }
+  useEffect(() => {
+    getContents();
+  }, []);
   return (
     <div className={styles.wrap_question}>
       <div>
         <span className={styles.q_icon}>Q</span>
         <span className={styles.question_title}>{title}</span>
       </div>
-      <div>
-        <p>{contents}</p>
-        <img
-          src={question_sample}
-          style={{ margin: "5px", width: "80%" }}
-          alt="load error"
-        />
-      </div>
+      <div>{contents}</div>
       <Comment />
     </div>
   );
