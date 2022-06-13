@@ -200,14 +200,14 @@ function extractBoardName(req, res, next){
         if(err instanceof BoardURIExtractFailed){
             resObj.code = 9972
             resObj.message = '게시판 이름이 손상되거나 누락되었습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -239,14 +239,14 @@ function extractPostNum(req, res, next){
         if(err instanceof PostNumExtractFailed){
             resObj.code = 9653
             resObj.message = '게시글 번호가 손상되거나 누락되었습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -276,14 +276,14 @@ function extractPageNum(req, res, next){
         if(err instanceof PageNumExtractFailed){
             resObj.code = 9973
             resObj.message = '페이지 번호가 없거나 손상되었습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -313,14 +313,14 @@ function extractPageNum(req, res, next){
         if(err instanceof PostTypeExtractFailed){
             resObj.code = 9974
             resObj.message = '게시글 타입이 손상되거나 없습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -368,21 +368,21 @@ async function checkExistingBoard(req, res, next){
         if(err instanceof BoardNotExist){
             resObj.code = 3304
             resObj.message = '존재하지 않는 게시판 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof UnknownDuplicateOnDataBase){
             resObj.code = 3306
             resObj.message = '알 수 없는 오류가 DB에서 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -434,28 +434,28 @@ async function checkExistingPost(req, res, next){
         if(err instanceof PostNotExist){
             resObj.code = 3305
             resObj.message = '존재하지 않는 게시물 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof DeletedPost){
             resObj.code = 3306
             resObj.message = '삭제된 게시물 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof UnknownDuplicateOnDataBase){
             resObj.code = 3307
             resObj.message = '원인 미상의 오류가 DB에서 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '원인을 알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -507,28 +507,28 @@ async function checkExistingPost(req, res, next){
         if(err instanceof PostNotExist){
             resObj.code = 3305
             resObj.message = '존재하지 않는 게시물 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof DeletedPost){
             resObj.code = 3306
             resObj.message = '삭제된 게시물 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof UnknownDuplicateOnDataBase){
             resObj.code = 3307
             resObj.message = '원인 미상의 오류가 DB에서 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '원인을 알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -579,7 +579,7 @@ async function ContentViewerController(req, res){
             Time: data[0]['Time'],
             Type: data[0]['Type'],
             content: contentText,
-            newToken: req.tokenBox['totken']
+            newToken: req.tokenBox?.['token'] ?? null
         })
         conn.release()
         normalLog(req, controllerName, `${req.paramBox['Account']}에게 게시글 ${req.paramBox['postNum']} 전송 완료`)
@@ -593,28 +593,28 @@ async function ContentViewerController(req, res){
         if(err instanceof PostFileNotExist){
             resObj.code = 4470
             resObj.message = '손상되어 불러올 수 없는 게시물 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof EmptyContentFetched){
             resObj.code = 4473
             resObj.message = '볼 수 없는 게시글 입니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else if(err instanceof ErrorOnS3Fetching){
             resObj.code = 4507
             resObj.message = '컨텐츠를 꺼내 오는 도중 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
         else{
             resObj.code = 9999
             resObj.message = '알 수 없는 오류가 발생하였습니다'
-            if(req.tokenBox['token']){
+            if(req.tokenBox?.['token']){
                 resObj.newToken = req.tokenBox['token']
             }
         }
@@ -632,7 +632,7 @@ async function LoadPostListController(req, res){
     try{
         const startNum = 15 * pageNum
         const postList = await fetchPostList(board, startNum, type)
-        res.json({ code: 210, postlist: postList, newToken: req.tokenBox['token'] })
+        res.json({ code: 210, postlist: postList, newToken: req.tokenBox?.['token'] ?? null })
         normalLog(req, controllerName, `에게 게시판 ${board}의 게시글 목록 전송완료`)
     }
     catch(err){
@@ -649,7 +649,7 @@ async function FetchAnswerListController(req, res){
     const { postNum } = req.paramBox
     try{
         const list = await fetchAnswerList(postNum)
-        res.json({ code: 212, answerlist: list, newToken: req.tokenBox['token'] })
+        res.json({ code: 212, answerlist: list, newToken: req.tokenBox?.['token'] ?? null })
         normalLog(req, controllerName, `에게 질문글 ${postNum}의 답변글 목록 전송완료`)
     }
     catch(err){
