@@ -34,13 +34,7 @@ function Question(props) {
         if ((data.code = 210)) {
           console.log(data);
           setTitle(data.Title);
-          // const fs = require("fs");
-          // const myData = fs.readFileSync(data.content, {
-          //   encoding: "utf8",
-          //   flag: "r",
-          // });
-          //내용 출력이랑 작성자 닉네임 출력 필요
-          //const t = data.content.toString("utf-8");
+         
         }
       });
   });
