@@ -62,8 +62,6 @@ function extractPageNum(req, res, next){
             throw new Error()
         }
 
-        console.log(`pageNum: '${pageNum}'`)
-
         req.paramBox['pageNum'] = parseInt(pageNum, 10)
 
         next()
