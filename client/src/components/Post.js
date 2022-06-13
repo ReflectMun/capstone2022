@@ -102,21 +102,24 @@ function AnswerBtn(props) {
 }
 
 function Answer(props) {
-  const answer = (
-    <div style={{ marginLeft: "10px" }}>
-      <p>어떻게 돌아가긴요?</p>
-      <p>잘만 돌아가지요오~</p>
-    </div>
-  );
+  const [answer, setAnswer] = useState(null);
   const answerContent = props.item.content;
   const ansWriter = props.item.Nickname;
+  const decoder = new TextDecoder("utf-8");
+  const buf = new Uint8Array(props.item.content.data);
+  const answerString = decoder.decode(buf);
+  console.log(answerString);
+  const answerHtml = parse(answerString);
+  useEffect(() => {
+    setAnswer(answerHtml);
+  }, []);
   return (
     <div className={styles.wrap_answer}>
       <div className={styles.wrap_ans_name}>
         <span className={styles.a_icon}>A</span>
         <span>{ansWriter}</span>
       </div>
-      {answer}
+      {answerHtml}
     </div>
   );
 }
@@ -263,8 +266,7 @@ function Post(props) {
   }
   useEffect(() => {
     getComment();
-  },[]);
-
+  }, []);
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
