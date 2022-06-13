@@ -10,7 +10,7 @@ const NoFileErrorMessage = 'NoFile'
 
 fetchPost.get(
     '/fetch/content',
-    // jwtVerify,
+    jwtVerify,
     extractBoardName,
     extractPostNum,
     checkExistingBoard,
@@ -183,9 +183,6 @@ function proprocess(req, res, next){
  */
 function extractBoardName(req, res, next){
     const resObj = getResponseObject()
-
-    req.paramBox = {}
-    req.tokenBox = {}
 
     try{
         const { boardURI } = req.query
