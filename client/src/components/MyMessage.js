@@ -7,8 +7,9 @@ const Receive = "api/message/fetch/received";
 const Send = "api/message/fetch/sended";
 const token = getCookie("token");
 
-function MyContent(props) {
- //const content = props.content;
+function MyMessage(props) {
+  
+ const content = props.content;
  let p = 0;
  const pageNum= p.toString();
 
@@ -129,4 +130,4 @@ useEffect(() => {
       </div>
     );
   }
-export default MyContent;
+export default MyMessage;
