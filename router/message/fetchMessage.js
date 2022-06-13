@@ -67,7 +67,8 @@ function extractPageNum(req, res, next){
         next()
     }
     catch(err){
-
+        errorLog(req, controllerName, err.message)
+        res.json({ code: 7700, message: '페이지 번호가 없습니다', newToken: req.tokenBox?.['token'] ?? null})
     }
 }
 ////////////////////////////////////////////
@@ -100,7 +101,7 @@ async function fetchSendedMessageController(req, res){
             res.json({
                 code: 215,
                 messages: '보낸 메시지가 존재하지 않습니다',
-                newToken: req.tokenBox['token']
+                newToken: req.tokenBox?.['token'] ?? null
             })
             normalLog(req, controllerName, '보낸 메시지가 없음')
         }
@@ -108,14 +109,14 @@ async function fetchSendedMessageController(req, res){
             res.json({
                 code: 214,
                 list: messages,
-                newToken: req.tokenBox['token']
+                newToken: req.tokenBox?.['token'] ?? null
             })
             normalLog(req, controllerName, '보낸 메시지 전송 완료')
         }
     }
     catch(err){
         errorLog(req, controllerName, err.messages)
-        res.json({ code: 7701, message: '보낸 메시지 목록을 불러오는 중 오류가 발생하였습니다' })
+        res.json({ code: 7701, message: '보낸 메시지 목록을 불러오는 중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     finally{
         if(conn) { conn.release() }
@@ -148,7 +149,7 @@ async function fetchReceivedMessageController(req, res){
             res.json({
                 code: 217,
                 messages: '받은 메시지가 존재하지 않습니다',
-                newToken: req.tokenBox['token']
+                newToken: req.tokenBox?.['token'] ?? null
             })
             normalLog(req, controllerName, '받은 메시지가 없음')
         }
@@ -156,14 +157,14 @@ async function fetchReceivedMessageController(req, res){
             res.json({
                 code: 216,
                 list: messages,
-                newToken: req.tokenBox['token']
+                newToken: req.tokenBox?.['token'] ?? null
             })
             normalLog(req, controllerName, '받은 메시지 전송 완료')
         }
     }
     catch(err){
         errorLog(req, controllerName, err.messages)
-        res.json({ code: 7701, message: '보낸 메시지 목록을 불러오는 중 오류가 발생하였습니다' })
+        res.json({ code: 7701, message: '보낸 메시지 목록을 불러오는 중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     finally{
         if(conn) { conn.release() }

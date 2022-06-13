@@ -33,7 +33,7 @@ async function FetchUserPointController(req, res){
         const point = data[0]['Point']
 
         conn.release()
-        res.json({ code: 240, point: point })
+        res.json({ code: 240, point: point, newToken: req.tokenBox?.['token'] ?? null })
         normalLog(req, controllerName, `유저 UID: ${UID} 에게 잔여 포인트량을 전송함`)
     }
     catch(err){
@@ -42,7 +42,7 @@ async function FetchUserPointController(req, res){
             conn.release()
         }
         errorLog(req, controllerName, err.message += '=1')
-        res.json({ code: 5050, message: '잔여 포인트량을 불러오는 도중 오류가 발생하였습니다' })
+        res.json({ code: 5050, message: '잔여 포인트량을 불러오는 도중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
 }
 
@@ -83,7 +83,7 @@ export async function checkEnoughPoint(req, res, next){
             conn.release()
         }
         errorLog(req, controllerName, err.message += '=2')
-        res.json({ code: 5051, message: '포인트량을 처리하는 도중 오류가 발생하였습니다' })
+        res.json({ code: 5051, message: '포인트량을 처리하는 도중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
 }
 
@@ -121,7 +121,7 @@ export async function checkEnoughPoint(req, res, next){
             conn.release()
         }
         errorLog(req, controllerName, err.message += '=3')
-        res.json({ code: 5051, message: '포인트량을 처리하는 도중 오류가 발생하였습니다' })
+        res.json({ code: 5051, message: '포인트량을 처리하는 도중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
 }
 /////////////////////////////////////////////////////
