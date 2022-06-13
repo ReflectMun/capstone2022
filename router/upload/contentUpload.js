@@ -65,19 +65,19 @@ function extractValues(req, res, next){
 function errorHandle(err, req, res, next){
     if(err instanceof InvalidValueType){
         errorLog(req, controllerName, err.message += '-01')
-        res.json({ code: 8810, message: '게시판 이름 또는 글 제목이 손상되었습니다', newToken: req.tokenBox['token'] })
+        res.json({ code: 8810, message: '게시판 이름 또는 글 제목이 손상되었습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     else if(err instanceof FileExtractFailed){
         errorLog(req, controllerName, err.message += '-02')
-        res.json({ code: 8812, message: '작성하신 본문이 전송되지 않았거나 손상되었습니다', newToken: req.tokenBox['token'] })
+        res.json({ code: 8812, message: '작성하신 본문이 전송되지 않았거나 손상되었습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     else if(err.message == 'Unexpected field'){
         errorLog(req, controllerName, err.message += '-03')
-        res.json({ code: 8813, message: '잘못된 형식의 데이터가 도착하였습니다', newToken: req.tokenBox['token'] })
+        res.json({ code: 8813, message: '잘못된 형식의 데이터가 도착하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     else{
         errorLog(req, controllerName, err.message += '-04')
-        res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
+        res.json({ code: 9999, message: '알 수 없는 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
 }
 ////////////////////////////////////////////////////////////////
@@ -119,13 +119,13 @@ async function putContentController(req, res, next){
         }
 
         errorLog(req, controllerName, err.message += '=1')
-        res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다', newToken: req.tokenBox['token'] })
+        res.json({ code: 5792, message: '글을 저장하는 도중 오류가 발생하였습니다', newToken: req.tokenBox?.['token'] ?? null })
     } 
 }
 
 function okResponserController(req, res){
     const { Nickname: AuthorNickname, Title } = req.paramBox
-    res.json({ code: 230, message: '본문 작성 완료', newToken: req.tokenBox['token'] })
+    res.json({ code: 230, message: '본문 작성 완료', newToken: req.tokenBox?.['token'] ?? null })
     normalLog(req, controllerName, `사용자 ${AuthorNickname}이(가) 게시글 ${Title}을 작성함`)
 }
 ////////////////////////////////////////////////////////////////

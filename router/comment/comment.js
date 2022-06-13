@@ -64,10 +64,10 @@ function extractValue(req, res, next){
     catch(err){
         errorLog(req, controllerName, err.message += '-2')
         if(err instanceof EmptyPostNum){
-            res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다' })
+            res.json({ code: 4302, message: '게시글 정보가 전송되지 않았습니다', newToken: req.tokenBox?.['token'] ?? null })
         }
         else if(err instanceof EmptyComment){
-            res.json({ code: 4303, message: '빈 댓글은 등록할 수 없습니다' })
+            res.json({ code: 4303, message: '빈 댓글은 등록할 수 없습니다', newToken: req.tokenBox?.['token'] ?? null })
         }
     }
 }
@@ -97,7 +97,7 @@ async function getComment(req, res) {
     }
     catch(err){
         if(conn) { await conn.commit() }
-        res.json({ code: 9102, message: '댓글을 불러오는 도중 오류가 발생했습니다' })
+        res.json({ code: 9102, message: '댓글을 불러오는 도중 오류가 발생했습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     finally{
         if(conn) { conn.release() }
@@ -120,12 +120,12 @@ async function postComment(req, res) {
         await conn.query(queryString)
         await conn.commit()
 
-        res.json({ code: 271, message: '댓글작성 완료' })
+        res.json({ code: 271, message: '댓글작성 완료', newToken: req.tokenBox?.['token'] ?? null })
         normalLog(req, controllerName, `${Author}가 ${sourcePost}게시물에 댓글 작성 완료`)
     }
     catch(err){
         if(conn) { await conn.rollback() }
-        res.json({ code: 9102, message: '댓글을 작성하는 도중 오류가 발생했습니다' })
+        res.json({ code: 9102, message: '댓글을 작성하는 도중 오류가 발생했습니다', newToken: req.tokenBox?.['token'] ?? null })
     }
     finally{
         if(conn) { conn.release() }
