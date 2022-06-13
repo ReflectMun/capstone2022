@@ -13,7 +13,6 @@ const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment/fetch";
 const answer_api = "api/post/fetch/answer";
 const uploadComment_api = "api/comment/put";
-const postNum = "1";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
@@ -182,9 +181,10 @@ function AnswerBox(props) {
 
 /////////////////////////////////////////////댓글////////////////////////////////////////////
 function Comment() {
+  const { id } = useParams();
   const [comment, setComment] = useState("");
   const [visibleComment, setVisibleComment] = useState(false);
-
+  const [commentList, setCommentList] = useState([]);
   const clickCommentBtn = () => {
     setVisibleComment(!visibleComment);
   };
@@ -192,9 +192,41 @@ function Comment() {
   const changeText = (e) => {
     setComment(e.target.value);
   };
+
+  function getCommentList() {
+    fetch(`${serverURL}/${comment_api}?postNum=${id}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: token,
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.code === 270) {
+          setCommentList(result.comments);
+          console.log(result.comments);
+          console.log("Comment List:");
+          console.log(commentList);
+        }
+      });
+  }
+  const pageCommentList = commentList.map((items) => (
+    <li key={items.Author} className={styles.commentList}>
+      <p>{items.Author}</p>
+      <p>{items.Comment}</p>
+      <div id={styles.commentDate}>
+        <p>{items.Date.slice(0, 10)}</p>
+        <p>{items.Time.slice(0, 8)}</p>
+      </div>
+    </li>
+  ));
+  useEffect(() => {
+    getCommentList();
+  }, []);
   const upLoadComment = () => {
     const reqBody = {
-      postNum: postNum,
+      postNum: id,
       text: comment,
     };
     fetch(`${serverURL}/${uploadComment_api}`, {
@@ -218,26 +250,31 @@ function Comment() {
 
   return (
     <div>
-      {visibleComment ? (
-        <div className={styles.comment}>
-          <textarea id={styles.comment_text} onChange={changeText}></textarea>
-          <button
-            id={styles.comment_btn}
-            onClick={() => {
-              upLoadComment();
-              clickCommentBtn();
-            }}
-          >
-            댓글달기
-          </button>
-        </div>
-      ) : (
-        <div>
-          <button id={styles.comment_btn} onClick={clickCommentBtn}>
-            comment
-          </button>
-        </div>
-      )}
+      <div>
+        <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
+      </div>
+      <div>
+        {visibleComment ? (
+          <div className={styles.comment}>
+            <textarea id={styles.comment_text} onChange={changeText}></textarea>
+            <button
+              id={styles.comment_btn}
+              onClick={() => {
+                upLoadComment();
+                clickCommentBtn();
+              }}
+            >
+              댓글달기
+            </button>
+          </div>
+        ) : (
+          <div>
+            <button id={styles.comment_btn} onClick={clickCommentBtn}>
+              comment
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -267,6 +304,7 @@ function Post(props) {
   useEffect(() => {
     getComment();
   }, []);
+
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
@@ -281,6 +319,7 @@ function Post(props) {
             console.log("답변글 리스트");
             console.log(data.answerlist);
             setAnswerList(data.answerlist);
+            console.log(answerList);
           }
         });
     });
