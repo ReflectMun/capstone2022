@@ -213,8 +213,8 @@ function Comment() {
   }
   const pageCommentList = commentList.map((items) => (
     <li key={items.Author} className={styles.commentList}>
-      <p>{items.Author}</p>
-      <p>{items.Comment}</p>
+      <p id ={styles.commentAuthor}>{items.Author}</p>
+      <p id ={styles.commentContent}>{items.Comment}</p>
       <div id={styles.commentDate}>
         <p>{items.Date.slice(0, 10)}</p>
         <p>{items.Time.slice(0, 8)}</p>
@@ -270,14 +270,15 @@ function Comment() {
         </div>
       ) : (
         <div>
+          <hr id ={styles.comment_hr}/>
           <button id={styles.comment_btn} onClick={clickCommentBtn}>
             comment
           </button>
-          <div>
-            <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
-          </div>
         </div>
       )}
+      <div className={styles.commentContainer}>
+            <ul style={{ listStyle: "none", padding: "0px", margin:"0px" }}>{pageCommentList}</ul>
+          </div>
       </div>
     </div>
   );
@@ -289,7 +290,7 @@ function Post(props) {
   const [answerList, setAnswerList] = useState([]);
   //원래 있던 댓글 가져오기
   function getComment() {
-    fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
+    fetch(`${serverURL}/${comment_api}?postNum=${id}`, {
       method: "get",
       headers: {
         "Content-Type": "application/json",

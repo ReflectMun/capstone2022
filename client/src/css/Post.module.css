@@ -73,8 +73,33 @@
 .commentList{
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  height: 18px;
+  padding: 1px;
+  font-size: 0.8em;
+}
+.commentList p{
+  margin: 0 0;
+  padding-left: 10px;
 }
 #commentDate{
   display: flex;
+ flex-grow : 2;
+ justify-content: flex-end;
 }
+#comment_hr{
+ border: solid 0.1px rgb(196, 191, 191);
+}
+.commentContainer{
+  margin: 0 0;
+}
+#commentAuthor{
+ flex-grow : 1;
+}
+#commentContent{
+  align-self: flex-start;
+ flex-grow : 3;
+
+} 
+
 
