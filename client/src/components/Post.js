@@ -34,13 +34,13 @@ function Question(props) {
         if ((data.code = 210)) {
           console.log(data);
           setTitle(data.Title);
-          // const fs = require("fs");
-          // const myData = fs.readFileSync(data.content, {
-          //   encoding: "utf8",
-          //   flag: "r",
-          // });
           //내용 출력이랑 작성자 닉네임 출력 필요
-          //const t = data.content.toString("utf-8");
+          console.log("test");
+          //console.log(...data.content.data);
+          const decoder = new TextDecoder("utf-8");
+          const buf = new Uint8Array(data.content.data);
+          const string = decoder.decode(buf);
+          console.log(string);
         }
       });
   });
@@ -276,6 +276,7 @@ function Post(props) {
         .then((res) => res.json())
         .then((data) => {
           if (data.code === 212) {
+            console.log(data);
             console.log("답변글 리스트");
             console.log(data.answerlist);
             setAnswerList(data.answerlist);
@@ -292,7 +293,6 @@ function Post(props) {
       <Answer item={item} />
     </li>
   ));
-
   return (
     <center>
       <Nav />

@@ -109,14 +109,17 @@ function Writer(props) {
       return;
     }
     const blobFile = new Blob([editor], {
-      type: "text/html",
+      type: "text/html;charset=utf-16;",
     });
-    const file = new File([blobFile], "newPost.html");
+    const file = new File([blobFile], "newPost.html", {
+      type: "text/html;charset=utf-16;",
+    });
     const data = new FormData();
     data.append("content", file);
     data.append("BoardURI", BoardURI);
     data.append("Title", title);
     data.append("Type", type);
+    console.log(file);
     return new Promise((resolve, reject) => {
       fetch(`${API_URL}/${UPLOAD_API}`, {
         method: "PUT",
