@@ -13,7 +13,6 @@ const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment/fetch";
 const answer_api = "api/post/fetch/answer";
 const uploadComment_api = "api/comment/put";
-const postNum = "1";
 
 const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
@@ -102,6 +101,7 @@ function AnswerBtn(props) {
 }
 
 function Answer(props) {
+  console.log("answer" + props.item);
   const answer = (
     <div style={{ marginLeft: "10px" }}>
       <p>어떻게 돌아가긴요?</p>
@@ -178,10 +178,11 @@ function AnswerBox(props) {
 }
 
 /////////////////////////////////////////////댓글////////////////////////////////////////////
-function Comment(props) {
+function Comment() {
+  const { id } = useParams();
   const [comment, setComment] = useState("");
   const [visibleComment, setVisibleComment] = useState(false);
-
+  const [commentList, setCommentList] = useState([]);
   const clickCommentBtn = () => {
     setVisibleComment(!visibleComment);
   };
@@ -189,13 +190,42 @@ function Comment(props) {
   const changeText = (e) => {
     setComment(e.target.value);
   };
-  // const commentContent = props.item.Comment;
-  // const commentAuthor = props.item.Author;
-  // const commentDate = props.item.Date;
 
+  function getCommentList() {
+    fetch(`${serverURL}/${comment_api}?postNum=${id}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: token,
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.code === 270) {
+          setCommentList(result.comments);
+          console.log(result.comments);
+          console.log("Comment List:");
+          console.log(commentList);
+        }
+      });
+  }
+  const pageCommentList = commentList.map((items) => (
+  
+    <li key ={items.Author} className={styles.commentList}>
+      <p>{items.Author}</p>
+      <p>{items.Comment}</p>
+      <div id={styles.commentDate}>
+      <p>{items.Date.slice(0, 10)}</p>
+      <p>{items.Time.slice(0, 8)}</p>
+      </div>
+    </li>
+  ))
+  useEffect(() => {
+    getCommentList();
+  }, []);
   const upLoadComment = () => {
     const reqBody = {
-      postNum: postNum,
+      postNum: id,
       text: comment,
     };
     fetch(`${serverURL}/${uploadComment_api}`, {
@@ -220,11 +250,9 @@ function Comment(props) {
   return (
     <div>
       <div>
-      <div>
-        {/* <span>{commentAuthor}</span> */}
+      <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
       </div>
-     {/* {commentContent} */}
-    </div>
+      <div>
       {visibleComment ? (
         <div className={styles.comment}>
           <textarea id={styles.comment_text} onChange={changeText}></textarea>
@@ -245,37 +273,16 @@ function Comment(props) {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }
 
 function Post(props) {
   const [answer, setAnswer] = useState(false);
-  const [comment, setComment] = useState(false);
   const { id } = useParams();
   const [answerList, setAnswerList] = useState([]);
-  const [commentList, setCommentList] = useState([]);
-  //원래 있던 댓글 가져오기
-  function getCommentList() {
-    fetch(`${serverURL}/${comment_api}?postNum=${postNum}`, {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: null,
-      },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.code === 270) {
-          setCommentList(result.comments);
-          // console.log("a");
-          // console.log(result.comments);
-          // console.log(result.comments[0].Comment);
-          console.log("Comment List:");
-          console.log(commentList);
-        }
-      });
-  }
+
   //답변글 목록 가져오기
   function getAnswerList() {
     new Promise((resolve, reject) => {
@@ -290,19 +297,15 @@ function Post(props) {
             console.log("답변글 리스트");
             console.log(data.answerlist);
             setAnswerList(data.answerlist);
+            console.log(answerList);
           }
         });
     });
   }
   useEffect(() => {
     getAnswerList();
-    getCommentList();
   }, []);
-  const pageCommentList = commentList.map((item) => (
-    <li key ={item.Author}>
-      <Comment item ={item} />
-    </li>
-  ));
+
   const pageAnswerList = answerList.map((item) => (
     <li key={item.AuthorUID}>
       <Answer item={item} />

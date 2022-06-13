@@ -70,4 +70,11 @@
   height: 30px;
   cursor: pointer;
 }
+.commentList{
+  display: flex;
+  justify-content: space-between;
+}
+#commentDate{
+  display: flex;
+}
 
