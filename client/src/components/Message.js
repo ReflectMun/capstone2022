@@ -62,7 +62,7 @@ function Message() {
     }; 
     // const sendMessage = () => {};
     return (
-      <div className={styled.messagePopup}>
+      <div className={styled.messagePopup} style={{cursor:"pointer"}} >
         <button id ={styled.toggleBtn}onClick={togglePopup} />
         {visible ? (
             <div id ={styled.popup} visible={visible}>
@@ -89,6 +89,7 @@ function Message() {
                     />
                 </div>
                     <button 
+                    style={{cursor:"pointer"}} 
                         id ={styled.sendBtn}
                         onClick={()=>{
                             togglePopup()

@@ -26,7 +26,7 @@
     border-bottom : 2px solid rgb(131, 128, 128);
     text-align: left;
 }
-/* #info_bottom{
-    border-bottom : 2px solid rgb(43, 42, 42);
-    
-} */
+.messageArea{
+    width: fit-content;
+}
+

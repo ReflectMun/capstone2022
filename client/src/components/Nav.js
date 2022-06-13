@@ -187,7 +187,9 @@ function Nav(props) {
         </ul>
       </div>
       <div className={styled.logoContainer}>
-        <img src={logoImage} id={styled.logo_image} alt="savior" />
+       <Link to ={"/"}>
+          <img src={logoImage} id={styled.logo_image} alt="savior" />
+        </Link>
       </div>
       <div className={styled.info}>
         <ul id={styled.info}>
