@@ -54,9 +54,11 @@
 .comment{
   display: flex;
   align-items: flex-end;
+  margin-bottom: 2px;
 }
+
 #comment_text{
-  margin: 5px;
+  margin-right: 5px;
   height: 22px;
   flex-basis : 85%;
 }
@@ -70,11 +72,67 @@
   height: 30px;
   cursor: pointer;
 }
+/* 불러온 댓글 내용 */
 .commentList{
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  height: 18px;
+  padding: 1px;
+  font-size: 0.8em;
+  border-bottom: solid 0.1px rgb(196, 191, 191);
+}
+.commentList p{
+  margin: 0 0;
+  padding-left: 10px;
 }
 #commentDate{
   display: flex;
+ flex-grow : 2;
+ justify-content: flex-end;
 }
+#comment_hr{
+ border: solid 0.1px rgb(196, 191, 191);
+}
+.commentContainer{
+  margin: 0 0;
+}
+#commentAuthor{
+ flex-grow : 1;
+}
+#commentContent{
+  align-self: flex-start;
+ flex-grow : 3;
+
+} 
+/* 댓글 포맷? */
+.commentListFormat{
+  display: flex;
+  justify-content: space-between;
+  height: 18px;
+  padding: 1px;
+  font-size: 0.9em;
+  padding-bottom: 2px;
+  margin: 0 0;
+  border-bottom: solid 0.4px rgb(196, 191, 191);
+}
+.commentListFormat span{
+  padding-right: 2px;
+  padding-left: -10px;
+}
+#FormatDate{
+  display: flex;
+  flex-grow : 2;
+  margin-left: 100px;
+  justify-content: center;
+}
+ #FormatContent{
+  flex-grow: 3;
+  justify-self: flex-start;
+ } 
+#FormatAuthor{
+  flex-grow: 1;
+  padding-left: 10px;
+ }
+
 

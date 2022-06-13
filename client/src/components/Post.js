@@ -213,8 +213,8 @@ function Comment() {
   }
   const pageCommentList = commentList.map((items) => (
     <li key={items.Author} className={styles.commentList}>
-      <p>{items.Author}</p>
-      <p>{items.Comment}</p>
+      <p id ={styles.commentAuthor}>{items.Author}</p>
+      <p id ={styles.commentContent}>{items.Comment}</p>
       <div id={styles.commentDate}>
         <p>{items.Date.slice(0, 10)}</p>
         <p>{items.Time.slice(0, 8)}</p>
@@ -225,55 +225,67 @@ function Comment() {
     getCommentList();
   }, []);
   const upLoadComment = () => {
-    const reqBody = {
-      postNum: id,
-      text: comment,
-    };
-    fetch(`${serverURL}/${uploadComment_api}`, {
-      method: "put",
-      body: JSON.stringify(reqBody),
-      headers: {
-        "content-type": "application/json",
-        authorization: token,
-      },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.code === 271) {
-          alert(result.message);
-        }
+    if(comment === "")
+    alert("등록할 댓글 내용을 입력해주세요.");
+    else{
+      const reqBody = {
+        postNum: id,
+        text: comment,
+      };
+      fetch(`${serverURL}/${uploadComment_api}`, {
+        method: "put",
+        body: JSON.stringify(reqBody),
+        headers: {
+          "content-type": "application/json",
+          authorization: token,
+        },
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.code === 271) {
+            alert(result.message);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
     <div>
       <div>
-        <ul style={{ listStyle: "none", padding: "0px" }}>{pageCommentList}</ul>
-      </div>
-      <div>
-        {visibleComment ? (
-          <div className={styles.comment}>
-            <textarea id={styles.comment_text} onChange={changeText}></textarea>
-            <button
-              id={styles.comment_btn}
-              onClick={() => {
-                upLoadComment();
-                clickCommentBtn();
-              }}
-            >
-              댓글달기
-            </button>
+      {visibleComment ? (
+        <div className={styles.comment}>
+          <textarea id={styles.comment_text} onChange={changeText}></textarea>
+          <button
+            id={styles.comment_btn}
+            onClick={() => {
+              upLoadComment();
+              clickCommentBtn();
+            }}
+          >
+            댓글달기
+          </button>
+        </div>
+      ) : (
+        <div className={styles.falseComment}>
+          <hr id ={styles.comment_hr}/>
+          <button id={styles.comment_btn} onClick={clickCommentBtn}>
+            댓글달기
+          </button>
+        </div>
+      )}
+      <div className={styles.commentContainer}>
+            <ul style={{ listStyle: "none", padding: "0px", margin:"0px" }}>
+              <li className={styles.commentListFormat} >
+                <span id ={styles.FormatAuthor}>작성자</span>
+                <span  id ={styles.FormatContent}>내용</span>
+                <span id={styles.FormatDate}>작성일</span>
+              </li>
+              {pageCommentList}
+              </ul>
           </div>
-        ) : (
-          <div>
-            <button id={styles.comment_btn} onClick={clickCommentBtn}>
-              comment
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

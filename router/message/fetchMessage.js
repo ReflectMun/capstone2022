@@ -31,7 +31,7 @@ fetchMessage.get(
  * @param {express.NextFunction} next 
  */
 function extractSender(req, res, next){
-    const { Author } = req.paramBox['Account']
+    const Author = req.paramBox['Account']
     req.paramBox['Author'] = Author
     next()
 }
@@ -43,7 +43,7 @@ function extractSender(req, res, next){
  * @param {express.NextFunction} next 
  */
 function extractRecipient(req, res, next){
-    const { Recipient } = req.paramBox['Account']
+    const Recipient = req.paramBox['Account']
     req.paramBox['Recipient'] = Recipient
     next()
 }

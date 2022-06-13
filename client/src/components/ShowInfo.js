@@ -1,16 +1,13 @@
 import styled from "../css/ShowInfo.module.css";
-import MyContent from "../components/MyContent.js";
+import MyContent from "./MyContent.js";
 import { getCookie } from './Nav';
 import { useState } from "react";
+import jwt_decode from "jwt-decode";
 
-const token = getCookie("token");
-
-// function getContent(e) {
-//   console.log(e.target.innerText);
-//   <MyContent />
-// }
-
-function ShowInfo() {
+function ShowInfo(props) {
+  const token = getCookie("token");
+  const accountData = jwt_decode(token);
+  console.log(accountData);
   const [contents,setContent]=useState(null);
   const clickContent =(e) => {
     setContent(e.target.innerText);
@@ -18,14 +15,18 @@ function ShowInfo() {
   return (
     <div className={styled.info_container}>
       <ul className={styled.info_ul}>
-        <li className={styled.info_li}>id</li>
+        <li className={styled.info_li}>
+          <span>{accountData.Account}</span>
+          </li>
         <li 
           className={styled.info_li} 
           onClick={clickContent}
           value ="question">
           my question
         </li>
-        <li className={styled.info_li}>닉네임</li>
+        <li className={styled.info_li}>
+        <span>{accountData.Nickname}</span>
+          </li>
         <li 
           className={styled.info_li} 
           onClick={clickContent}
@@ -45,9 +46,11 @@ function ShowInfo() {
           my solution
         </li>
       </ul>
+      <div>
       <MyContent
         content = {contents}
         /> 
+        </div>
     </div>
   );
 }
