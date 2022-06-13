@@ -7,7 +7,12 @@ function Home(props) {
   return (
     <div>
       <Nav setSelectedMajor={setSelectedMajor} />
-      <Mainarea selectedMajor={selectedMajor} setBoardURI={props.setBoardURI} />
+      {selectedMajor === "" ? null : (
+        <Mainarea
+          selectedMajor={selectedMajor}
+          setBoardURI={props.setBoardURI}
+        />
+      )}
       <Message />
     </div>
   );

@@ -18,6 +18,7 @@ function Mainarea(props) {
   const [write, setWrite] = useState(false);
   const [boardType, setBoardType] = useState("1");
   const [boardLists, setBoardLists] = useState([]);
+  const [totalBoardLists, setTotalBoardLists] = useState([]);
   function changeBoardType(event) {
     setBoardType(event.target.value);
   }
@@ -25,6 +26,8 @@ function Mainarea(props) {
     event.preventDefault();
     pageNum++;
     loadPosts();
+    console.log("total");
+    console.log(totalBoardLists);
   }
   function loadPosts() {
     //console.log(BoardURI);
@@ -44,7 +47,9 @@ function Mainarea(props) {
               alert("마지막 페이지입니다");
             } else {
               console.log("load data: ", data.postlist);
-              setBoardLists([...boardLists, ...data.postlist]);
+              setBoardLists(data.postlist);
+              console.log(boardLists);
+              //setBoardLists([...boardLists, ...data.postlist]);
             }
           } else {
             alert("load error");
@@ -156,8 +161,19 @@ function Mainarea(props) {
       props.setBoardURI("Dance");
       break;
   }
+  useEffect(() => {
+    pageNum = 0;
+    setTotalBoardLists([]);
+    console.log(props.selectedMajor);
+    if (props.selectedMajor !== "") {
+      loadPosts();
+    }
+  }, [props.selectedMajor]);
+  useEffect(() => {
+    setTotalBoardLists([...totalBoardLists, ...boardLists]);
+  }, [boardLists]);
 
-  const boardsList = boardLists.map((item) => (
+  const boardsList = totalBoardLists.map((item) => (
     <li key={item.PostID} style={{ listStyle: "none" }}>
       <Link
         to={`/${BoardURI}/${item.PostID}`}
@@ -167,15 +183,6 @@ function Mainarea(props) {
       </Link>
     </li>
   ));
-
-  useEffect(() => {
-    console.log(props.selectedMajor);
-    setBoardLists([]);
-    console.log("useEffect1 ", boardLists);
-    if (props.selectedMajor !== "") {
-      loadPosts();
-    }
-  }, [props.selectedMajor]);
 
   return (
     <center>
