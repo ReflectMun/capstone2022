@@ -1,5 +1,44 @@
+.messageContainer{
+    display: flex;
+    justify-content: space-around;
+    padding-top:5px;
+}
 .container{
-    position:absolute;
-    width: 500px;
-    /* left : 10%; */
+    text-align: left;
+    width: fit-content;
+}
+#header{
+    text-align: center;
+    top:5px;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+.messages{
+    list-style: none;
+}
+.message{
+    display: flex;
+    border-bottom: solid 0.2px rgb(196, 191, 191);
+}
+#author{
+    margin-right: 10px;
+    width: 5em;
+}
+#content{
+    margin-right: 10px;
+    width: 10em;
+}
+#date{
+    margin-right: 10px;
+    width: 6em;   
+}
+#time{
+    margin-right: 10px;
+    width: 6em;
+}
+
+#ho{
+    border-left: solid 2px rgb(131, 128, 128);
+    margin-left: 30px;
+    height: 1fr;
 }

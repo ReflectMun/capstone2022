@@ -193,7 +193,6 @@ function Nav(props) {
         <ul id={styled.info}>
           <li id={styled.id}>
             <Link
-              id ={navId}
               to={"/account"}
               style={{ textDecoration: "none", color: "inherit" }}
             >
@@ -208,7 +207,14 @@ function Nav(props) {
           ) : (
             <li id={styled.point}>POINT</li>
           )}
-          <li id={styled.message}>쪽지</li>
+          <li id={styled.message}>
+            <Link
+                to={"/account"}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                쪽지
+              </Link>
+          </li>
           {
             //로그인상태 값이 false 이면 로그인 컴포넌트, true 면 로그아웃 컴포넌트
             isLogin ? <LogoutText /> : <LoginText />
