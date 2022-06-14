@@ -84,7 +84,7 @@ function Signup() {
         if(result.code === 204){
           alert("🎉회원가입 성공🎉");
           console.log("ㅇㅇ");
-          navigate("/");
+          window.location.replace("/");
         }
         else{
           alert("😥" + result.message + "😥");
