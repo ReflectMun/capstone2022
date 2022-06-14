@@ -1,6 +1,6 @@
 import styles from "../css/Writer.module.css";
 import MyEditor from "./MyEditor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 //메인 화면에서 글쓰기 버튼 클릭했을 때 나타나는 것. 게시물 안에서 답변하기 클릭했을 때 나타나는 것 아님. 다른 것
 
@@ -93,11 +93,14 @@ function Writer(props) {
   function onTitleChange(event) {
     setTitle(event.target.value);
   }
+  useEffect(() => {
+    setType(props.boardType);
+  }, [type]);
   function onClickWrite(event) {
     event.preventDefault();
     const token = getCookie("token");
     console.log("type number: " + typeof type);
-    setType(props.boardType);
+    console.log("type:" + type);
     console.log(editor);
 
     if (title === null || title === "") {

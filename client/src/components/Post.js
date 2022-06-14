@@ -18,7 +18,7 @@ const API_URL = "http://www.qnasavior.kro.kr";
 const CONTENT_API = "api/post/fetch/content";
 const ANSWER_API = "api/upload/answer";
 const ANSWER_LIST_API = "api/post/fetch/answer";
-
+let boardType;
 function Question(props) {
   const { boardURI, id } = useParams();
   const [title, setTitle] = useState("");
@@ -33,6 +33,8 @@ function Question(props) {
         .then((data) => {
           if ((data.code = 210)) {
             console.log(data);
+            boardType = data.Type;
+            console.log(boardType);
             setTitle(data.Title);
             //내용 출력이랑 작성자 닉네임 출력 필요
             console.log("test");
@@ -53,7 +55,11 @@ function Question(props) {
   return (
     <div className={styles.wrap_question}>
       <div>
-        <span className={styles.q_icon}>Q</span>
+        {boardType === 1 ? (
+          <span className={styles.q_icon}>Q</span>
+        ) : (
+          <span className={styles.q_icon}>S</span>
+        )}
         <span className={styles.question_title}>{title}</span>
       </div>
       <div>{contents}</div>
@@ -62,27 +68,27 @@ function Question(props) {
   );
 }
 
-function Solution() {
-  const title = "이것은 답입니다";
-  const contents = "참고하세요";
-  return (
-    <div className={styles.wrap_question}>
-      <div>
-        <span className={styles.q_icon}>S</span>
-        <span className={styles.question_title}>{title}</span>
-      </div>
-      <div>
-        <p style={{ marginLeft: "10px" }}>{contents}</p>
-        <img
-          src={question_sample}
-          style={{ margin: "5px", width: "80%" }}
-          alt="load error"
-        />
-      </div>
-      <Comment />
-    </div>
-  );
-}
+// function Solution() {
+//   const title = "이것은 답입니다";
+//   const contents = "참고하세요";
+//   return (
+//     <div className={styles.wrap_question}>
+//       <div>
+//         <span className={styles.q_icon}>S</span>
+//         <span className={styles.question_title}>{title}</span>
+//       </div>
+//       <div>
+//         <p style={{ marginLeft: "10px" }}>{contents}</p>
+//         <img
+//           src={question_sample}
+//           style={{ margin: "5px", width: "80%" }}
+//           alt="load error"
+//         />
+//       </div>
+//       <Comment />
+//     </div>
+//   );
+// }
 
 function AnswerBtn(props) {
   return (
@@ -213,8 +219,8 @@ function Comment() {
   }
   const pageCommentList = commentList.map((items) => (
     <li key={items.Author} className={styles.commentList}>
-      <p id ={styles.commentAuthor}>{items.Author}</p>
-      <p id ={styles.commentContent}>{items.Comment}</p>
+      <p id={styles.commentAuthor}>{items.Author}</p>
+      <p id={styles.commentContent}>{items.Comment}</p>
       <div id={styles.commentDate}>
         <p>{items.Date.slice(0, 10)}</p>
         <p>{items.Time.slice(0, 8)}</p>
@@ -225,9 +231,8 @@ function Comment() {
     getCommentList();
   }, []);
   const upLoadComment = () => {
-    if(comment === "")
-    alert("등록할 댓글 내용을 입력해주세요.");
-    else{
+    if (comment === "") alert("등록할 댓글 내용을 입력해주세요.");
+    else {
       const reqBody = {
         postNum: id,
         text: comment,
@@ -255,37 +260,37 @@ function Comment() {
   return (
     <div>
       <div>
-      {visibleComment ? (
-        <div className={styles.comment}>
-          <textarea id={styles.comment_text} onChange={changeText}></textarea>
-          <button
-            id={styles.comment_btn}
-            onClick={() => {
-              upLoadComment();
-              clickCommentBtn();
-            }}
-          >
-            댓글달기
-          </button>
-        </div>
-      ) : (
-        <div className={styles.falseComment}>
-          <hr id ={styles.comment_hr}/>
-          <button id={styles.comment_btn} onClick={clickCommentBtn}>
-            댓글달기
-          </button>
-        </div>
-      )}
-      <div className={styles.commentContainer}>
-            <ul style={{ listStyle: "none", padding: "0px", margin:"0px" }}>
-              <li className={styles.commentListFormat} >
-                <span id ={styles.FormatAuthor}>작성자</span>
-                <span  id ={styles.FormatContent}>내용</span>
-                <span id={styles.FormatDate}>작성일</span>
-              </li>
-              {pageCommentList}
-              </ul>
+        {visibleComment ? (
+          <div className={styles.comment}>
+            <textarea id={styles.comment_text} onChange={changeText}></textarea>
+            <button
+              id={styles.comment_btn}
+              onClick={() => {
+                upLoadComment();
+                clickCommentBtn();
+              }}
+            >
+              댓글달기
+            </button>
           </div>
+        ) : (
+          <div className={styles.falseComment}>
+            <hr id={styles.comment_hr} />
+            <button id={styles.comment_btn} onClick={clickCommentBtn}>
+              댓글달기
+            </button>
+          </div>
+        )}
+        <div className={styles.commentContainer}>
+          <ul style={{ listStyle: "none", padding: "0px", margin: "0px" }}>
+            <li className={styles.commentListFormat}>
+              <span id={styles.FormatAuthor}>작성자</span>
+              <span id={styles.FormatContent}>내용</span>
+              <span id={styles.FormatDate}>작성일</span>
+            </li>
+            {pageCommentList}
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -351,17 +356,24 @@ function Post(props) {
       <Message />
       <div className={styles.wrap_post}>
         <Question boardURI={props.boardURI} />
-        <AnswerBtn
-          onChangeMode={() => {
-            if (answer === false) {
-              setAnswer(true);
-            } else if (answer === true) {
-              setAnswer(false);
-            }
-          }}
-        />
+        {boardType === 1 ? (
+          <AnswerBtn
+            onChangeMode={() => {
+              if (answer === false) {
+                setAnswer(true);
+              } else if (answer === true) {
+                setAnswer(false);
+              }
+            }}
+          />
+        ) : null}
+
         {answer ? <AnswerBox setAnswer={setAnswer} /> : null}
-        <ul style={{ listStyle: "none", padding: "0px" }}>{pageAnswerList}</ul>
+        {boardType === 1 ? (
+          <ul style={{ listStyle: "none", padding: "0px" }}>
+            {pageAnswerList}
+          </ul>
+        ) : null}
       </div>
     </center>
   );

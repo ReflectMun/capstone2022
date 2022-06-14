@@ -161,6 +161,7 @@ function Mainarea(props) {
       props.setBoardURI("Dance");
       break;
   }
+
   useEffect(() => {
     pageNum = 0;
     setTotalBoardLists([]);
@@ -168,7 +169,7 @@ function Mainarea(props) {
     if (props.selectedMajor !== "") {
       loadPosts();
     }
-  }, [props.selectedMajor]);
+  }, [props.selectedMajor, boardType]);
   useEffect(() => {
     setTotalBoardLists([...totalBoardLists, ...boardLists]);
   }, [boardLists]);
