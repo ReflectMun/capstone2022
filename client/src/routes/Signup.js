@@ -82,7 +82,8 @@ function Signup() {
       .then((response) => response.json())
       .then((result) => {
         if(result.code === 204){
-          alert("🎉회원가입 성공🎉")
+          alert("🎉회원가입 성공🎉");
+          console.log("ㅇㅇ");
           navigate("/");
         }
         else{
