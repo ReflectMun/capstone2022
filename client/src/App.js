@@ -18,6 +18,7 @@ function boolCheckCookie(key) {
 }
 
 function App() {
+  console.log("gfasd");
   const [isLogin, setIsLogin] = useState(false);
   const [loginId, setLoginId] = useState("");
   const [boardURI, setBoardURI] = useState("");
