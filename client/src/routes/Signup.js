@@ -1,4 +1,4 @@
-import { func } from "prop-types";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styles from "../css/Signup.module.css";
 import logoImage from "../img/logo_savior.png";
@@ -56,34 +56,37 @@ function onClickCheckEmailBtn(e) {
     });
 }
 //회원가입
-function onClickSignupBtn(e) {
-  e.preventDefault();
-  //회원가입 텍스트 박스
-  const formElement = document.SignUpForm;
-  const id = formElement.id.value;
-  const password = formElement.password.value;
-  const nickname = formElement.nickname.value;
-  const email = formElement.email.value;
-  const reqBody = {
-    Account: id,
-    Password: password,
-    Nickname: nickname,
-    EMail: email,
-  };
-  //회원가입 요청
-  fetch(`${serverURL}/${signup_api}`, {
-    method: "post",
-    body: JSON.stringify(reqBody),
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      result.code === 204
-        ? alert("🎉회원가입 성공🎉")
-        : alert("😥" + result.message + "😥");
-    });
-}
+
 function Signup() {
+  const navigate = useNavigate();
+  function onClickSignupBtn(e) {
+    e.preventDefault();
+    //회원가입 텍스트 박스
+    const formElement = document.SignUpForm;
+    const id = formElement.id.value;
+    const password = formElement.password.value;
+    const nickname = formElement.nickname.value;
+    const email = formElement.email.value;
+    const reqBody = {
+      Account: id,
+      Password: password,
+      Nickname: nickname,
+      EMail: email,
+    };
+    //회원가입 요청
+    fetch(`${serverURL}/${signup_api}`, {
+      method: "post",
+      body: JSON.stringify(reqBody),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        result.code === 204
+          ? alert("🎉회원가입 성공🎉")
+          : alert("😥" + result.message + "😥");
+          navigate("/login");
+      });
+  }
   const [pw, setPw] = useState("");
   const [pwc, setPwc] = useState("");
   const [isPasswordConfirm, setIsPasswordConfirm] = useState(false);
