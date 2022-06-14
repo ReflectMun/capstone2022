@@ -78,21 +78,12 @@
     eslint-visitor-keys "^2.1.0"
     semver "^6.3.0"
 
-<<<<<<< HEAD
 "@babel/generator@^7.18.0", "@babel/generator@^7.7.2":
   version "7.18.0"
   resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.18.0.tgz#46d28e8a18fc737b028efb25ab105d74473af43f"
   integrity sha512-81YO9gGx6voPXlvYdZBliFXAZU8vZ9AZ6z+CjlmcnaeOcYSFbMTpdeDUO9xD9dh/68Vq03I8ZspfUTPfitcDHg==
   dependencies:
     "@babel/types" "^7.18.0"
-=======
-"@babel/generator@^7.17.12", "@babel/generator@^7.7.2":
-  version "7.17.12"
-  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.17.12.tgz#5970e6160e9be0428e02f4aba62d8551ec366cc8"
-  integrity sha512-V49KtZiiiLjH/CnIW6OjJdrenrGoyh6AmKQ3k2AZFKozC1h846Q4NYlZ5nqAigPDUXfGzC88+LOUuG8yKd2kCw==
-  dependencies:
-    "@babel/types" "^7.17.12"
->>>>>>> 5cab068 (d)
     "@jridgewell/gen-mapping" "^0.3.0"
     jsesc "^2.5.1"
 
