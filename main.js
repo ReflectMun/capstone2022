@@ -53,18 +53,6 @@ app.get('/', (req, res) => {
     })
 })
 
-app.get('/what', (req, res) => {
-    readFile('client/public/index.html', { encoding: 'utf-8' }, (err, data) => {
-        if(err){
-            res.send('No Such File or Directory')
-        }
-        else{
-            res.send(data)
-            normalLog(req, 'main', '메인페이지 요청')
-        }
-    })
-})
-
 app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'client/build/index.html'))
 })
