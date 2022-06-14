@@ -8,12 +8,7 @@ function ShowInfo(props) {
   const token = getCookie("token");
   const accountData = jwt_decode(token);
   const [contents,setContent]=useState(null);
-  const selectComponent = {
-    question: <MyMessage />,
-    answer: <MyMessage />,
-    message: <MyMessage />,
-    solution: <MyMessage />,
-  };
+
   const clickContent =(e) => {
     setContent(e.target.innerText);
   }
