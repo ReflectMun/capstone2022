@@ -8,7 +8,7 @@ import { getCookie } from "./Nav";
 import { useParams } from "react-router-dom";
 import parse from "html-react-parser";
 import { history } from "../history.js";
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from "react-router-dom";
 const token = getCookie("token");
 const serverURL = "http://www.qnasavior.kro.kr";
 const comment_api = "api/comment/fetch";
@@ -134,7 +134,7 @@ function AnswerBox(props) {
   const token1 = getCookie("token");
   const [editor, setEditor] = useState(null);
   const { boardURI, id } = useParams();
- // const { id } = useParams();
+  // const { id } = useParams();
   function onClickAnswer(event) {
     event.preventDefault();
     console.log(editor);
@@ -183,7 +183,12 @@ function AnswerBox(props) {
         data={editor}
         {...props}
       />
-      <input type="submit" value="작성" onClick={onClickAnswer} id ={styles.submitBtn} />
+      <input
+        type="submit"
+        value="작성"
+        onClick={onClickAnswer}
+        id={styles.submitBtn}
+      />
     </div>
   );
 }
@@ -257,7 +262,7 @@ function Comment() {
         .catch((error) => {
           console.log(error);
         });
-        window.location.replace(`/${boardURI}/${id}`);
+      window.location.replace(`/${boardURI}/${id}`);
     }
   };
 
@@ -301,25 +306,6 @@ function Comment() {
 }
 
 function Post(props) {
-  const navigate = useNavigate();
-  useEffect(() => {
-    const listenBackEvent = () => {
-      // 뒤로가기 할 때 수행할 동작을 적는다
-      console.log("백");
-      navigate(-1);
-    };
-
-    const unlistenHistoryEvent = history.listen(({ action }) => {
-      if (action === "POP") {
-        listenBackEvent();
-      }
-    });
-
-    return unlistenHistoryEvent;
-  }, [
-  // effect에서 사용하는 state를 추가
-]);
-
   const [answer, setAnswer] = useState(false);
   const { id } = useParams();
   const [answerList, setAnswerList] = useState([]);

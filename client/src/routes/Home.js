@@ -14,7 +14,7 @@ function boolCheckCookie(key) {
 }
 function Home(props) {
   const [selectedMajor, setSelectedMajor] = useState("");
-  const [isLogin,setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
     if (boolCheckCookie("token")) {
       setIsLogin(true);
@@ -25,27 +25,45 @@ function Home(props) {
   return (
     <div>
       <Nav setSelectedMajor={setSelectedMajor} />
-      {isLogin  ? (<Mainarea
-          selectedMajor={selectedMajor}
-          setBoardURI={props.setBoardURI}
-        />) : (
+      {isLogin ? (
+        selectedMajor === "" ? null : (
+          <Mainarea
+            selectedMajor={selectedMajor}
+            setBoardURI={props.setBoardURI}
+          />
+        )
+      ) : (
         <div className={styles.container}>
           <div className={styles.logoContainer}>
             <span>SAVIOR</span>
           </div>
           <div>
             <div className={styles.actionContainer}>
-            <p id ={styles.ment}>로그인 후 서비스를 이용할 수 있습니다</p>
-            <Link to ={"/login"} style={{ textDecoration: "none", color: "inherit", margin:"0px 0px" }}>
-              <span id={styles.id}>로그인</span>
-            </Link>
-            <div>
-            <Link to ={"/signup"} style={{ textDecoration: "none", color: "inherit", margin:"0px 0px"}}>
-              <span id={styles.sign}>회원가입</span>
-            </Link>
+              <p id={styles.ment}>로그인 후 서비스를 이용할 수 있습니다</p>
+              <Link
+                to={"/login"}
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  margin: "0px 0px",
+                }}
+              >
+                <span id={styles.id}>로그인</span>
+              </Link>
+              <div>
+                <Link
+                  to={"/signup"}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    margin: "0px 0px",
+                  }}
+                >
+                  <span id={styles.sign}>회원가입</span>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       )}
       <Message />
