@@ -5,7 +5,6 @@ import express, { urlencoded } from 'express'
 import serveStatic from 'serve-static'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import cors from 'cors'
 
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
