@@ -81,10 +81,14 @@ function Signup() {
     })
       .then((response) => response.json())
       .then((result) => {
-        result.code === 204
-          ? alert("🎉회원가입 성공🎉")
-          : alert("😥" + result.message + "😥");
-          navigate("/login");
+        if(result.code === 204){
+          alert("🎉회원가입 성공🎉")
+          navigate("/");
+        }
+        else{
+          alert("😥" + result.message + "😥");
+        }
+          
       });
   }
   const [pw, setPw] = useState("");
