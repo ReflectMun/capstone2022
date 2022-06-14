@@ -34,6 +34,17 @@
   height: 30px;
   cursor: pointer;
 }
+#submitBtn{
+  position: relative;
+  left: 85%;
+  top:100%;
+  border: none;
+  color: white;
+  background-color: #9f81f7;
+  width: 100px;
+  height: 30px;
+  cursor: pointer;
+}
 .wrap_ans_name {
   border-bottom: solid 1.5px rgb(196, 191, 191);
   margin: 3px;

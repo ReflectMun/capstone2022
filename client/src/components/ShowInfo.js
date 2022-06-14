@@ -7,23 +7,19 @@ import jwt_decode from "jwt-decode";
 function ShowInfo(props) {
   const token = getCookie("token");
   const accountData = jwt_decode(token);
-  const [contents, setContent] = useState(null);
-  const clickContent = (e) => {
-    const selectComponent = {
-      question: <MyMessage />,
-      answer: <MyMessage />,
-      message: <MyMessage />,
-      solution: <MyMessage />,
-    };
-    const clickContent = (e) => {
-      setContent(e.target.innerText);
-    };
-    return (
-      <div className={styled.info_container}>
-        <ul className={styled.info_ul}>
-          <li className={styled.info_li}>
-            <span>ID : </span>
-            <span>{accountData.Account}</span>
+
+  const [contents,setContent]=useState(null);
+
+  const clickContent =(e) => {
+    setContent(e.target.innerText);
+  }
+  return (
+    <div className={styled.info_container}>
+      <ul className={styled.info_ul}>
+        <li
+          className={styled.info_li}>
+          <span>ID : </span>
+          <span>{accountData.Account}</span>
           </li>
           <li
             style={{ cursor: "pointer" }}
@@ -70,5 +66,5 @@ function ShowInfo(props) {
       </div>
     );
   };
-}
+
 export default ShowInfo;
