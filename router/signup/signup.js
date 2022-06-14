@@ -6,7 +6,6 @@ import { renderFile } from 'ejs'
 import { errorLog, normalLog } from '../../private/apis/logger.js'
 import Pool from '../../private/server/DBConnector.js'
 import session from 'express-session'
-import fileSession from 'session-file-store'
 
 const signup = Router()
 const controllerName = 'signup'
@@ -19,7 +18,6 @@ const transportter = createTransport(smtp({
     }
 }))
 
-const FileStore = fileSession(session)
 signup.use(session({
     secret: process.env.SESSION,
     cookie: {

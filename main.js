@@ -21,7 +21,6 @@ const port = 14450
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(cors())
 
 app.use(serveStatic(join(__dirname, 'public/html')))
 app.use(serveStatic(join(__dirname, 'public/js')))
@@ -32,11 +31,9 @@ app.use(serveStatic(join(__dirname, 'client/build')))
 // Router들
 import test from './router/test/test.js'
 import api from './router/api.js'
-import loginPage from './router/login/loginPage.js'
 import { readFile } from 'fs'
 import { normalLog } from './private/apis/logger.js'
 
-app.use('/login', loginPage)
 app.use('/test', test)
 app.use('/api', api)
 ////////////////////////////////////////////////////////////////
@@ -54,6 +51,10 @@ app.get('/', (req, res) => {
             normalLog(req, 'main', '메인페이지 요청')
         }
     })
+})
+
+app.get('*', (req, res) => {
+    res.sendFile(join(__dirname, 'client/build/index.html'))
 })
 
 app.listen(port, () => {
