@@ -21,7 +21,6 @@ const port = 14450
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(cors())
 
 app.use(serveStatic(join(__dirname, 'public/html')))
 app.use(serveStatic(join(__dirname, 'public/js')))
@@ -44,6 +43,18 @@ app.use('/api', api)
 // 두번째 인자는 해당 엔드포인트로 연결했을 때 실행될 동작들에 대한 정보가 담긴 콜백 함수
 app.get('/', (req, res) => {
     readFile('client/build/index.html', { encoding: 'utf-8' }, (err, data) => {
+        if(err){
+            res.send('No Such File or Directory')
+        }
+        else{
+            res.send(data)
+            normalLog(req, 'main', '메인페이지 요청')
+        }
+    })
+})
+
+app.get('/what', (req, res) => {
+    readFile('client/public/index.html', { encoding: 'utf-8' }, (err, data) => {
         if(err){
             res.send('No Such File or Directory')
         }
