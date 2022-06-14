@@ -32,11 +32,9 @@ app.use(serveStatic(join(__dirname, 'client/build')))
 // Router들
 import test from './router/test/test.js'
 import api from './router/api.js'
-import loginPage from './router/login/loginPage.js'
 import { readFile } from 'fs'
 import { normalLog } from './private/apis/logger.js'
 
-app.use('/login', loginPage)
 app.use('/test', test)
 app.use('/api', api)
 ////////////////////////////////////////////////////////////////
