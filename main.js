@@ -56,6 +56,10 @@ app.get('/', (req, res) => {
     })
 })
 
+app.get('*', (req, res) => {
+    res.sendFile(join(__dirname, 'client/build/index.html'))
+})
+
 app.listen(port, () => {
     console.log('Server start')
     console.log(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
