@@ -66,5 +66,5 @@ function ShowInfo(props) {
       </div>
     );
   };
-}
+
 export default ShowInfo;
