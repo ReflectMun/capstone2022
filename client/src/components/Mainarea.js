@@ -15,6 +15,7 @@ function getCookie(key) {
 }
 
 function Mainarea(props) {
+
   const [write, setWrite] = useState(false);
   const [boardType, setBoardType] = useState("1");
   const [boardLists, setBoardLists] = useState([]);
@@ -183,9 +184,8 @@ function Mainarea(props) {
       </Link>
     </li>
   ));
-
   return (
-    <center>
+      <center>
       <div className={styles.main_area}>
         <div
           style={{ display: "flex", marginLeft: "30px", marginRight: "30px" }}
