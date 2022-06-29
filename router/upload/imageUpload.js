@@ -15,6 +15,7 @@ const imageUploadToS3 = multer({
         s3: S3,
         bucket: 'saviorimg',
         key: function (req, file, callback) {
+            console.log('파일 넘어옴?')
             let fileType
             const fileMimetype = file.mimetype
 
